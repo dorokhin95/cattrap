@@ -31,7 +31,6 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
 
   // Флаг смерти и блокировки ввода
   private isDead = false;
-  private isInvulnerable = false;
   private levelDeathsCount = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
@@ -362,5 +361,41 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
         this.scene.time.delayedCall(150, onComplete);
       }
     });
+  }
+
+  public respawn(x: number, y: number, deathsCount?: number): void {
+    this.scene.tweens.killTweensOf(this);
+    this.isDead = false;
+    this.catState = 'idle';
+    this.sizeState = 'normal';
+    this.gravityState = 'normal';
+    this.timeSinceLeftGroundMs = 9999;
+    this.timeSinceJumpRequestedMs = 9999;
+    this.idleBlinkTimerMs = 0;
+    this.isBlinking = false;
+    this.isLanding = false;
+    this.landingTimerMs = 0;
+
+    this.setPosition(x, y);
+    this.setAlpha(1);
+    this.setVisible(true);
+    this.setAngle(0);
+    this.setFlipX(false);
+    this.setFlipY(false);
+
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    if (body) {
+      body.enable = true;
+      body.setVelocity(0, 0);
+      body.setAcceleration(0, 0);
+      body.setGravityY(0);
+      body.setAllowGravity(true);
+    }
+    this.updateCollider();
+    this.play('cat_idle', true);
+
+    if (deathsCount !== undefined) {
+      this.setLevelDeaths(deathsCount);
+    }
   }
 }

@@ -1,23 +1,28 @@
 import { SaveData, GameSettings } from '../types';
+import { LevelRegistry } from '../game/levels/LevelRegistry';
 
 const STORAGE_KEY = 'cattrap_save_v1';
 
-const DEFAULT_SETTINGS: GameSettings = {
-  music: true,
-  sfx: true,
-  vibration: true,
-  screenShake: true,
-  touchOpacity: 0.75
-};
+export function createDefaultSettings(): GameSettings {
+  return {
+    music: true,
+    sfx: true,
+    vibration: true,
+    screenShake: true,
+    touchOpacity: 0.75
+  };
+}
 
-const DEFAULT_SAVE: SaveData = {
-  highestUnlockedLevel: 1,
-  completedLevels: [],
-  bestTimes: {},
-  deathsPerLevel: {},
-  totalDeaths: 0,
-  settings: DEFAULT_SETTINGS
-};
+export function createDefaultSave(): SaveData {
+  return {
+    highestUnlockedLevel: 1,
+    completedLevels: [],
+    bestTimes: {},
+    deathsPerLevel: {},
+    totalDeaths: 0,
+    settings: createDefaultSettings()
+  };
+}
 
 export class SaveProvider {
   private static instance: SaveProvider | null = null;
@@ -35,24 +40,71 @@ export class SaveProvider {
   }
 
   private loadFromStorage(): SaveData {
+    const defaultData = createDefaultSave();
     if (typeof localStorage === 'undefined') {
-      return { ...DEFAULT_SAVE };
+      return defaultData;
     }
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return { ...DEFAULT_SAVE };
+      if (!raw) return defaultData;
       const parsed = JSON.parse(raw);
-      return {
-        ...DEFAULT_SAVE,
-        ...parsed,
-        settings: {
-          ...DEFAULT_SETTINGS,
-          ...(parsed.settings || {})
+      if (!parsed || typeof parsed !== 'object') {
+        return defaultData;
+      }
+
+      const totalLevels = LevelRegistry.getTotalLevels();
+      const highestUnlockedLevel = typeof parsed.highestUnlockedLevel === 'number' && parsed.highestUnlockedLevel >= 1
+        ? Math.min(totalLevels, Math.floor(parsed.highestUnlockedLevel))
+        : 1;
+
+      const completedLevels = Array.isArray(parsed.completedLevels)
+        ? parsed.completedLevels.filter((lvl: unknown) => typeof lvl === 'number' && lvl >= 1 && lvl <= totalLevels)
+        : [];
+
+      const bestTimes: Record<number, number> = {};
+      if (parsed.bestTimes && typeof parsed.bestTimes === 'object') {
+        for (const [key, val] of Object.entries(parsed.bestTimes)) {
+          const numKey = Number(key);
+          if (!isNaN(numKey) && typeof val === 'number' && val > 0) {
+            bestTimes[numKey] = Math.round(val * 100) / 100;
+          }
         }
+      }
+
+      const deathsPerLevel: Record<number, number> = {};
+      if (parsed.deathsPerLevel && typeof parsed.deathsPerLevel === 'object') {
+        for (const [key, val] of Object.entries(parsed.deathsPerLevel)) {
+          const numKey = Number(key);
+          if (!isNaN(numKey) && typeof val === 'number' && val >= 0) {
+            deathsPerLevel[numKey] = Math.floor(val);
+          }
+        }
+      }
+
+      const totalDeaths = typeof parsed.totalDeaths === 'number' && parsed.totalDeaths >= 0
+        ? Math.floor(parsed.totalDeaths)
+        : Object.values(deathsPerLevel).reduce((acc, cur) => acc + cur, 0);
+
+      const parsedSettings = parsed.settings && typeof parsed.settings === 'object' ? parsed.settings : {};
+      const settings: GameSettings = {
+        music: typeof parsedSettings.music === 'boolean' ? parsedSettings.music : true,
+        sfx: typeof parsedSettings.sfx === 'boolean' ? parsedSettings.sfx : true,
+        vibration: typeof parsedSettings.vibration === 'boolean' ? parsedSettings.vibration : true,
+        screenShake: typeof parsedSettings.screenShake === 'boolean' ? parsedSettings.screenShake : true,
+        touchOpacity: typeof parsedSettings.touchOpacity === 'number' ? parsedSettings.touchOpacity : 0.75
+      };
+
+      return {
+        highestUnlockedLevel,
+        completedLevels,
+        bestTimes,
+        deathsPerLevel,
+        totalDeaths,
+        settings
       };
     } catch (e) {
       console.warn('[SaveProvider] Ошибка чтения localStorage, сброс к значениям по умолчанию:', e);
-      return { ...DEFAULT_SAVE };
+      return defaultData;
     }
   }
 
@@ -99,8 +151,9 @@ export class SaveProvider {
     if (!this.data.completedLevels.includes(level)) {
       this.data.completedLevels.push(level);
     }
-    if (level >= this.data.highestUnlockedLevel) {
-      this.data.highestUnlockedLevel = Math.max(this.data.highestUnlockedLevel, level + 1);
+    const maxLevel = LevelRegistry.getTotalLevels();
+    if (level >= this.data.highestUnlockedLevel && this.data.highestUnlockedLevel < maxLevel) {
+      this.data.highestUnlockedLevel = Math.min(maxLevel, level + 1);
     }
     const currentBest = this.data.bestTimes[level];
     if (currentBest === undefined || timeSeconds < currentBest) {
@@ -110,9 +163,10 @@ export class SaveProvider {
   }
 
   public resetProgress(): void {
+    const defaults = createDefaultSave();
     this.data = {
-      ...DEFAULT_SAVE,
-      settings: this.data.settings
+      ...defaults,
+      settings: { ...this.data.settings }
     };
     this.save();
   }

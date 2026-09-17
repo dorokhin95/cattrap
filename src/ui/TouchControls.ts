@@ -126,10 +126,14 @@ export class TouchControls {
 
     if (pointer.x < midX) {
       // 1. Касание в левой половине экрана -> D-Pad
+      // Если зона уже занята активным указателем, игнорируем второй палец (защита от "залипания")
+      if (this.activeDPadPointerId !== null && this.activeDPadPointerId !== pointer.id) return;
       this.activeDPadPointerId = pointer.id;
       this.updateDPadDirection(pointer.x);
     } else {
       // 2. Касание в правой половине экрана -> Прыжок
+      // Если кнопка прыжка уже удерживается пальцем, игнорируем второй палец
+      if (this.activeJumpPointerId !== null && this.activeJumpPointerId !== pointer.id) return;
       this.activeJumpPointerId = pointer.id;
       this.triggerJumpPress();
     }
@@ -196,7 +200,7 @@ export class TouchControls {
     this.btnJumpBg.setFillStyle(0x0284c7, 1);
     this.btnJumpIcon.setColor('#ffffff');
 
-    PlatformManager.getInstance().getPlatform().haptic('light');
+    PlatformManager.getInstance().haptic('light');
   }
 
   private triggerJumpRelease(): void {

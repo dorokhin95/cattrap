@@ -56,6 +56,7 @@ export interface LevelTriggerData {
   action: 'pop' | 'drop' | 'collapse' | 'move_portal' | 'chain_pop';
   delayMs?: number;
   once?: boolean;
+  resetOnDeath?: boolean;
 }
 
 export interface LevelData {

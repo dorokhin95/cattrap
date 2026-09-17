@@ -37,7 +37,7 @@ export class FallingBlock extends HazardBase {
     });
 
     // 100 мс: летит пыль
-    this.scene.time.delayedCall(CONSTANTS.FALLING_BLOCK_SHAKE_MS, () => {
+    this.schedule(CONSTANTS.FALLING_BLOCK_SHAKE_MS, () => {
       for (let i = 0; i < 5; i++) {
         const dust = this.scene.add.image(
           this.x + Phaser.Math.Between(-24, 24),
@@ -55,7 +55,7 @@ export class FallingBlock extends HazardBase {
     });
 
     // 220 мс: начало падения вниз
-    this.scene.time.delayedCall(CONSTANTS.FALLING_BLOCK_DROP_MS, () => {
+    this.schedule(CONSTANTS.FALLING_BLOCK_DROP_MS, () => {
       this.scene.tweens.add({
         targets: this,
         y: this.landingY,
@@ -102,6 +102,7 @@ export class FallingBlock extends HazardBase {
   public reset(): void {
     this.isTriggered = false;
     this.isLanded = false;
+    this.cancelScheduledEvents();
     this.scene.tweens.killTweensOf(this);
     this.setPosition(this.initialX, this.initialY);
 

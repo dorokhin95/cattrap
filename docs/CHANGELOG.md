@@ -46,3 +46,40 @@
   - В `main.ts`: принудительный `resizeGame()` с тройным `setTimeout` (50/150/300 мс) для iOS Safari + `ResizeObserver` на `#game-container`.
   - В `style.css`: `#game-container` — `position: fixed; height: 100dvh`.
   - В `GameScene`, `UIScene`, `MenuScene`, `CameraSystem`: явный вызов `camera.setViewport` + `camera.setSize` при каждом `handleResize`.
+
+---
+
+## [1.0.1] — 2026-09-17
+
+### Исправлено (Комплексный архитектурный аудит):
+- **Утечка обработчиков событий (Memory Leak / Double Pause):**
+  - Во всех сценах (`GameScene`, `UIScene`, `MenuScene`, `LevelSelectScene`) внедрены именованные обработчики событий и обязательный метод `shutdown()`, привязанный к событию `Phaser.Scenes.Events.SHUTDOWN`.
+  - Предотвращено дублирование глобальных слушателей `game.events` (`PAUSE_REQUEST`, `RETRY_LEVEL`, `LEVEL_START`), `scale.resize` и нативной `BackButton`.
+- **Накопление коллайдеров в физическом мире (World Collider Leak):**
+  - Добавлен метод `Cat.respawn(x, y)`: спрайт котика и его физическое тело переиспользуются без вызова `destroy()`.
+  - `setupCollisions()` в `GameScene` теперь вызывается строго один раз за уровень, исключая утечку дескрипторов коллизий при частых смертях.
+- **Срабатывание таймеров ловушек после рестарта:**
+  - В `HazardBase` внедрены методы `schedule()` и `cancelScheduledEvents()`.
+  - Ловушки `CrumbleBlock`, `FakeFloor`, `FallingBlock` отменяют все запланированные `Phaser.Time.TimerEvent` при вызове `reset()`.
+- **Честная пауза:**
+  - `GameScene.setPaused()` теперь полностью замораживает физику, часы сцены (`time.paused = true`), анимации и твины.
+  - `TriggerManager` переведён на таймеры сцены Phaser (`delayedCall`), которые автоматически замирают при паузе и очищаются при `clear()`.
+- **Ограничение прогресса и валидация сохранений (`SaveProvider`):**
+  - Внедрена фабрика `createDefaultSave()`, предотвращающая загрязнение значений по умолчанию через поверхностное копирование.
+  - Санитизация данных из `localStorage` при чтении.
+  - Ограничение разблокировки на максимальном 10-м уровне (устранена попытка открытия уровня 11).
+- **Виброотклик (`PlatformManager.haptic`):**
+  - Централизована проверка настройки `settings.vibration` перед вызовом платформенных методов виброотклика.
+- **Навигация в окне настроек (`settingsOrigin`):**
+  - Добавлено свойство `settingsOrigin: 'menu' | 'pause'` в `UIScene`. Поворот экрана или ресайз в окне настроек больше не сбрасывают контекст возврата.
+- **Спидран-рекорд 10-го уровня с чекпоинтом:**
+  - Введено разделение между таймером текущей жизни (`attemptTimerSeconds`) и полным временем прохождения уровня (`totalLevelRunTimeSeconds`), исключающее искажение рекорда при смерти после чекпоинта.
+- **Автоплей WebAudio:**
+  - `SoundSynthesizer` и `AudioManager` теперь разблокируют аудиоконтекст и запускают BGM только после первого взаимодействия пользователя (`pointerdown`/`keydown`).
+- **Мультитач и залипание кнопок:**
+  - `TouchControls` теперь проверяет владение указателями в зоне D-Pad и прыжка, не позволяя второму пальцу перехватывать активную кнопку.
+  - Расчёт `jumpPressed` и `jumpReleased` переведён на отслеживание переходов объединённого состояния кнопок.
+- **Единый источник Viewport и Safe Area:**
+  - `PlatformManager.getViewport()` объединяет CSS safe area и специфичные Telegram insets.
+- **Тесты:**
+  - Добавлен тестовый набор `tests/audit-fixes.test.ts` для автоматической верификации исправлений.

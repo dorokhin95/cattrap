@@ -24,7 +24,7 @@ export class FakeFloor extends HazardBase {
     AudioManager.getInstance().playSFX('crumble');
 
     // 180 мс задержка -> легкое опускание
-    this.scene.time.delayedCall(CONSTANTS.FAKE_FLOOR_DROP_DELAY_MS, () => {
+    this.schedule(CONSTANTS.FAKE_FLOOR_DROP_DELAY_MS, () => {
       this.scene.tweens.add({
         targets: this,
         y: this.initialY + 6,
@@ -34,7 +34,7 @@ export class FakeFloor extends HazardBase {
     });
 
     // 350 мс -> падение в бездну
-    this.scene.time.delayedCall(CONSTANTS.FAKE_FLOOR_VANISH_MS, () => {
+    this.schedule(CONSTANTS.FAKE_FLOOR_VANISH_MS, () => {
       const body = this.body as Phaser.Physics.Arcade.Body;
       body.setImmovable(false);
       body.setAllowGravity(true);
@@ -53,6 +53,7 @@ export class FakeFloor extends HazardBase {
 
   public reset(): void {
     this.isTriggered = false;
+    this.cancelScheduledEvents();
     this.scene.tweens.killTweensOf(this);
     this.setPosition(this.initialX, this.initialY);
     this.setAlpha(1);

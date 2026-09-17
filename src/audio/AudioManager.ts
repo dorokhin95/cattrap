@@ -5,10 +5,12 @@ export class AudioManager {
   private static instance: AudioManager | null = null;
   private synth: SoundSynthesizer;
   private isMutedDueToBackground = false;
+  private isUnlocked = false;
 
   private constructor() {
     this.synth = new SoundSynthesizer();
     this.setupVisibilityListeners();
+    this.setupUserGestureUnlock();
   }
 
   public static getInstance(): AudioManager {
@@ -16,6 +18,24 @@ export class AudioManager {
       AudioManager.instance = new AudioManager();
     }
     return AudioManager.instance;
+  }
+
+  private setupUserGestureUnlock(): void {
+    if (typeof window === 'undefined') return;
+
+    const unlockHandler = async () => {
+      if (this.isUnlocked) return;
+      const success = await this.synth.unlock();
+      if (success) {
+        this.isUnlocked = true;
+        window.removeEventListener('pointerdown', unlockHandler);
+        window.removeEventListener('keydown', unlockHandler);
+        this.syncMusicState();
+      }
+    };
+
+    window.addEventListener('pointerdown', unlockHandler);
+    window.addEventListener('keydown', unlockHandler);
   }
 
   private setupVisibilityListeners(): void {

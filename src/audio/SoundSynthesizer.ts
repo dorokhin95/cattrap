@@ -263,10 +263,30 @@ export class SoundSynthesizer {
     osc.stop(now + 0.05);
   }
 
+  public async unlock(): Promise<boolean> {
+    this.initContext();
+    if (!this.ctx) return false;
+    if (this.ctx.state === 'suspended') {
+      try {
+        await this.ctx.resume();
+      } catch {
+        return false;
+      }
+    }
+    return this.ctx.state === 'running';
+  }
+
+  public isUnlocked(): boolean {
+    return !!this.ctx && this.ctx.state === 'running';
+  }
+
   public startBGM(): void {
     if (this.isBgmPlaying) return;
     this.initContext();
-    if (!this.ctx) return;
+    if (!this.ctx || this.ctx.state !== 'running') {
+      // Контекст ещё не разблокирован жестом пользователя
+      return;
+    }
 
     this.isBgmPlaying = true;
     this.bgmGain = this.ctx.createGain();

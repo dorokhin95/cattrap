@@ -1,6 +1,8 @@
-import { PlatformService } from './PlatformService';
+import { PlatformService, HapticType } from './PlatformService';
 import { BrowserPlatformService } from './BrowserPlatformService';
 import { TelegramPlatformService } from './TelegramPlatformService';
+import { SaveProvider } from '../save/SaveProvider';
+import { ViewportInfo } from '../types';
 
 export class PlatformManager {
   private static instance: PlatformManager | null = null;
@@ -27,5 +29,22 @@ export class PlatformManager {
 
   public getPlatform(): PlatformService {
     return this.service;
+  }
+
+  public haptic(type: HapticType): void {
+    if (!SaveProvider.getInstance().getSettings().vibration) return;
+    this.service.haptic(type);
+  }
+
+  public getViewport(width?: number, height?: number): ViewportInfo {
+    return this.service.getViewport(width, height);
+  }
+
+  public showBackButton(onClick: () => void): void {
+    this.service.showBackButton(onClick);
+  }
+
+  public hideBackButton(): void {
+    this.service.hideBackButton();
   }
 }

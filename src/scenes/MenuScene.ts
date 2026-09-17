@@ -2,9 +2,19 @@ import Phaser from 'phaser';
 import { SaveProvider } from '../save/SaveProvider';
 import { AudioManager } from '../audio/AudioManager';
 import { PlatformManager } from '../platform/PlatformManager';
+import { LevelRegistry } from '../game/levels/LevelRegistry';
 
 export class MenuScene extends Phaser.Scene {
   private container!: Phaser.GameObjects.Container;
+  private boundResize = (gameSize: Phaser.Structs.Size) => {
+    this.cameras.main.setViewport(0, 0, gameSize.width, gameSize.height);
+    this.cameras.main.setSize(gameSize.width, gameSize.height);
+    this.container.removeAll(true);
+    const save = SaveProvider.getInstance();
+    const highestLevel = Math.min(LevelRegistry.getTotalLevels(), save.getData().highestUnlockedLevel);
+    const isContinued = highestLevel > 1;
+    this.renderMenu(isContinued, highestLevel);
+  };
 
   constructor() {
     super({ key: 'MenuScene' });
@@ -12,24 +22,26 @@ export class MenuScene extends Phaser.Scene {
 
   public create(): void {
     const save = SaveProvider.getInstance();
-    const highestLevel = save.getData().highestUnlockedLevel;
+    const highestLevel = Math.min(LevelRegistry.getTotalLevels(), save.getData().highestUnlockedLevel);
     const isContinued = highestLevel > 1;
 
     this.cameras.main.setBackgroundColor('#181622');
 
     // Скрываем нативную кнопку Back в главном меню
-    PlatformManager.getInstance().getPlatform().hideBackButton();
+    PlatformManager.getInstance().hideBackButton();
 
     this.container = this.add.container(0, 0);
     this.renderMenu(isContinued, highestLevel);
 
     // Подписка на изменение размера окна
-    this.scale.on('resize', (gameSize: Phaser.Structs.Size) => {
-      this.cameras.main.setViewport(0, 0, gameSize.width, gameSize.height);
-      this.cameras.main.setSize(gameSize.width, gameSize.height);
-      this.container.removeAll(true);
-      this.renderMenu(isContinued, highestLevel);
-    });
+    this.scale.on('resize', this.boundResize);
+
+    // Очистка слушателей при закрытии/переходе сцены
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this);
+  }
+
+  public shutdown(): void {
+    this.scale.off('resize', this.boundResize);
   }
 
   private renderMenu(isContinued: boolean, highestLevel: number): void {

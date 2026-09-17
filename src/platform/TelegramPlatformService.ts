@@ -84,9 +84,13 @@ export class TelegramPlatformService implements PlatformService {
     }
   }
 
-  public getViewport(): ViewportInfo {
-    const width = window.innerWidth;
-    const height = this.tg?.viewportStableHeight || this.tg?.viewportHeight || window.innerHeight;
+  public getViewport(customWidth?: number, customHeight?: number): ViewportInfo {
+    const width = typeof customWidth === 'number' && customWidth > 0
+      ? customWidth
+      : (typeof window !== 'undefined' ? window.innerWidth : 800);
+    const height = typeof customHeight === 'number' && customHeight > 0
+      ? customHeight
+      : (this.tg?.viewportStableHeight || this.tg?.viewportHeight || (typeof window !== 'undefined' ? window.innerHeight : 600));
     const aspectRatio = width / (height || 1);
 
     let mode: OrientationMode = 'landscape';
@@ -96,11 +100,22 @@ export class TelegramPlatformService implements PlatformService {
       mode = 'compact';
     }
 
+    const rootStyle = typeof document !== 'undefined' ? getComputedStyle(document.documentElement) : null;
+    const cssTop = rootStyle ? parseFloat(rootStyle.getPropertyValue('--sat')) || 0 : 0;
+    const cssBottom = rootStyle ? parseFloat(rootStyle.getPropertyValue('--sab')) || 0 : 0;
+    const cssLeft = rootStyle ? parseFloat(rootStyle.getPropertyValue('--sal')) || 0 : 0;
+    const cssRight = rootStyle ? parseFloat(rootStyle.getPropertyValue('--sar')) || 0 : 0;
+
+    const tgTop = this.tg?.contentSafeAreaInset?.top ?? this.tg?.safeAreaInset?.top ?? 0;
+    const tgBottom = this.tg?.contentSafeAreaInset?.bottom ?? this.tg?.safeAreaInset?.bottom ?? 0;
+    const tgLeft = this.tg?.contentSafeAreaInset?.left ?? this.tg?.safeAreaInset?.left ?? 0;
+    const tgRight = this.tg?.contentSafeAreaInset?.right ?? this.tg?.safeAreaInset?.right ?? 0;
+
     const safeArea = {
-      top: this.tg?.contentSafeAreaInset?.top ?? this.tg?.safeAreaInset?.top ?? 0,
-      bottom: this.tg?.contentSafeAreaInset?.bottom ?? this.tg?.safeAreaInset?.bottom ?? 0,
-      left: this.tg?.contentSafeAreaInset?.left ?? this.tg?.safeAreaInset?.left ?? 0,
-      right: this.tg?.contentSafeAreaInset?.right ?? this.tg?.safeAreaInset?.right ?? 0
+      top: Math.max(cssTop, tgTop),
+      bottom: Math.max(cssBottom, tgBottom),
+      left: Math.max(cssLeft, tgLeft),
+      right: Math.max(cssRight, tgRight)
     };
 
     return {

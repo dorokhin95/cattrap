@@ -40,10 +40,19 @@ export class GameScene extends Phaser.Scene {
   private currentRespawnPoint = { x: 0, y: 0 };
   private levelDeaths = 0;
   private attemptTimerSeconds = 0;
+  private totalLevelRunTimeSeconds = 0;
   private isTimerRunning = false;
   private isLevelFinished = false;
   private isPaused = false;
   private isDying = false;
+
+  // Отслеживание перехода состояния прыжка
+  private prevCombinedJumpDown = false;
+
+  // Именованные обработчики для безопасной отписки на SHUTDOWN
+  private boundHandleResize = (gameSize?: Phaser.Structs.Size) => this.handleResize(gameSize);
+  private boundPauseRequest = (forceState?: boolean) => this.setPaused(forceState);
+  private boundRetryLevel = () => this.instantRestart();
 
   // Клавиатурный ввод
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -61,6 +70,8 @@ export class GameScene extends Phaser.Scene {
     this.levelId = data.level || 1;
     this.levelDeaths = 0;
     this.attemptTimerSeconds = 0;
+    this.totalLevelRunTimeSeconds = 0;
+    this.prevCombinedJumpDown = false;
     this.isTimerRunning = false;
     this.isLevelFinished = false;
     this.isPaused = false;
@@ -92,7 +103,7 @@ export class GameScene extends Phaser.Scene {
     // Инициализация систем
     this.cameraSystem = new CameraSystem(this.cameras.main);
     this.cameraSystem.setLevelBounds(this.levelData.width, this.levelData.height);
-    this.triggerManager = new TriggerManager();
+    this.triggerManager = new TriggerManager(this);
 
     // Создание объектов уровня
     this.buildLevel();
@@ -104,24 +115,42 @@ export class GameScene extends Phaser.Scene {
     };
     this.spawnCat();
 
-    // Настройка коллизий
+    // Настройка коллизий (выполняется строго ОДИН раз за уровень)
     this.setupCollisions();
 
     // Настройка ввода
     this.setupInput();
 
     // Настройка Telegram BackButton для вызова паузы
-    PlatformManager.getInstance().getPlatform().showBackButton(() => {
+    PlatformManager.getInstance().showBackButton(() => {
       this.setPaused();
     });
 
     // Реакция на изменение ориентации и размера
-    this.scale.on('resize', this.handleResize, this);
+    this.scale.on('resize', this.boundHandleResize);
     this.handleResize();
 
-    // Слушатели событий UI
-    this.game.events.on(EVENTS.PAUSE_REQUEST, (forceState?: boolean) => this.setPaused(forceState), this);
-    this.game.events.on(EVENTS.RETRY_LEVEL, this.instantRestart, this);
+    // Слушатели событий UI с именованными ссылками
+    this.game.events.on(EVENTS.PAUSE_REQUEST, this.boundPauseRequest);
+    this.game.events.on(EVENTS.RETRY_LEVEL, this.boundRetryLevel);
+
+    // Очистка при завершении/перезапуске сцены
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this);
+  }
+
+  public shutdown(): void {
+    this.scale.off('resize', this.boundHandleResize);
+    this.game.events.off(EVENTS.PAUSE_REQUEST, this.boundPauseRequest);
+    this.game.events.off(EVENTS.RETRY_LEVEL, this.boundRetryLevel);
+
+    if (this.keyR) this.keyR.removeAllListeners();
+    if (this.keyEsc) this.keyEsc.removeAllListeners();
+
+    PlatformManager.getInstance().hideBackButton();
+
+    if (this.triggerManager) {
+      this.triggerManager.clear();
+    }
   }
 
   private buildLevel(): void {
@@ -239,7 +268,8 @@ export class GameScene extends Phaser.Scene {
           this.executeTriggerAction(trig.targetId, trig.action);
         },
         delayMs: trig.delayMs,
-        once: trig.once !== false
+        once: trig.once !== false,
+        resetOnDeath: trig.resetOnDeath !== false
       });
     }
   }
@@ -256,6 +286,18 @@ export class GameScene extends Phaser.Scene {
       if (ff) ff.triggerCollapse();
     } else if (action === 'move_portal') {
       this.portal.advanceToNextTarget();
+    } else if (action === 'chain_pop') {
+      const matchingSpikes: PopSpike[] = [];
+      (this.levelData.popSpikes || []).forEach((ps, idx) => {
+        if (ps.id === targetId || ps.id.startsWith(targetId)) {
+          matchingSpikes.push(this.popSpikes[idx]);
+        }
+      });
+      matchingSpikes.forEach((spike, idx) => {
+        this.time.delayedCall(idx * 120, () => {
+          spike?.pop();
+        });
+      });
     }
   }
 
@@ -363,16 +405,6 @@ export class GameScene extends Phaser.Scene {
     const keyLeft = (this.cursors?.left?.isDown || this.keyA?.isDown) ?? false;
     const keyRight = (this.cursors?.right?.isDown || this.keyD?.isDown) ?? false;
     const keyJumpDown = (this.cursors?.up?.isDown || this.cursors?.space?.isDown || this.keyW?.isDown) ?? false;
-    const keyJumpPressed = (
-      Phaser.Input.Keyboard.JustDown(this.cursors?.up) ||
-      Phaser.Input.Keyboard.JustDown(this.cursors?.space) ||
-      Phaser.Input.Keyboard.JustDown(this.keyW)
-    ) ?? false;
-    const keyJumpReleased = (
-      Phaser.Input.Keyboard.JustUp(this.cursors?.up) ||
-      Phaser.Input.Keyboard.JustUp(this.cursors?.space) ||
-      Phaser.Input.Keyboard.JustUp(this.keyW)
-    ) ?? false;
 
     // Считываем сенсорный ввод из UIScene
     const uiScene = this.scene.get('UIScene') as unknown as {
@@ -388,12 +420,18 @@ export class GameScene extends Phaser.Scene {
       left: false, right: false, jumpDown: false, jumpPressed: false, jumpReleased: false
     };
 
+    // Честный расчёт переходов нажатия/отпускания из объединенного состояния
+    const currentJumpDown = keyJumpDown || touchInput.jumpDown;
+    const jumpPressed = !this.prevCombinedJumpDown && currentJumpDown;
+    const jumpReleased = this.prevCombinedJumpDown && !currentJumpDown;
+    this.prevCombinedJumpDown = currentJumpDown;
+
     const combinedInput: CatInputState = {
       left: keyLeft || touchInput.left,
       right: keyRight || touchInput.right,
-      jumpDown: keyJumpDown || touchInput.jumpDown,
-      jumpPressed: keyJumpPressed || touchInput.jumpPressed,
-      jumpReleased: keyJumpReleased || touchInput.jumpReleased
+      jumpDown: currentJumpDown,
+      jumpPressed: jumpPressed,
+      jumpReleased: jumpReleased
     };
 
     // Старт таймера попытки с первого ввода игрока (ТЗ пункт 64)
@@ -404,6 +442,7 @@ export class GameScene extends Phaser.Scene {
 
     if (this.isTimerRunning) {
       this.attemptTimerSeconds += delta / 1000;
+      this.totalLevelRunTimeSeconds += delta / 1000;
       this.game.events.emit(EVENTS.UPDATE_TIMER, this.attemptTimerSeconds);
     }
 
@@ -431,7 +470,7 @@ export class GameScene extends Phaser.Scene {
 
     this.levelDeaths++;
     SaveProvider.getInstance().recordDeath(this.levelId);
-    PlatformManager.getInstance().getPlatform().haptic('medium');
+    PlatformManager.getInstance().haptic('medium');
 
     // Экранная тряска при смерти (1-2px / 80-120ms)
     if (SaveProvider.getInstance().getSettings().screenShake) {
@@ -465,9 +504,9 @@ export class GameScene extends Phaser.Scene {
     // Сброс зажатых сенсорных кнопок (ТЗ раздел 24)
     this.game.events.emit(EVENTS.LEVEL_RESTART);
 
-    // Пересоздание котика на текущей точке спауна (или активном чекпоинте)
-    this.spawnCat();
-    this.setupCollisions();
+    // Переиспользование котика на текущей точке спауна (или активном чекпоинте)
+    // без повторного добавления коллайдеров в физический мир
+    this.cat.respawn(this.currentRespawnPoint.x, this.currentRespawnPoint.y, this.levelDeaths);
   }
 
   private handleLevelComplete(): void {
@@ -479,8 +518,10 @@ export class GameScene extends Phaser.Scene {
       this.portal.triggerTrollSqueeze();
     }
 
-    SaveProvider.getInstance().recordLevelCompletion(this.levelId, this.attemptTimerSeconds);
-    PlatformManager.getInstance().getPlatform().haptic('success');
+    // Для сохранения рекорда уровня используем честное суммарное время забега
+    const finalRunTime = this.totalLevelRunTimeSeconds > 0 ? this.totalLevelRunTimeSeconds : this.attemptTimerSeconds;
+    SaveProvider.getInstance().recordLevelCompletion(this.levelId, finalRunTime);
+    PlatformManager.getInstance().haptic('success');
 
     this.cat.enterPortal(this.portal.x, this.portal.y, () => {
       if (this.levelId >= LevelRegistry.getTotalLevels()) {
@@ -500,8 +541,14 @@ export class GameScene extends Phaser.Scene {
     this.isPaused = forceState !== undefined ? forceState : !this.isPaused;
     if (this.isPaused) {
       this.physics.pause();
+      this.time.paused = true;
+      this.tweens.pauseAll();
+      this.anims.pauseAll();
     } else {
       this.physics.resume();
+      this.time.paused = false;
+      this.tweens.resumeAll();
+      this.anims.resumeAll();
     }
     this.game.events.emit(EVENTS.PAUSE_STATE_CHANGED, this.isPaused);
   }

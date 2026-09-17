@@ -6,7 +6,7 @@ export interface PlatformService {
   readonly id: 'browser' | 'telegram';
   init(): Promise<void>;
   ready(): void;
-  getViewport(): ViewportInfo;
+  getViewport(width?: number, height?: number): ViewportInfo;
   haptic(type: HapticType): void;
   showBackButton(onClick: () => void): void;
   hideBackButton(): void;

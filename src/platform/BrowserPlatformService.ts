@@ -39,8 +39,10 @@ export class BrowserPlatformService implements PlatformService {
     };
   }
 
-  public getViewport(): ViewportInfo {
-    return BrowserPlatformService.computeViewport(window.innerWidth, window.innerHeight);
+  public getViewport(width?: number, height?: number): ViewportInfo {
+    const w = typeof width === 'number' && width > 0 ? width : (typeof window !== 'undefined' ? window.innerWidth : 800);
+    const h = typeof height === 'number' && height > 0 ? height : (typeof window !== 'undefined' ? window.innerHeight : 600);
+    return BrowserPlatformService.computeViewport(w, h);
   }
 
   public haptic(type: HapticType): void {

@@ -1,3 +1,4 @@
+import Phaser from 'phaser';
 import { CONSTANTS } from '../../core/Constants';
 
 export interface TriggerDefinition {
@@ -14,9 +15,15 @@ export interface TriggerDefinition {
 }
 
 export class TriggerManager {
+  private scene?: Phaser.Scene;
   private triggers: TriggerDefinition[] = [];
   private activatedTriggerIds = new Set<string>();
-  private pendingTimeouts: number[] = [];
+  private pendingTimerEvents: Phaser.Time.TimerEvent[] = [];
+  private pendingTimeouts: ReturnType<typeof setTimeout>[] = [];
+
+  constructor(scene?: Phaser.Scene) {
+    this.scene = scene;
+  }
 
   public addTrigger(trigger: TriggerDefinition): void {
     this.triggers.push(trigger);
@@ -57,10 +64,17 @@ export class TriggerManager {
         this.activatedTriggerIds.add(trigger.id);
 
         if (trigger.delayMs && trigger.delayMs > 0) {
-          const tid = window.setTimeout(() => {
-            trigger.action();
-          }, trigger.delayMs);
-          this.pendingTimeouts.push(tid);
+          if (this.scene && this.scene.time) {
+            const timer = this.scene.time.delayedCall(trigger.delayMs, () => {
+              trigger.action();
+            });
+            this.pendingTimerEvents.push(timer);
+          } else {
+            const tid = setTimeout(() => {
+              trigger.action();
+            }, trigger.delayMs);
+            this.pendingTimeouts.push(tid);
+          }
         } else {
           trigger.action();
         }
@@ -69,7 +83,13 @@ export class TriggerManager {
   }
 
   public reset(): void {
-    // Очищаем запланированные задержки
+    // Очищаем запланированные задержки таймеров Phaser
+    for (const timer of this.pendingTimerEvents) {
+      timer.remove(false);
+    }
+    this.pendingTimerEvents = [];
+
+    // Очищаем fallback таймеры (если запускались без сцены)
     for (const tid of this.pendingTimeouts) {
       clearTimeout(tid);
     }

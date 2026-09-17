@@ -25,7 +25,7 @@ export class CrumbleBlock extends HazardBase {
 
     // 0-150 мс: появление видимости трещины
     // 150-450 мс: дрожание
-    this.scene.time.delayedCall(CONSTANTS.CRUMBLE_SHAKE_DELAY_MS, () => {
+    this.schedule(CONSTANTS.CRUMBLE_SHAKE_DELAY_MS, () => {
       this.scene.tweens.add({
         targets: this,
         x: { from: this.initialX - 2, to: this.initialX + 2 },
@@ -36,7 +36,7 @@ export class CrumbleBlock extends HazardBase {
     });
 
     // 450 мс: падение плиты
-    this.scene.time.delayedCall(CONSTANTS.CRUMBLE_FALL_DELAY_MS, () => {
+    this.schedule(CONSTANTS.CRUMBLE_FALL_DELAY_MS, () => {
       const body = this.body as Phaser.Physics.Arcade.Body;
       body.setImmovable(false);
       body.setAllowGravity(true);
@@ -56,6 +56,7 @@ export class CrumbleBlock extends HazardBase {
 
   public reset(): void {
     this.isTriggered = false;
+    this.cancelScheduledEvents();
     this.scene.tweens.killTweensOf(this);
     this.setPosition(this.initialX, this.initialY);
     this.setAlpha(1);

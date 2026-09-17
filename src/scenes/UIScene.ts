@@ -3,6 +3,7 @@ import { EVENTS } from '../core/Events';
 import { TouchControls } from '../ui/TouchControls';
 import { SaveProvider } from '../save/SaveProvider';
 import { AudioManager } from '../audio/AudioManager';
+import { PlatformManager } from '../platform/PlatformManager';
 
 export class UIScene extends Phaser.Scene {
   private levelId = 1;
@@ -21,6 +22,43 @@ export class UIScene extends Phaser.Scene {
   private touchControls!: TouchControls;
   private isPaused = false;
   private isSettingsOpen = false;
+  private settingsOrigin: 'menu' | 'pause' = 'pause';
+
+  // Именованные обработчики событий для безопасной отписки при SHUTDOWN
+  private boundHandleResize = (gameSize?: Phaser.Structs.Size) => this.handleResize(gameSize);
+  private boundLevelStart = (data: { levelId: number; levelName: string }) => {
+    this.levelId = data.levelId;
+    this.levelName = data.levelName;
+    const numStr = this.levelId < 10 ? `0${this.levelId}` : `${this.levelId}`;
+    this.levelText.setText(`УРОВЕНЬ ${numStr}`);
+    this.timerText.setText('00.0s');
+    this.deathsText.setText('☠ 0');
+  };
+  private boundUpdateTimer = (seconds: number) => {
+    this.timerText.setText(`${seconds.toFixed(1)}s`);
+  };
+  private boundPlayerDeath = (deaths: number) => {
+    this.deathsText.setText(`☠ ${deaths}`);
+  };
+  private boundLevelRestart = () => {
+    this.touchControls.resetInputOnRespawn();
+  };
+  private boundPauseStateChanged = (paused: boolean) => {
+    this.isPaused = paused;
+    if (this.isPaused) {
+      this.renderPauseModalContent();
+      this.pauseModal.setVisible(true);
+      this.touchControls.setVisible(false);
+      this.touchControls.setEnabled(false);
+    } else {
+      this.pauseModal.setVisible(false);
+      this.touchControls.setVisible(true);
+      this.touchControls.setEnabled(true);
+    }
+  };
+  private boundChapterComplete = (data: { totalDeaths: number }) => {
+    this.showVictoryScreen(data.totalDeaths);
+  };
 
   constructor() {
     super({ key: 'UIScene' });
@@ -30,6 +68,7 @@ export class UIScene extends Phaser.Scene {
     this.levelId = data.levelId || 1;
     this.levelName = data.levelName || '';
     this.isSettingsOpen = !!data.openSettingsFromMenu;
+    this.settingsOrigin = data.openSettingsFromMenu ? 'menu' : 'pause';
   }
 
   public create(): void {
@@ -54,8 +93,11 @@ export class UIScene extends Phaser.Scene {
     this.setupEventListeners();
 
     // 5. Обработка ресайза
-    this.scale.on('resize', this.handleResize, this);
+    this.scale.on('resize', this.boundHandleResize);
     this.handleResize();
+
+    // 6. Очистка при завершении сцены
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this);
   }
 
   private createHUD(): void {
@@ -157,6 +199,7 @@ export class UIScene extends Phaser.Scene {
 
   private openSettings(fromMenu: boolean): void {
     this.isSettingsOpen = true;
+    this.settingsOrigin = fromMenu ? 'menu' : 'pause';
     this.renderSettingsContent(fromMenu);
     this.settingsModal.setVisible(true);
     this.hudContainer.setVisible(false);
@@ -377,44 +420,22 @@ export class UIScene extends Phaser.Scene {
   }
 
   private setupEventListeners(): void {
-    this.game.events.on(EVENTS.LEVEL_START, (data: { levelId: number; levelName: string }) => {
-      this.levelId = data.levelId;
-      this.levelName = data.levelName;
-      const numStr = this.levelId < 10 ? `0${this.levelId}` : `${this.levelId}`;
-      this.levelText.setText(`УРОВЕНЬ ${numStr}`);
-      this.timerText.setText('00.0s');
-      this.deathsText.setText('☠ 0');
-    });
+    this.game.events.on(EVENTS.LEVEL_START, this.boundLevelStart);
+    this.game.events.on(EVENTS.UPDATE_TIMER, this.boundUpdateTimer);
+    this.game.events.on(EVENTS.PLAYER_DEATH, this.boundPlayerDeath);
+    this.game.events.on(EVENTS.LEVEL_RESTART, this.boundLevelRestart);
+    this.game.events.on(EVENTS.PAUSE_STATE_CHANGED, this.boundPauseStateChanged);
+    this.game.events.on(EVENTS.CHAPTER_COMPLETE, this.boundChapterComplete);
+  }
 
-    this.game.events.on(EVENTS.UPDATE_TIMER, (seconds: number) => {
-      this.timerText.setText(`${seconds.toFixed(1)}s`);
-    });
-
-    this.game.events.on(EVENTS.PLAYER_DEATH, (deaths: number) => {
-      this.deathsText.setText(`☠ ${deaths}`);
-    });
-
-    this.game.events.on(EVENTS.LEVEL_RESTART, () => {
-      this.touchControls.resetInputOnRespawn();
-    });
-
-    this.game.events.on(EVENTS.PAUSE_STATE_CHANGED, (paused: boolean) => {
-      this.isPaused = paused;
-      if (this.isPaused) {
-        this.renderPauseModalContent();
-        this.pauseModal.setVisible(true);
-        this.touchControls.setVisible(false);
-        this.touchControls.setEnabled(false);
-      } else {
-        this.pauseModal.setVisible(false);
-        this.touchControls.setVisible(true);
-        this.touchControls.setEnabled(true);
-      }
-    });
-
-    this.game.events.on(EVENTS.CHAPTER_COMPLETE, (data: { totalDeaths: number }) => {
-      this.showVictoryScreen(data.totalDeaths);
-    });
+  public shutdown(): void {
+    this.scale.off('resize', this.boundHandleResize);
+    this.game.events.off(EVENTS.LEVEL_START, this.boundLevelStart);
+    this.game.events.off(EVENTS.UPDATE_TIMER, this.boundUpdateTimer);
+    this.game.events.off(EVENTS.PLAYER_DEATH, this.boundPlayerDeath);
+    this.game.events.off(EVENTS.LEVEL_RESTART, this.boundLevelRestart);
+    this.game.events.off(EVENTS.PAUSE_STATE_CHANGED, this.boundPauseStateChanged);
+    this.game.events.off(EVENTS.CHAPTER_COMPLETE, this.boundChapterComplete);
   }
 
   private handleResize(gameSize?: Phaser.Structs.Size): void {
@@ -425,15 +446,12 @@ export class UIScene extends Phaser.Scene {
     this.cameras.main.setViewport(0, 0, width, height);
     this.cameras.main.setSize(width, height);
 
-    // Вычисляем mode прямо из известных w/h — НЕ из window.innerWidth (может быть устаревшим на iOS)
-    const aspect = width / (height || 1);
-    const mode = aspect < 0.85 ? 'portrait' : aspect <= 1.15 ? 'compact' : 'landscape';
-
-    // safe-area читаем из CSS-переменных (они обновляются синхронно браузером)
-    const rootStyle = getComputedStyle(document.documentElement);
-    const safeTop = parseFloat(rootStyle.getPropertyValue('--sat')) || 0;
-    const safeBottom = parseFloat(rootStyle.getPropertyValue('--sab')) || 0;
-    const safeLeft = parseFloat(rootStyle.getPropertyValue('--sal')) || 0;
+    // Единый платформенный источник геометрии и Safe Area
+    const vp = PlatformManager.getInstance().getViewport(width, height);
+    const mode = vp.mode;
+    const safeTop = vp.safeArea.top;
+    const safeBottom = vp.safeArea.bottom;
+    const safeLeft = vp.safeArea.left;
 
     // Обновляем геометрию сенсорных кнопок под новый размер
     this.touchControls.updateLayout(mode, width, height, safeBottom, safeTop);
@@ -456,7 +474,7 @@ export class UIScene extends Phaser.Scene {
       this.renderPauseModalContent();
     }
     if (this.isSettingsOpen && this.settingsModal && this.settingsModal.visible) {
-      this.renderSettingsContent(false);
+      this.renderSettingsContent(this.settingsOrigin === 'menu');
     }
   }
 

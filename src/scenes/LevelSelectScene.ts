@@ -11,21 +11,28 @@ export class LevelSelectScene extends Phaser.Scene {
     super({ key: 'LevelSelectScene' });
   }
 
+  private boundResize = () => {
+    this.container.removeAll(true);
+    this.renderView();
+  };
+
   public create(): void {
     this.cameras.main.setBackgroundColor('#181622');
     this.container = this.add.container(0, 0);
 
     // Поддержка Telegram BackButton
-    PlatformManager.getInstance().getPlatform().showBackButton(() => {
+    PlatformManager.getInstance().showBackButton(() => {
       this.scene.start('MenuScene');
     });
 
     this.renderView();
 
-    this.scale.on('resize', () => {
-      this.container.removeAll(true);
-      this.renderView();
-    });
+    this.scale.on('resize', this.boundResize);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this);
+  }
+
+  public shutdown(): void {
+    this.scale.off('resize', this.boundResize);
   }
 
   private renderView(): void {
@@ -119,12 +126,18 @@ export class LevelSelectScene extends Phaser.Scene {
 
         // Отображение лучшего времени и смертей под плиткой
         const bestTime = save.getData().bestTimes[i];
-        if (bestTime !== undefined) {
-          const timeText = this.add.text(x, y + tileSize / 2 + 10, `${bestTime}s`, {
-            fontSize: '11px',
+        const deaths = save.getData().deathsPerLevel[i];
+        if (bestTime !== undefined || deaths !== undefined) {
+          const statsStr = [
+            bestTime !== undefined ? `${bestTime}s` : null,
+            deaths !== undefined && deaths > 0 ? `☠${deaths}` : null
+          ].filter(Boolean).join(' ');
+
+          const statsText = this.add.text(x, y + tileSize / 2 + 10, statsStr, {
+            fontSize: '10px',
             color: '#10b981'
           }).setOrigin(0.5);
-          this.container.add(timeText);
+          this.container.add(statsText);
         }
       }
 
