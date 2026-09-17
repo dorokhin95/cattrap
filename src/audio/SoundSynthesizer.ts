@@ -263,6 +263,196 @@ export class SoundSynthesizer {
     osc.stop(now + 0.05);
   }
 
+  // --- МЕХАНИКИ ГЛАВЫ 2 ---
+
+  public playBounce(): void {
+    this.initContext();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(280, now);
+    osc.frequency.exponentialRampToValueAtTime(620, now + 0.18);
+
+    gain.gain.setValueAtTime(0.20, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.18);
+  }
+
+  public playConveyor(): void {
+    this.initContext();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(95, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.12);
+
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.12);
+  }
+
+  public playButton(): void {
+    this.initContext();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1200, now);
+    osc.frequency.exponentialRampToValueAtTime(350, now + 0.05);
+
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.05);
+  }
+
+  public playToggleDissolve(): void {
+    this.initContext();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(800, now);
+    osc.frequency.exponentialRampToValueAtTime(160, now + 0.14);
+
+    gain.gain.setValueAtTime(0.10, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.14);
+  }
+
+  public playCrusherWarning(): void {
+    this.initContext();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(450, now);
+    osc.frequency.setValueAtTime(550, now + 0.05);
+
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.10);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.10);
+  }
+
+  public playCrusherSlam(): void {
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+
+    // Низкий удар
+    const osc1 = this.ctx.createOscillator();
+    const gain1 = this.ctx.createGain();
+    osc1.type = 'square';
+    osc1.frequency.setValueAtTime(110, now);
+    osc1.frequency.exponentialRampToValueAtTime(35, now + 0.22);
+    gain1.gain.setValueAtTime(0.25, now);
+    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+    osc1.connect(gain1);
+    gain1.connect(this.ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.22);
+
+    // Металлический звон
+    const osc2 = this.ctx.createOscillator();
+    const gain2 = this.ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(680, now);
+    osc2.frequency.exponentialRampToValueAtTime(200, now + 0.15);
+    gain2.gain.setValueAtTime(0.15, now);
+    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+    osc2.connect(gain2);
+    gain2.connect(this.ctx.destination);
+    osc2.start(now);
+    osc2.stop(now + 0.15);
+  }
+
+  public playControlReverse(): void {
+    this.initContext();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.linearRampToValueAtTime(160, now + 0.12);
+    osc.frequency.linearRampToValueAtTime(480, now + 0.25);
+
+    gain.gain.setValueAtTime(0.16, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.25);
+  }
+
+  public playAutorunStart(): void {
+    this.initContext();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(340, now);
+    osc.frequency.exponentialRampToValueAtTime(680, now + 0.20);
+
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.20);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.20);
+  }
+
   public async unlock(): Promise<boolean> {
     this.initContext();
     if (!this.ctx) return false;

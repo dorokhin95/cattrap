@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { CONSTANTS } from '../../core/Constants';
-import { CatState, SizeState, GravityState } from '../../types';
+import { CatState, SizeState, GravityState, ControlModifier } from '../../types';
 import { AudioManager } from '../../audio/AudioManager';
 
 export interface CatInputState {
@@ -15,6 +15,7 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
   private catState: CatState = 'idle';
   private sizeState: SizeState = 'normal';
   private gravityState: GravityState = 'normal';
+  private controlModifier: ControlModifier = 'normal';
 
   // Coyote time & Jump buffer таймеры (в мс)
   private timeSinceLeftGroundMs = 9999;
@@ -143,10 +144,21 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
     const controlMultiplier = isGroundContact ? 1 : CONSTANTS.AIR_CONTROL;
     const accel = CONSTANTS.ACCELERATION * controlMultiplier;
 
-    if (input.left && !input.right) {
+    let moveLeft = input.left;
+    let moveRight = input.right;
+
+    if (this.controlModifier === 'reverse') {
+      moveLeft = input.right;
+      moveRight = input.left;
+    } else if (this.controlModifier === 'autorun_right') {
+      moveLeft = false;
+      moveRight = true;
+    }
+
+    if (moveLeft && !moveRight) {
       body.setAccelerationX(-accel);
       this.setFlipX(true);
-    } else if (input.right && !input.left) {
+    } else if (moveRight && !moveLeft) {
       body.setAccelerationX(accel);
       this.setFlipX(false);
     } else {
@@ -363,12 +375,21 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
+  public getControlModifier(): ControlModifier {
+    return this.controlModifier;
+  }
+
+  public setControlModifier(modifier: ControlModifier): void {
+    this.controlModifier = modifier;
+  }
+
   public respawn(x: number, y: number, deathsCount?: number): void {
     this.scene.tweens.killTweensOf(this);
     this.isDead = false;
     this.catState = 'idle';
     this.sizeState = 'normal';
     this.gravityState = 'normal';
+    this.controlModifier = 'normal';
     this.timeSinceLeftGroundMs = 9999;
     this.timeSinceJumpRequestedMs = 9999;
     this.idleBlinkTimerMs = 0;

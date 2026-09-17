@@ -56,8 +56,8 @@ export class UIScene extends Phaser.Scene {
       this.touchControls.setEnabled(true);
     }
   };
-  private boundChapterComplete = (data: { totalDeaths: number }) => {
-    this.showVictoryScreen(data.totalDeaths);
+  private boundChapterComplete = (data: { totalDeaths: number; chapter?: number; isFinalChapter?: boolean }) => {
+    this.showVictoryScreen(data.totalDeaths, data.chapter || 1);
   };
 
   constructor() {
@@ -349,7 +349,7 @@ export class UIScene extends Phaser.Scene {
     this.victoryModal.setVisible(false);
   }
 
-  private showVictoryScreen(totalDeaths: number): void {
+  private showVictoryScreen(totalDeaths: number, chapter = 1): void {
     this.victoryModal.removeAll(true);
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
@@ -359,34 +359,54 @@ export class UIScene extends Phaser.Scene {
       .setInteractive();
     this.victoryModal.add(overlay);
 
-    const title = this.add.text(width / 2, height * 0.18, 'ГЛАВА 1 ПРОЙДЕНА!', {
-      fontSize: '32px',
+    const titleText = chapter === 1 ? 'ГЛАВА 1 ПРОЙДЕНА!' : 'ГЛАВА 2 ПРОЙДЕНА!';
+    const title = this.add.text(width / 2, height * 0.16, titleText, {
+      fontSize: '30px',
       fontStyle: 'bold',
       color: '#facc15',
       stroke: '#451a03',
       strokeThickness: 5
     }).setOrigin(0.5);
 
-    const cat = this.add.sprite(width / 2, height * 0.38, 'cat').setScale(3.5);
+    const cat = this.add.sprite(width / 2, height * 0.35, 'cat').setScale(3.5);
     cat.play('cat_idle');
 
-    const stats = this.add.text(width / 2, height * 0.55, `Всего смертей: ${totalDeaths}\nКотик доволен и мурлычет! 🐱`, {
-      fontSize: '18px',
+    const descText = chapter === 1
+      ? `Всего смертей: ${totalDeaths}\nКотик готов спуститься глубже! 🐱`
+      : `Всего смертей: ${totalDeaths}\nВсе 20 уровней пройдены!\nКотик победил все ловушки и свободен! 👑🐱`;
+
+    const stats = this.add.text(width / 2, height * 0.52, descText, {
+      fontSize: '17px',
       color: '#ffffff',
       align: 'center',
-      lineSpacing: 10
+      lineSpacing: 8
     }).setOrigin(0.5);
 
     this.victoryModal.add([title, cat, stats]);
 
-    // Кнопки добавляются последними — поверх всего
-    this.createModalButton(this.victoryModal, width / 2, height * 0.74, 'В ГЛАВНОЕ МЕНЮ', '#38bdf8', () => {
-      this.scene.stop('GameScene');
-      this.scene.start('MenuScene');
-    });
-    this.createModalButton(this.victoryModal, width / 2, height * 0.74 + 56, 'ВЫБОР УРОВНЯ', '#94a3b8', () => {
+    let btnY = height * 0.68;
+    const btnSpacing = 52;
+
+    if (chapter === 1) {
+      // Кнопка продолжения во 2-ю главу
+      this.createModalButton(this.victoryModal, width / 2, btnY, 'ПРОДОЛЖИТЬ → ГЛАВА 2', '#22d3c5', () => {
+        this.victoryModal.setVisible(false);
+        this.hudContainer.setVisible(true);
+        this.scene.stop('GameScene');
+        this.scene.start('GameScene', { level: 11 });
+      });
+      btnY += btnSpacing;
+    }
+
+    this.createModalButton(this.victoryModal, width / 2, btnY, 'ВЫБОР УРОВНЯ', '#38bdf8', () => {
       this.scene.stop('GameScene');
       this.scene.start('LevelSelectScene');
+    });
+    btnY += btnSpacing;
+
+    this.createModalButton(this.victoryModal, width / 2, btnY, 'В ГЛАВНОЕ МЕНЮ', '#94a3b8', () => {
+      this.scene.stop('GameScene');
+      this.scene.start('MenuScene');
     });
 
     this.victoryModal.setVisible(true);

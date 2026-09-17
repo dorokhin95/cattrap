@@ -14,6 +14,14 @@ import { FakeFloor } from '../game/hazards/FakeFloor';
 import { MovingPortal } from '../game/hazards/MovingPortal';
 import { ModifierZone } from '../game/hazards/ModifierZone';
 import { Checkpoint } from '../game/hazards/Checkpoint';
+import { BouncePad } from '../game/hazards/BouncePad';
+import { ConveyorTile } from '../game/hazards/ConveyorTile';
+import { MovingPlatform } from '../game/hazards/MovingPlatform';
+import { PressureButton } from '../game/hazards/PressureButton';
+import { ToggleBlock } from '../game/hazards/ToggleBlock';
+import { Crusher } from '../game/hazards/Crusher';
+import { ControlZone } from '../game/hazards/ControlZone';
+import { BackgroundRenderer } from '../game/BackgroundRenderer';
 import { SaveProvider } from '../save/SaveProvider';
 import { PlatformManager } from '../platform/PlatformManager';
 
@@ -35,6 +43,17 @@ export class GameScene extends Phaser.Scene {
   private modifierZones: ModifierZone[] = [];
   private portal!: MovingPortal;
   private checkpoint: Checkpoint | null = null;
+  private backgroundRenderer!: BackgroundRenderer;
+
+  // Сущности Главы 2
+  private bouncePads: BouncePad[] = [];
+  private conveyors: ConveyorTile[] = [];
+  private movingPlatforms: MovingPlatform[] = [];
+  private buttons: PressureButton[] = [];
+  private toggleBlocks: ToggleBlock[] = [];
+  private toggleBlocksMap: Map<string, ToggleBlock> = new Map();
+  private crushers: Crusher[] = [];
+  private controlZones: ControlZone[] = [];
 
   // Состояние попытки
   private currentRespawnPoint = { x: 0, y: 0 };
@@ -151,10 +170,23 @@ export class GameScene extends Phaser.Scene {
     if (this.triggerManager) {
       this.triggerManager.clear();
     }
+
+    if (this.backgroundRenderer) {
+      this.backgroundRenderer.destroy();
+    }
   }
 
   private buildLevel(): void {
     const T = CONSTANTS.TILE_SIZE;
+
+    // 0. Фоновый рендерер (Глава 1 или Глава 2 с параллаксом)
+    this.backgroundRenderer = new BackgroundRenderer(
+      this,
+      this.levelData.width,
+      this.levelData.height,
+      this.levelData.theme,
+      this.levelId
+    );
 
     // 1. Твердые блоки
     this.solidGroup = this.physics.add.staticGroup();
@@ -252,7 +284,107 @@ export class GameScene extends Phaser.Scene {
       pTargets
     );
 
-    // 10. Регистрация триггеров уровня
+    // 10. Батуты (BouncePad)
+    this.bouncePads = [];
+    if (this.levelData.bouncePads) {
+      for (const bp of this.levelData.bouncePads) {
+        const pad = new BouncePad(this, (bp.x + 0.5) * T, (bp.y + 0.5) * T, bp.id, bp.power);
+        this.bouncePads.push(pad);
+      }
+    }
+
+    // 11. Конвейеры (ConveyorTile)
+    this.conveyors = [];
+    if (this.levelData.conveyors) {
+      for (const conv of this.levelData.conveyors) {
+        const c = new ConveyorTile(this, (conv.x + 0.5) * T, (conv.y + 0.5) * T, conv.id, conv.direction, conv.speed);
+        this.conveyors.push(c);
+      }
+    }
+
+    // 12. Движущиеся платформы (MovingPlatform)
+    this.movingPlatforms = [];
+    if (this.levelData.movingPlatforms) {
+      for (const mp of this.levelData.movingPlatforms) {
+        const p = new MovingPlatform(
+          this,
+          (mp.x + 0.5) * T,
+          (mp.y + 0.5) * T,
+          (mp.targetX + 0.5) * T,
+          (mp.targetY + 0.5) * T,
+          mp.id,
+          mp.speed,
+          mp.pingPong !== false
+        );
+        this.movingPlatforms.push(p);
+      }
+    }
+
+    // 13. Переключаемые блоки (ToggleBlock)
+    this.toggleBlocks = [];
+    this.toggleBlocksMap.clear();
+    if (this.levelData.toggleBlocks) {
+      for (const tb of this.levelData.toggleBlocks) {
+        const block = new ToggleBlock(this, (tb.x + 0.5) * T, (tb.y + 0.5) * T, tb.id, tb.initiallyActive !== false);
+        this.toggleBlocks.push(block);
+        if (tb.id) {
+          this.toggleBlocksMap.set(tb.id, block);
+        }
+      }
+    }
+
+    // 14. Нажимные кнопки (PressureButton)
+    this.buttons = [];
+    if (this.levelData.buttons) {
+      for (const btn of this.levelData.buttons) {
+        const b = new PressureButton(this, (btn.x + 0.5) * T, (btn.y + 0.5) * T, btn.id, btn.targets, btn.once);
+        this.buttons.push(b);
+      }
+    }
+
+    // 15. Прессы (Crusher)
+    this.crushers = [];
+    if (this.levelData.crushers) {
+      for (const cr of this.levelData.crushers) {
+        const targetX = cr.targetX !== undefined ? (cr.targetX + 0.5) * T : (cr.x + 0.5) * T;
+        const targetY = cr.targetY !== undefined ? (cr.targetY + 0.5) * T : (cr.y + 2.5) * T;
+        const c = new Crusher(
+          this,
+          (cr.x + 0.5) * T,
+          (cr.y + 0.5) * T,
+          targetX,
+          targetY,
+          cr.orientation,
+          cr.id,
+          cr.warningMs,
+          cr.slamMs,
+          undefined,
+          cr.retractMs,
+          cr.cycle !== false
+        );
+        this.crushers.push(c);
+      }
+    }
+
+    // 16. Зоны модификатора управления (ControlZone)
+    this.controlZones = [];
+    if (this.levelData.controlZones) {
+      for (const cz of this.levelData.controlZones) {
+        const heightTiles = cz.height || 2;
+        const zone = new ControlZone(
+          this,
+          (cz.x + cz.width / 2) * T,
+          (cz.y + heightTiles / 2) * T,
+          cz.width * T,
+          heightTiles * T,
+          cz.type,
+          cz.id
+        );
+        this.controlZones.push(zone);
+      }
+    }
+
+    // 17. Регистрация триггеров уровня
     this.registerTriggers();
   }
 
@@ -378,6 +510,53 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
+    // --- Коллизии Главы 2 ---
+
+    // Кот <-> Батуты (BouncePad)
+    for (const bp of this.bouncePads) {
+      this.physics.add.collider(this.cat, bp, () => {
+        bp.triggerBounce(this.cat);
+      });
+    }
+
+    // Кот <-> Конвейеры (ConveyorTile)
+    for (const conv of this.conveyors) {
+      this.physics.add.collider(this.cat, conv);
+    }
+
+    // Кот <-> Движущиеся платформы (MovingPlatform)
+    for (const mp of this.movingPlatforms) {
+      this.physics.add.collider(this.cat, mp);
+    }
+
+    // Кот <-> Переключаемые блоки (ToggleBlock)
+    for (const tb of this.toggleBlocks) {
+      this.physics.add.collider(this.cat, tb);
+    }
+
+    // Кот <-> Нажимные кнопки (PressureButton)
+    for (const btn of this.buttons) {
+      this.physics.add.overlap(this.cat, btn, () => {
+        btn.press(this.toggleBlocksMap, this.cat);
+      });
+    }
+
+    // Кот <-> Прессы (Crusher)
+    for (const crusher of this.crushers) {
+      this.physics.add.overlap(this.cat, crusher, () => {
+        if (crusher.isLethal) {
+          this.handlePlayerDeath();
+        }
+      });
+    }
+
+    // Кот <-> Зоны управления (ControlZone)
+    for (const cz of this.controlZones) {
+      this.physics.add.overlap(this.cat, cz, () => {
+        cz.applyModifier(this.cat);
+      });
+    }
+
     // Кот <-> Портал (финиш уровня)
     this.physics.add.overlap(this.cat, this.portal, () => {
       this.handleLevelComplete();
@@ -446,6 +625,21 @@ export class GameScene extends Phaser.Scene {
       this.game.events.emit(EVENTS.UPDATE_TIMER, this.attemptTimerSeconds);
     }
 
+    // Обновление батутов
+    for (const bp of this.bouncePads) {
+      bp.updatePad(delta);
+    }
+
+    // Обновление конвейеров
+    for (const conv of this.conveyors) {
+      conv.applyConveyorMotion(this.cat, delta);
+    }
+
+    // Обновление движущихся платформ
+    for (const mp of this.movingPlatforms) {
+      mp.updatePlatform(delta, this.cat);
+    }
+
     // Обновление котика
     this.cat.updateCat(delta, combinedInput);
 
@@ -499,6 +693,13 @@ export class GameScene extends Phaser.Scene {
     for (const crumble of this.crumbleBlocks) crumble.reset();
     for (const fb of this.fallingBlocks) fb.reset();
     for (const fake of this.fakeFloors) fake.reset();
+    for (const bp of this.bouncePads) bp.reset();
+    for (const conv of this.conveyors) conv.reset();
+    for (const mp of this.movingPlatforms) mp.reset();
+    for (const btn of this.buttons) btn.reset();
+    for (const tb of this.toggleBlocks) tb.reset();
+    for (const cr of this.crushers) cr.reset();
+    for (const cz of this.controlZones) cz.reset();
     this.portal.reset();
 
     // Сброс зажатых сенсорных кнопок (ТЗ раздел 24)
@@ -524,9 +725,11 @@ export class GameScene extends Phaser.Scene {
     PlatformManager.getInstance().haptic('success');
 
     this.cat.enterPortal(this.portal.x, this.portal.y, () => {
-      if (this.levelId >= LevelRegistry.getTotalLevels()) {
-        // Завершение Главы 1!
+      if (this.levelData.isChapterEnd || this.levelId >= LevelRegistry.getTotalLevels()) {
+        // Завершение Главы!
         this.game.events.emit(EVENTS.CHAPTER_COMPLETE, {
+          chapter: this.levelData.chapter || 1,
+          isFinalChapter: this.levelId >= LevelRegistry.getTotalLevels(),
           totalDeaths: SaveProvider.getInstance().getData().totalDeaths,
           bestTimes: SaveProvider.getInstance().getData().bestTimes
         });

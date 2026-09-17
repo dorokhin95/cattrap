@@ -8,6 +8,7 @@ export class PixelArtGenerator {
     PixelArtGenerator.generateHazards(scene);
     PixelArtGenerator.generateObjects(scene);
     PixelArtGenerator.generateParticles(scene);
+    PixelArtGenerator.generateChapter2(scene);
   }
 
   // --- КОТИК: Спрайтшит 24x24 px ---
@@ -501,5 +502,301 @@ export class PixelArtGenerator {
     sctx.fillRect(3, 1, 2, 6);
     sctx.fillRect(1, 3, 6, 2);
     scene.textures.addCanvas('particle_star', starCanvas);
+  }
+
+  // --- МЕХАНИКИ И ВИЗУАЛ ГЛАВЫ 2 ---
+  private static generateChapter2(scene: Phaser.Scene): void {
+    const C = CONSTANTS.COLORS;
+
+    // 1. BouncePad (32x16)
+    const bpCanvas = document.createElement('canvas');
+    bpCanvas.width = 32;
+    bpCanvas.height = 16;
+    const bpctx = bpCanvas.getContext('2d')!;
+    bpctx.imageSmoothingEnabled = false;
+    // Металлическое основание
+    bpctx.fillStyle = '#0f172a';
+    bpctx.fillRect(2, 12, 28, 4);
+    bpctx.fillStyle = '#334155';
+    bpctx.fillRect(4, 13, 24, 2);
+    // Пружины
+    bpctx.fillStyle = '#f59e0b';
+    bpctx.fillRect(8, 7, 4, 5);
+    bpctx.fillRect(20, 7, 4, 5);
+    bpctx.fillStyle = '#fbbf24';
+    bpctx.fillRect(9, 8, 2, 4);
+    bpctx.fillRect(21, 8, 2, 4);
+    // Верхняя упругая площадка
+    bpctx.fillStyle = '#b45309';
+    bpctx.fillRect(2, 3, 28, 5);
+    bpctx.fillStyle = '#facc15';
+    bpctx.fillRect(3, 4, 26, 3);
+    bpctx.fillStyle = '#fef08a';
+    bpctx.fillRect(5, 4, 22, 1);
+    scene.textures.addCanvas('bounce_pad', bpCanvas);
+
+    // 2. Conveyor Left (32x32)
+    const clCanvas = document.createElement('canvas');
+    clCanvas.width = 32;
+    clCanvas.height = 32;
+    const clctx = clCanvas.getContext('2d')!;
+    clctx.imageSmoothingEnabled = false;
+    // Корпус
+    clctx.fillStyle = '#0f172a';
+    clctx.fillRect(0, 0, 32, 32);
+    clctx.fillStyle = '#1e293b';
+    clctx.fillRect(1, 1, 30, 30);
+    // Верхняя резиновая лента
+    clctx.fillStyle = '#334155';
+    clctx.fillRect(1, 1, 30, 8);
+    // Стрелки влево <<<
+    clctx.fillStyle = '#38bdf8';
+    for (let ox of [4, 14, 24]) {
+      clctx.fillRect(ox + 3, 3, 2, 4);
+      clctx.fillRect(ox + 1, 4, 2, 2);
+      clctx.fillRect(ox, 5, 2, 1);
+    }
+    // Ролики снизу
+    clctx.fillStyle = '#475569';
+    clctx.fillRect(4, 18, 6, 6);
+    clctx.fillRect(13, 18, 6, 6);
+    clctx.fillRect(22, 18, 6, 6);
+    scene.textures.addCanvas('conveyor_left', clCanvas);
+
+    // 3. Conveyor Right (32x32)
+    const crCanvas = document.createElement('canvas');
+    crCanvas.width = 32;
+    crCanvas.height = 32;
+    const crctx = crCanvas.getContext('2d')!;
+    crctx.imageSmoothingEnabled = false;
+    // Корпус
+    crctx.fillStyle = '#0f172a';
+    crctx.fillRect(0, 0, 32, 32);
+    crctx.fillStyle = '#1e293b';
+    crctx.fillRect(1, 1, 30, 30);
+    // Верхняя лента
+    crctx.fillStyle = '#334155';
+    crctx.fillRect(1, 1, 30, 8);
+    // Стрелки вправо >>>
+    crctx.fillStyle = '#38bdf8';
+    for (let ox of [4, 14, 24]) {
+      crctx.fillRect(ox, 3, 2, 4);
+      crctx.fillRect(ox + 2, 4, 2, 2);
+      crctx.fillRect(ox + 3, 5, 2, 1);
+    }
+    // Ролики снизу
+    crctx.fillStyle = '#475569';
+    crctx.fillRect(4, 18, 6, 6);
+    crctx.fillRect(13, 18, 6, 6);
+    crctx.fillRect(22, 18, 6, 6);
+    scene.textures.addCanvas('conveyor_right', crCanvas);
+
+    // 4. Moving Platform (64x16)
+    const mpCanvas = document.createElement('canvas');
+    mpCanvas.width = 64;
+    mpCanvas.height = 16;
+    const mpctx = mpCanvas.getContext('2d')!;
+    mpctx.imageSmoothingEnabled = false;
+    mpctx.fillStyle = '#0f172a';
+    mpctx.fillRect(0, 0, 64, 16);
+    mpctx.fillStyle = '#1e293b';
+    mpctx.fillRect(1, 1, 62, 14);
+    mpctx.fillStyle = '#334155';
+    mpctx.fillRect(2, 2, 60, 4);
+    // Неоновые направляющие по бокам и центру
+    mpctx.fillStyle = C.ACCENT_TEAL;
+    mpctx.fillRect(4, 9, 8, 3);
+    mpctx.fillRect(28, 9, 8, 3);
+    mpctx.fillRect(52, 9, 8, 3);
+    scene.textures.addCanvas('moving_platform', mpCanvas);
+
+    // 5. Pressure Button Up (32x16)
+    const pbuCanvas = document.createElement('canvas');
+    pbuCanvas.width = 32;
+    pbuCanvas.height = 16;
+    const pbuctx = pbuCanvas.getContext('2d')!;
+    pbuctx.imageSmoothingEnabled = false;
+    pbuctx.fillStyle = '#0f172a';
+    pbuctx.fillRect(2, 11, 28, 5);
+    pbuctx.fillStyle = '#334155';
+    pbuctx.fillRect(4, 12, 24, 3);
+    // Кнопка поднята (красная)
+    pbuctx.fillStyle = '#9f1239';
+    pbuctx.fillRect(8, 5, 16, 7);
+    pbuctx.fillStyle = '#e11d48';
+    pbuctx.fillRect(9, 6, 14, 5);
+    pbuctx.fillStyle = '#fb7185';
+    pbuctx.fillRect(10, 6, 12, 2);
+    scene.textures.addCanvas('pressure_button_up', pbuCanvas);
+
+    // 6. Pressure Button Down (32x16)
+    const pbdCanvas = document.createElement('canvas');
+    pbdCanvas.width = 32;
+    pbdCanvas.height = 16;
+    const pbdctx = pbdCanvas.getContext('2d')!;
+    pbdctx.imageSmoothingEnabled = false;
+    pbdctx.fillStyle = '#0f172a';
+    pbdctx.fillRect(2, 11, 28, 5);
+    pbdctx.fillStyle = '#334155';
+    pbdctx.fillRect(4, 12, 24, 3);
+    // Кнопка утоплена (зелёная)
+    pbdctx.fillStyle = '#065f46';
+    pbdctx.fillRect(8, 9, 16, 3);
+    pbdctx.fillStyle = '#10b981';
+    pbdctx.fillRect(9, 10, 14, 2);
+    scene.textures.addCanvas('pressure_button_down', pbdCanvas);
+
+    // 7. Toggle Block Active (32x32)
+    const tbCanvas = document.createElement('canvas');
+    tbCanvas.width = 32;
+    tbCanvas.height = 32;
+    const tbctx = tbCanvas.getContext('2d')!;
+    tbctx.imageSmoothingEnabled = false;
+    tbctx.fillStyle = '#0f172a';
+    tbctx.fillRect(0, 0, 32, 32);
+    tbctx.fillStyle = '#134e4a';
+    tbctx.fillRect(2, 2, 28, 28);
+    tbctx.fillStyle = C.ACCENT_TEAL;
+    // Угловые скобки
+    tbctx.fillRect(2, 2, 6, 2);
+    tbctx.fillRect(2, 2, 2, 6);
+    tbctx.fillRect(24, 2, 6, 2);
+    tbctx.fillRect(28, 2, 2, 6);
+    tbctx.fillRect(2, 28, 6, 2);
+    tbctx.fillRect(2, 24, 2, 6);
+    tbctx.fillRect(24, 28, 6, 2);
+    tbctx.fillRect(28, 24, 2, 6);
+    // Центральный энергетический кристалл
+    tbctx.fillStyle = '#5eead4';
+    tbctx.fillRect(14, 10, 4, 12);
+    tbctx.fillRect(10, 14, 12, 4);
+    scene.textures.addCanvas('toggle_block', tbCanvas);
+
+    // 8. Toggle Block Inactive (32x32)
+    const tbiCanvas = document.createElement('canvas');
+    tbiCanvas.width = 32;
+    tbiCanvas.height = 32;
+    const tbictx = tbiCanvas.getContext('2d')!;
+    tbictx.imageSmoothingEnabled = false;
+    tbictx.fillStyle = 'rgba(15, 23, 42, 0.3)';
+    tbictx.fillRect(0, 0, 32, 32);
+    // Пунктирная рамка
+    tbictx.fillStyle = 'rgba(34, 211, 197, 0.4)';
+    for (let i = 2; i < 30; i += 6) {
+      tbictx.fillRect(i, 2, 3, 2);
+      tbictx.fillRect(i, 28, 3, 2);
+      tbictx.fillRect(2, i, 2, 3);
+      tbictx.fillRect(28, i, 2, 3);
+    }
+    scene.textures.addCanvas('toggle_block_inactive', tbiCanvas);
+
+    // 9. Crusher (32x32)
+    const crushCanvas = document.createElement('canvas');
+    crushCanvas.width = 32;
+    crushCanvas.height = 32;
+    const cctx = crushCanvas.getContext('2d')!;
+    cctx.imageSmoothingEnabled = false;
+    // Тяжёлый стальной корпус
+    cctx.fillStyle = '#0f172a';
+    cctx.fillRect(0, 0, 32, 32);
+    cctx.fillStyle = '#334155';
+    cctx.fillRect(2, 2, 28, 28);
+    // Полосы предупреждения (жёлто-чёрные)
+    cctx.fillStyle = '#facc15';
+    cctx.fillRect(4, 8, 24, 6);
+    cctx.fillStyle = '#0f172a';
+    cctx.fillRect(8, 8, 4, 6);
+    cctx.fillRect(18, 8, 4, 6);
+    // Заклёпки
+    cctx.fillStyle = '#94a3b8';
+    cctx.fillRect(4, 4, 2, 2);
+    cctx.fillRect(26, 4, 2, 2);
+    cctx.fillRect(4, 18, 2, 2);
+    cctx.fillRect(26, 18, 2, 2);
+    // Зубья/шипы на ударной кромке
+    cctx.fillStyle = '#cbd5e1';
+    for (let ox of [2, 10, 18, 26]) {
+      cctx.fillRect(ox + 1, 24, 4, 2);
+      cctx.fillRect(ox + 2, 26, 2, 4);
+    }
+    scene.textures.addCanvas('crusher', crushCanvas);
+
+    // 10. Control Zone Reverse (32x64)
+    const czrCanvas = document.createElement('canvas');
+    czrCanvas.width = 32;
+    czrCanvas.height = 64;
+    const czrctx = czrCanvas.getContext('2d')!;
+    czrctx.imageSmoothingEnabled = false;
+    czrctx.fillStyle = 'rgba(56, 189, 248, 0.16)';
+    czrctx.fillRect(0, 0, 32, 64);
+    czrctx.fillStyle = 'rgba(244, 63, 94, 0.25)';
+    czrctx.fillRect(4, 4, 24, 56);
+    // Боковые рамки
+    czrctx.fillStyle = '#38bdf8';
+    czrctx.fillRect(1, 1, 2, 62);
+    czrctx.fillRect(29, 1, 2, 62);
+    // Символ ↔
+    czrctx.fillStyle = '#ffffff';
+    czrctx.fillRect(8, 30, 16, 4);
+    czrctx.fillRect(8, 27, 3, 10);
+    czrctx.fillRect(21, 27, 3, 10);
+    scene.textures.addCanvas('control_zone_reverse', czrCanvas);
+
+    // 11. Control Zone Autorun (32x64)
+    const czaCanvas = document.createElement('canvas');
+    czaCanvas.width = 32;
+    czaCanvas.height = 64;
+    const czactx = czaCanvas.getContext('2d')!;
+    czactx.imageSmoothingEnabled = false;
+    czactx.fillStyle = 'rgba(245, 158, 11, 0.18)';
+    czactx.fillRect(0, 0, 32, 64);
+    czactx.fillStyle = 'rgba(251, 191, 36, 0.25)';
+    czactx.fillRect(4, 4, 24, 56);
+    // Боковые рамки
+    czactx.fillStyle = '#f59e0b';
+    czactx.fillRect(1, 1, 2, 62);
+    czactx.fillRect(29, 1, 2, 62);
+    // Символ >>
+    czactx.fillStyle = '#ffffff';
+    czactx.fillRect(9, 26, 3, 12);
+    czactx.fillRect(12, 28, 3, 8);
+    czactx.fillRect(15, 30, 3, 4);
+    czactx.fillRect(18, 26, 3, 12);
+    czactx.fillRect(21, 28, 3, 8);
+    czactx.fillRect(24, 30, 3, 4);
+    scene.textures.addCanvas('control_zone_autorun', czaCanvas);
+
+    // 12. BG Sector Far (64x64)
+    const bgfCanvas = document.createElement('canvas');
+    bgfCanvas.width = 64;
+    bgfCanvas.height = 64;
+    const bgfctx = bgfCanvas.getContext('2d')!;
+    bgfctx.imageSmoothingEnabled = false;
+    bgfctx.fillStyle = C.BG_BASE_CH2;
+    bgfctx.fillRect(0, 0, 64, 64);
+    bgfctx.fillStyle = C.BG_SECONDARY_CH2;
+    bgfctx.fillRect(4, 4, 56, 56);
+    // Вентиляционные решётки
+    bgfctx.fillStyle = '#0b1017';
+    for (let y = 14; y <= 50; y += 8) {
+      bgfctx.fillRect(12, y, 40, 3);
+    }
+    scene.textures.addCanvas('bg_sector_far', bgfCanvas);
+
+    // 13. BG Sector Mid (64x64)
+    const bgmCanvas = document.createElement('canvas');
+    bgmCanvas.width = 64;
+    bgmCanvas.height = 64;
+    const bgmctx = bgmCanvas.getContext('2d')!;
+    bgmctx.imageSmoothingEnabled = false;
+    bgmctx.clearRect(0, 0, 64, 64);
+    // Балки и кабели
+    bgmctx.fillStyle = C.BG_OBJECT_CH2;
+    bgmctx.fillRect(0, 20, 64, 8);
+    bgmctx.fillRect(28, 0, 8, 64);
+    // Неоновые полосы
+    bgmctx.fillStyle = 'rgba(34, 211, 197, 0.4)';
+    bgmctx.fillRect(0, 27, 64, 2);
+    scene.textures.addCanvas('bg_sector_mid', bgmCanvas);
   }
 }

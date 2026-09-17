@@ -53,13 +53,21 @@ export class SaveProvider {
       }
 
       const totalLevels = LevelRegistry.getTotalLevels();
-      const highestUnlockedLevel = typeof parsed.highestUnlockedLevel === 'number' && parsed.highestUnlockedLevel >= 1
-        ? Math.min(totalLevels, Math.floor(parsed.highestUnlockedLevel))
-        : 1;
-
       const completedLevels = Array.isArray(parsed.completedLevels)
         ? parsed.completedLevels.filter((lvl: unknown) => typeof lvl === 'number' && lvl >= 1 && lvl <= totalLevels)
         : [];
+
+      let highestUnlockedLevel = typeof parsed.highestUnlockedLevel === 'number' && parsed.highestUnlockedLevel >= 1
+        ? Math.min(totalLevels, Math.floor(parsed.highestUnlockedLevel))
+        : 1;
+
+      // Если игрок уже прошел уровень X, следующий уровень должен быть открыт (поддержка расширения глав)
+      if (completedLevels.length > 0) {
+        const maxCompleted = Math.max(...completedLevels);
+        if (maxCompleted >= highestUnlockedLevel && highestUnlockedLevel < totalLevels) {
+          highestUnlockedLevel = Math.min(totalLevels, maxCompleted + 1);
+        }
+      }
 
       const bestTimes: Record<number, number> = {};
       if (parsed.bestTimes && typeof parsed.bestTimes === 'object') {

@@ -49,6 +49,16 @@ export const CONSTANTS = {
   PORTRAIT_TILES_X: 10,
   CAMERA_LOOKAHEAD_TILES: 1.8, // 1.5 - 2.0 тайла
 
+  // Механики Главы 2
+  BOUNCE_IMPULSE: -520,
+  BOUNCE_COOLDOWN_MS: 120,
+  CONVEYOR_SPEED: 90,
+  MOVING_PLATFORM_SPEED: 65,
+  CRUSHER_WARNING_MS: 220,
+  CRUSHER_SLAM_MS: 120,
+  CRUSHER_HOLD_MS: 350,
+  CRUSHER_RETRACT_MS: 300,
+
   // Цвета пиксель-арта
   COLORS: {
     BG_DARK: '#181622',
@@ -72,6 +82,21 @@ export const CONSTANTS = {
     CAT_DARK: '#2d2a32',
     CAT_MUZZLE: '#fffbeb',
     CAT_EYE: '#1e1e24',
-    CAT_COLLAR: '#e11d48'
+    CAT_COLLAR: '#e11d48',
+    // Глава 2
+    BG_BASE_CH2: '#101923',
+    BG_SECONDARY_CH2: '#162634',
+    BG_OBJECT_CH2: '#1e3443',
+    PLATFORM_CH2: '#232f3d',
+    PLATFORM_CH2_LIGHT: '#344558',
+    ACCENT_TEAL: '#22d3c5',
+    ACCENT_BLUE: '#38bdf8',
+    CONVEYOR_ARROW: '#38bdf8',
+    BOUNCE_SPRING: '#f59e0b',
+    TOGGLE_ACTIVE: '#22d3c5',
+    TOGGLE_INACTIVE: '#162634',
+    CRUSHER_BODY: '#334155',
+    BUTTON_UP: '#e11d48',
+    BUTTON_DOWN: '#10b981'
   }
 } as const;

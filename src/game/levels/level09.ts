@@ -2,6 +2,7 @@ import { LevelData } from './LevelData';
 
 export const level09: LevelData = {
   id: 9,
+  chapter: 1,
   name: 'Почти дошёл',
   width: 38,
   height: 15,

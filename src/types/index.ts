@@ -37,6 +37,10 @@ export type SizeState = 'normal' | 'small';
 
 export type GravityState = 'normal' | 'inverted';
 
+export type ControlModifier = 'normal' | 'reverse' | 'autorun_right';
+
+export type LevelTheme = 'chapter1' | 'chapter2';
+
 export interface ViewportInfo {
   width: number;
   height: number;

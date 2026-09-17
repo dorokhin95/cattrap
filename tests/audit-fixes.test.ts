@@ -43,19 +43,24 @@ describe('Audit Fixes Verification', () => {
       expect(save.getData().highestUnlockedLevel).toBe(1);
     });
 
-    it('прохождение 10-го уровня не открывает несуществующий уровень 11', () => {
+    it('прохождение финального 20-го уровня не открывает несуществующий уровень 21', () => {
       const save = SaveProvider.getInstance();
       const totalLevels = LevelRegistry.getTotalLevels();
-      expect(totalLevels).toBe(10);
+      expect(totalLevels).toBe(20);
 
-      // Проходим все уровни от 1 до 10
-      for (let i = 1; i <= 10; i++) {
+      // Прохождение 10 уровня открывает 11
+      save.recordLevelCompletion(10, 15.0);
+      expect(save.getData().highestUnlockedLevel).toBeGreaterThanOrEqual(11);
+      expect(save.isLevelUnlocked(11)).toBe(true);
+
+      // Проходим все уровни от 1 до 20
+      for (let i = 1; i <= 20; i++) {
         save.recordLevelCompletion(i, 10.0 + i);
       }
 
-      expect(save.getData().highestUnlockedLevel).toBe(10);
-      expect(save.isLevelUnlocked(10)).toBe(true);
-      expect(save.isLevelUnlocked(11)).toBe(false);
+      expect(save.getData().highestUnlockedLevel).toBe(20);
+      expect(save.isLevelUnlocked(20)).toBe(true);
+      expect(save.isLevelUnlocked(21)).toBe(false);
     });
 
     it('loadFromStorage санитизирует поврежденные или злонамеренные данные', () => {
@@ -78,7 +83,7 @@ describe('Audit Fixes Verification', () => {
       // Имитируем загрузку из хранилища с испорченными данными
       const sanitized = (save as any).loadFromStorage();
 
-      expect(sanitized.highestUnlockedLevel).toBe(10);
+      expect(sanitized.highestUnlockedLevel).toBe(20);
       expect(sanitized.completedLevels).toEqual([1]);
       expect(sanitized.bestTimes[1]).toBe(12.35);
       expect(sanitized.bestTimes['bad']).toBeUndefined();

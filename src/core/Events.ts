@@ -20,6 +20,7 @@ export const EVENTS = {
   GOTO_MENU: 'goto_menu',
   ORIENTATION_CHANGE: 'orientation_change',
   CONTINUE_AFTER_ROTATE: 'continue_after_rotate',
+  CONTROL_MODIFIED: 'control_modified',
   
   // Настройки
   SETTINGS_CHANGED: 'settings_changed',

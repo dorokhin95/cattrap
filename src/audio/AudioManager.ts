@@ -73,7 +73,7 @@ export class AudioManager {
     }
   }
 
-  public playSFX(sound: 'jump' | 'land' | 'spike' | 'death' | 'crumble' | 'blockFall' | 'size' | 'gravity' | 'portal' | 'checkpoint' | 'click'): void {
+  public playSFX(sound: 'jump' | 'land' | 'spike' | 'death' | 'crumble' | 'blockFall' | 'size' | 'gravity' | 'portal' | 'checkpoint' | 'click' | 'bounce' | 'conveyor' | 'button' | 'toggleDissolve' | 'crusherWarning' | 'crusherSlam' | 'controlReverse' | 'autorunStart'): void {
     const settings = SaveProvider.getInstance().getSettings();
     if (!settings.sfx || this.isMutedDueToBackground) return;
 
@@ -111,6 +111,30 @@ export class AudioManager {
         break;
       case 'click':
         this.synth.playUIButton();
+        break;
+      case 'bounce':
+        this.synth.playBounce();
+        break;
+      case 'conveyor':
+        this.synth.playConveyor();
+        break;
+      case 'button':
+        this.synth.playButton();
+        break;
+      case 'toggleDissolve':
+        this.synth.playToggleDissolve();
+        break;
+      case 'crusherWarning':
+        this.synth.playCrusherWarning();
+        break;
+      case 'crusherSlam':
+        this.synth.playCrusherSlam();
+        break;
+      case 'controlReverse':
+        this.synth.playControlReverse();
+        break;
+      case 'autorunStart':
+        this.synth.playAutorunStart();
         break;
     }
   }
