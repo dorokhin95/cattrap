@@ -187,7 +187,7 @@ export class GameScene extends Phaser.Scene {
     this.modifierZones = [];
     if (this.levelData.modifierZones) {
       for (const mz of this.levelData.modifierZones) {
-        const zone = new ModifierZone(this, (mz.x + 0.5) * T, (mz.y + 1.0) * T, mz.type);
+        const zone = new ModifierZone(this, (mz.x + 0.5) * T, mz.y * T, mz.type);
         this.modifierZones.push(zone);
       }
     }

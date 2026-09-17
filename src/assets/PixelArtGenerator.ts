@@ -389,36 +389,68 @@ export class PixelArtGenerator {
     bctx.fillRect(13, 22, 6, 4);
     scene.textures.addCanvas('checkpoint_box', boxCanvas);
 
-    // 3. Зона уменьшения (бирюзовая, 32x64 px)
+    // 3. Зона уменьшения (бирюзовая световая арка, 32x64 px)
     const sizeZoneCanvas = document.createElement('canvas');
     sizeZoneCanvas.width = size;
     sizeZoneCanvas.height = size * 2;
     const szctx = sizeZoneCanvas.getContext('2d')!;
-    szctx.fillStyle = 'rgba(6, 182, 212, 0.25)';
+    // Мягкое полупрозрачное силовое поле
+    szctx.fillStyle = 'rgba(6, 182, 212, 0.12)';
     szctx.fillRect(0, 0, size, size * 2);
+    // Внутреннее вертикальное свечение
+    szctx.fillStyle = 'rgba(6, 182, 212, 0.22)';
+    szctx.fillRect(6, 4, 20, size * 2 - 8);
+    // Боковые светящиеся энергетические пилоны
     szctx.fillStyle = C.SIZE_CYAN_LIGHT;
-    // Стрелочки уменьшения внутрь
-    szctx.fillRect(15, 12, 2, 10);
-    szctx.fillRect(13, 20, 6, 2);
-    szctx.fillRect(14, 22, 4, 2);
-    szctx.fillRect(15, 42, 2, 10);
-    szctx.fillRect(13, 42, 6, 2);
-    szctx.fillRect(14, 40, 4, 2);
+    szctx.fillRect(1, 2, 2, size * 2 - 4);
+    szctx.fillRect(size - 3, 2, 2, size * 2 - 4);
+    // Верхняя и нижняя перемычки арки
+    szctx.fillRect(1, 1, size - 2, 2);
+    szctx.fillRect(1, size * 2 - 3, size - 2, 2);
+    // Стрелочки уменьшения, сходящиеся к центру
+    szctx.fillStyle = '#ffffff';
+    // Верхняя стрелка (указывает вниз)
+    szctx.fillRect(15, 12, 2, 8);
+    szctx.fillRect(13, 18, 6, 2);
+    szctx.fillRect(14, 20, 4, 2);
+    szctx.fillRect(15, 22, 2, 2);
+    // Нижняя стрелка (указывает вверх)
+    szctx.fillRect(15, 44, 2, 8);
+    szctx.fillRect(13, 44, 6, 2);
+    szctx.fillRect(14, 42, 4, 2);
+    szctx.fillRect(15, 40, 2, 2);
+    // Мини-ядро в центре
+    szctx.fillStyle = C.SIZE_CYAN_LIGHT;
+    szctx.fillRect(14, 30, 4, 4);
     scene.textures.addCanvas('zone_shrink', sizeZoneCanvas);
 
-    // 4. Зона гравитации (фиолетовая, 32x64 px)
+    // 4. Зона гравитации (фиолетовая световая арка, 32x64 px)
     const gravZoneCanvas = document.createElement('canvas');
     gravZoneCanvas.width = size;
     gravZoneCanvas.height = size * 2;
     const gzctx = gravZoneCanvas.getContext('2d')!;
-    gzctx.fillStyle = 'rgba(147, 51, 234, 0.25)';
+    // Мягкое силовое поле
+    gzctx.fillStyle = 'rgba(147, 51, 234, 0.12)';
     gzctx.fillRect(0, 0, size, size * 2);
+    gzctx.fillStyle = 'rgba(147, 51, 234, 0.22)';
+    gzctx.fillRect(6, 4, 20, size * 2 - 8);
+    // Боковые энергетические пилоны
     gzctx.fillStyle = C.GRAVITY_PURPLE_LIGHT;
+    gzctx.fillRect(1, 2, 2, size * 2 - 4);
+    gzctx.fillRect(size - 3, 2, 2, size * 2 - 4);
+    // Верхняя и нижняя перемычки
+    gzctx.fillRect(1, 1, size - 2, 2);
+    gzctx.fillRect(1, size * 2 - 3, size - 2, 2);
     // Стрелки гравитации вверх
-    gzctx.fillRect(15, 20, 2, 24);
-    gzctx.fillRect(13, 24, 6, 2);
-    gzctx.fillRect(14, 22, 4, 2);
-    gzctx.fillRect(15, 20, 2, 2);
+    gzctx.fillStyle = '#ffffff';
+    gzctx.fillRect(15, 18, 2, 28);
+    gzctx.fillRect(13, 22, 6, 2);
+    gzctx.fillRect(14, 20, 4, 2);
+    gzctx.fillRect(15, 18, 2, 2);
+    gzctx.fillStyle = C.GRAVITY_PURPLE_LIGHT;
+    gzctx.fillRect(13, 36, 6, 2);
+    gzctx.fillRect(14, 34, 4, 2);
+    gzctx.fillRect(15, 32, 2, 2);
     scene.textures.addCanvas('zone_gravity', gravZoneCanvas);
   }
 

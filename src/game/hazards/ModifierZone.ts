@@ -20,12 +20,14 @@ export class ModifierZone extends Phaser.Physics.Arcade.Sprite {
 
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setAllowGravity(false);
-    body.setImmovable(true);
+    body.setImmovable(false);
+    body.moves = false;
+    this.setDepth(1); // Легкое энергетическое поле
 
-    // Легкое мерцание зоны
+    // Пульсация свечения зоны
     scene.tweens.add({
       targets: this,
-      alpha: { from: 0.6, to: 0.9 },
+      alpha: { from: 0.5, to: 0.95 },
       duration: 600,
       yoyo: true,
       repeat: -1
