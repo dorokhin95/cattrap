@@ -34,49 +34,28 @@ export const level16: LevelData = {
     ...Array.from({ length: 14 }, (_, i) => ({ x: 43, y: i }))
   ],
 
-  // Зоны изменения управления
+  // Зоны изменения управления: единый стабильный реверс без мельтешения
   controlZones: [
-    // Первая длинная зона реверса (вход на x=5, длина 22)
     {
-      id: 'cz_rev_1',
-      x: 5,
+      id: 'cz_rev_main',
+      x: 6,
       y: 9,
-      width: 22,
+      width: 37,
       height: 2,
       type: 'reverse'
-    },
-    // Зона восстановления обычного управления (x=28, длина 5)
-    {
-      id: 'cz_norm_1',
-      x: 28,
-      y: 9,
-      width: 5,
-      height: 2,
-      type: 'normal'
-    },
-    // Вторая короткая зона реверса перед финишем (x=34, длина 6)
-    {
-      id: 'cz_rev_2',
-      x: 34,
-      y: 9,
-      width: 6,
-      height: 2,
-      type: 'reverse'
-    },
-    // Финальное восстановление перед порталом
-    {
-      id: 'cz_norm_final',
-      x: 40,
-      y: 9,
-      width: 3,
-      height: 2,
-      type: 'normal'
     }
   ],
 
-  // Один знакомый PopSpike во второй реверс-зоне
+  // Шипы на дне ямы (x=21..23)
+  staticSpikes: [
+    { x: 21, y: 13 },
+    { x: 22, y: 13 },
+    { x: 23, y: 13 }
+  ],
+
+  // Один знакомый PopSpike во второй половине уровня
   popSpikes: [
-    { id: 'ps_rev_spike', x: 38, y: 10 }
+    { id: 'ps_rev_spike', x: 36, y: 10 }
   ],
 
   portal: {
@@ -88,7 +67,7 @@ export const level16: LevelData = {
     {
       id: 'trig_rev_spike',
       conditionType: 'player_x_greater',
-      conditionValue: 35.5,
+      conditionValue: 33.5,
       targetId: 'ps_rev_spike',
       action: 'pop',
       once: true

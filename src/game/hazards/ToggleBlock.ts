@@ -11,7 +11,7 @@ export class ToggleBlock extends HazardBase {
   private initialY: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id: string = '', initiallyActive = true) {
-    super(scene, x, y, 'toggle_block');
+    super(scene, x, y, 'tile_solid');
     this.id = id;
     this.initiallyActive = initiallyActive;
     this.isActiveState = initiallyActive;
@@ -50,7 +50,7 @@ export class ToggleBlock extends HazardBase {
       this.isActiveState = true;
       const body = this.body as Phaser.Physics.Arcade.Body;
       body.enable = true;
-      this.setTexture('toggle_block');
+      this.setTexture('tile_solid');
       this.setVisible(true);
 
       this.scene.tweens.killTweensOf(this);
@@ -101,7 +101,7 @@ export class ToggleBlock extends HazardBase {
     const body = this.body as Phaser.Physics.Arcade.Body;
     if (this.initiallyActive) {
       body.enable = true;
-      this.setTexture('toggle_block');
+      this.setTexture('tile_solid');
       this.setVisible(true);
       this.setAlpha(1);
     } else {

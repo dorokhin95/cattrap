@@ -174,7 +174,7 @@ describe('Audit Fixes Verification', () => {
 
   describe('Crusher dynamic traps and Level 15 redesign', () => {
     it('в Level 15 все прессы имеют autoStart: false и детерминированные триггеры активации', () => {
-      const l15 = LevelRegistry.getLevel(15);
+      const l15 = LevelRegistry.getLevel(15)!;
       expect(l15).toBeDefined();
       expect(l15.crushers).toBeDefined();
       expect(l15.crushers!.length).toBeGreaterThanOrEqual(4);
@@ -182,6 +182,7 @@ describe('Audit Fixes Verification', () => {
       // Каждый пресс должен быть отключен от автоматического долбления со старта уровня
       for (const cr of l15.crushers!) {
         expect(cr.autoStart).toBe(false);
+        expect(cr.cycle).toBe(false);
       }
 
       // Для всех прессов должны существовать соответствующие триггеры с action 'crush'
@@ -195,7 +196,7 @@ describe('Audit Fixes Verification', () => {
     });
 
     it('в Level 13 в ямах установлены шипы для предотвращения софтлока', () => {
-      const l13 = LevelRegistry.getLevel(13);
+      const l13 = LevelRegistry.getLevel(13)!;
       expect(l13).toBeDefined();
       expect(l13.staticSpikes).toBeDefined();
       expect(l13.staticSpikes!.length).toBeGreaterThan(0);
@@ -205,6 +206,18 @@ describe('Audit Fixes Verification', () => {
       expect(spikeXCoords).toContain(6);
       expect(spikeXCoords).toContain(15);
       expect(spikeXCoords).toContain(24);
+    });
+
+    it('в Level 16 управление не спамит переключениями, используется одна зона реверса', () => {
+      const l16 = LevelRegistry.getLevel(16)!;
+      expect(l16).toBeDefined();
+      expect(l16.controlZones).toBeDefined();
+      // Ровно одна точка входа в реверс без чехарды 'normal' -> 'reverse' -> 'normal'
+      expect(l16.controlZones!.length).toBe(1);
+      expect(l16.controlZones![0].type).toBe('reverse');
+      // В яме есть шипы
+      expect(l16.staticSpikes).toBeDefined();
+      expect(l16.staticSpikes!.length).toBeGreaterThanOrEqual(3);
     });
   });
 });

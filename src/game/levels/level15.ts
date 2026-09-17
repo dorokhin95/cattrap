@@ -60,7 +60,7 @@ export const level15: LevelData = {
       warningMs: 240,
       slamMs: 120,
       retractMs: 320,
-      cycle: true,
+      cycle: false,
       autoStart: false
     },
 
@@ -75,7 +75,7 @@ export const level15: LevelData = {
       warningMs: 220,
       slamMs: 120,
       retractMs: 300,
-      cycle: true,
+      cycle: false,
       startDelayMs: 150,
       autoStart: false
     },
@@ -89,7 +89,7 @@ export const level15: LevelData = {
       warningMs: 220,
       slamMs: 120,
       retractMs: 300,
-      cycle: true,
+      cycle: false,
       startDelayMs: 850,
       autoStart: false
     },
@@ -105,7 +105,7 @@ export const level15: LevelData = {
       warningMs: 280,
       slamMs: 140,
       retractMs: 350,
-      cycle: true,
+      cycle: false,
       autoStart: false
     }
   ],

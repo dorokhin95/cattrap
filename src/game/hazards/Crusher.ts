@@ -48,13 +48,13 @@ export class Crusher extends HazardBase {
     this.targetX = targetX;
     this.targetY = targetY;
 
-    this.warningMs = warningMs;
-    this.slamMs = slamMs;
-    this.holdMs = holdMs;
-    this.retractMs = retractMs;
-    this.cycle = cycle;
-    this.startDelayMs = startDelayMs;
-    this.autoStart = autoStart;
+    this.warningMs = warningMs ?? CONSTANTS.CRUSHER_WARNING_MS;
+    this.slamMs = slamMs ?? CONSTANTS.CRUSHER_SLAM_MS;
+    this.holdMs = holdMs ?? CONSTANTS.CRUSHER_HOLD_MS;
+    this.retractMs = retractMs ?? CONSTANTS.CRUSHER_RETRACT_MS;
+    this.cycle = cycle ?? true;
+    this.startDelayMs = startDelayMs ?? 300;
+    this.autoStart = autoStart ?? true;
 
     if (orientation === 'left') {
       this.setAngle(90);
@@ -67,8 +67,10 @@ export class Crusher extends HazardBase {
     body.setImmovable(true);
     body.setSize(30, 30);
 
-    // Запуск начального цикла, если включен autoStart
-    if (this.autoStart && this.cycle) {
+    // Если autoStart отключен — ловушка скрыта до момента активации триггером
+    if (!this.autoStart) {
+      this.setVisible(false);
+    } else if (this.cycle) {
       this.isCrushing = true;
       this.schedule(this.startDelayMs, () => this.startWarning());
     }
@@ -77,6 +79,7 @@ export class Crusher extends HazardBase {
   public triggerCrush(): void {
     if (this.isCrushing) return;
     this.isCrushing = true;
+    this.setVisible(true);
     this.startWarning();
   }
 
@@ -154,7 +157,10 @@ export class Crusher extends HazardBase {
     this.isCrushing = false;
     this.setPosition(this.startX, this.startY);
 
-    if (this.autoStart && this.cycle) {
+    if (!this.autoStart) {
+      this.setVisible(false);
+    } else if (this.cycle) {
+      this.setVisible(true);
       this.isCrushing = true;
       this.schedule(this.startDelayMs, () => this.startWarning());
     }
