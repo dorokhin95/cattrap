@@ -557,5 +557,24 @@ describe('Chapter 2 (Levels 11-20) Comprehensive Test Suite', () => {
       expect(maxCombinedSpeed).toBe(250);
       expect(maxCombinedSpeed).toBeGreaterThan(CONSTANTS.MOVE_SPEED);
     });
+
+    it('P0: Уровень 13 не содержит безопасного пола в ямах под платформами и исключает софтлок', () => {
+      const l13 = LevelRegistry.getLevel(13)!;
+      // В ямах под платформами (x=6..10, x=15..17, x=24..27, x=30..33) не должно быть сплошного пола solidTiles на дне y=15
+      const pitBottomTiles = l13.solidTiles.filter(t => t.y === 15 && ((t.x >= 6 && t.x <= 10) || (t.x >= 15 && t.x <= 17) || (t.x >= 24 && t.x <= 27)));
+      expect(pitBottomTiles.length).toBe(0);
+      // На дне ям должны быть установлены смертельные шипы
+      expect(l13.staticSpikes).toBeDefined();
+      expect(l13.staticSpikes!.length).toBeGreaterThan(0);
+    });
+
+    it('P0: Уровень 19 содержит шипы под FakeFloor, исключая падение на безопасный глухой ярус', () => {
+      const l19 = LevelRegistry.getLevel(19)!;
+      expect(l19.fakeFloors).toBeDefined();
+      expect(l19.fakeFloors!.length).toBe(2);
+      expect(l19.staticSpikes).toBeDefined();
+      const fakeFloorSpikes = l19.staticSpikes!.filter(s => s.x === 25 || s.x === 26);
+      expect(fakeFloorSpikes.length).toBe(2);
+    });
   });
 });

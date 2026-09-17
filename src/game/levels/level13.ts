@@ -31,12 +31,21 @@ export const level13: LevelData = {
     ...Array.from({ length: 6 }, (_, i) => ({ x: 34 + i, y: 5 })),
     ...Array.from({ length: 6 }, (_, i) => ({ x: 34 + i, y: 6 })),
 
-    // Безопасное дно под Section A и B
-    ...Array.from({ length: 40 }, (_, i) => ({ x: i, y: 15 })),
-
     // Стены
     ...Array.from({ length: 16 }, (_, i) => ({ x: 0, y: i })),
     ...Array.from({ length: 16 }, (_, i) => ({ x: 39, y: i }))
+  ],
+
+  // Смертельные шипы на дне всех ям под платформами (исключает застревание)
+  staticSpikes: [
+    // Под платформой Section A (x=6..10)
+    ...Array.from({ length: 5 }, (_, i) => ({ x: 6 + i, y: 15 })),
+    // Под лифтом Section B (x=15..17)
+    ...Array.from({ length: 3 }, (_, i) => ({ x: 15 + i, y: 15 })),
+    // Под пересадкой Section C (x=24..27)
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 24 + i, y: 15 })),
+    // Под лифтом Section D к финишу (x=30..33)
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 30 + i, y: 15 }))
   ],
 
   // Движущиеся платформы
