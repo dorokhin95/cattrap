@@ -2,7 +2,8 @@
 
 > **«Ничему не верь»** — динамичный 2D платформер про хитрого и стойкого котика, где каждый шаг готовит неожиданную ловушку. Смерть здесь — не наказание, а ключ к пониманию правил уровня!
 
-![CatTrap Preview](public/favicon.ico)
+🌐 **Онлайн-версия (GitHub Pages):** [https://dorokhin95.github.io/cattrap/](https://dorokhin95.github.io/cattrap/)  
+📁 **Репозиторий:** [https://github.com/dorokhin95/cattrap](https://github.com/dorokhin95/cattrap)
 
 ---
 
