@@ -194,18 +194,21 @@ export class PixelArtGenerator {
     sctx.fillRect(size - 1, 0, 1, size);
     scene.textures.addCanvas('tile_solid', solidCanvas);
 
-    // 2. Осыпающийся блок (crumble_block) — с тонкой трещиной
+    // 2. Осыпающийся блок (crumble_block) — идентичный базовый фон с трещиной
     const crumbleCanvas = document.createElement('canvas');
     crumbleCanvas.width = size;
     crumbleCanvas.height = size;
     const cctx = crumbleCanvas.getContext('2d')!;
     cctx.fillStyle = C.PLATFORM_OUTLINE;
     cctx.fillRect(0, 0, size, size);
-    cctx.fillStyle = C.CRUMBLE;
+    cctx.fillStyle = C.PLATFORM_DARK;
     cctx.fillRect(1, 1, size - 2, size - 2);
     cctx.fillStyle = C.PLATFORM_LIGHT;
     cctx.fillRect(1, 1, size - 2, 3);
-    // Тонкая характерная трещина
+    cctx.fillStyle = C.PLATFORM_OUTLINE;
+    cctx.fillRect(0, size - 1, size, 1);
+    cctx.fillRect(size - 1, 0, 1, size);
+    // Характерная трещина, появляющаяся только после касания
     cctx.fillStyle = C.CRUMBLE_CRACK;
     cctx.fillRect(10, 3, 1, 4);
     cctx.fillRect(11, 7, 2, 1);
