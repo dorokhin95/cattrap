@@ -165,6 +165,7 @@ export class UIScene extends Phaser.Scene {
     this.settingsModal.setVisible(true);
     this.hudContainer.setVisible(false);
     this.touchControls.setVisible(false);
+    this.touchControls.setEnabled(false);
   }
 
   private renderSettingsContent(fromMenu: boolean): void {
@@ -244,9 +245,11 @@ export class UIScene extends Phaser.Scene {
         if (settings.touchOpacity === 0.75) nextOpacity = 1.0;
         else if (settings.touchOpacity === 1.0) nextOpacity = 0.5;
         save.updateSettings({ touchOpacity: nextOpacity });
+        const vp = PlatformManager.getInstance().getPlatform().getViewport();
         this.touchControls.updateLayout(
-          PlatformManager.getInstance().getPlatform().getViewport().mode,
-          width, height
+          vp.mode,
+          width, height,
+          vp.safeArea.bottom, vp.safeArea.top
         );
         this.renderSettingsContent(fromMenu);
       }
@@ -273,6 +276,7 @@ export class UIScene extends Phaser.Scene {
         this.pauseModal.setVisible(true);
         this.hudContainer.setVisible(true);
         this.touchControls.setVisible(true);
+        this.touchControls.setEnabled(true);
       }
     });
   }
@@ -332,11 +336,13 @@ export class UIScene extends Phaser.Scene {
     btn.on('pointerdown', () => {
       AudioManager.getInstance().playSFX('click');
       this.rotateModal.setVisible(false);
+      this.touchControls.setEnabled(true);
       this.game.events.emit(EVENTS.PAUSE_REQUEST, false);
     });
 
     this.rotateModal.add([overlay, title, btn, btnText]);
     this.rotateModal.setVisible(true);
+    this.touchControls.setEnabled(false);
   }
 
   private createVictoryModal(): void {
@@ -379,6 +385,7 @@ export class UIScene extends Phaser.Scene {
     this.victoryModal.setVisible(true);
     this.hudContainer.setVisible(false);
     this.touchControls.setVisible(false);
+    this.touchControls.setEnabled(false);
   }
 
   private createModalButton(container: Phaser.GameObjects.Container, x: number, y: number, text: string, color: string, onClick: () => void): void {
@@ -433,9 +440,11 @@ export class UIScene extends Phaser.Scene {
         this.renderPauseModalContent();
         this.pauseModal.setVisible(true);
         this.touchControls.setVisible(false);
+        this.touchControls.setEnabled(false);
       } else {
         this.pauseModal.setVisible(false);
         this.touchControls.setVisible(true);
+        this.touchControls.setEnabled(true);
       }
     });
 
@@ -455,7 +464,7 @@ export class UIScene extends Phaser.Scene {
     this.previousOrientationMode = vp.mode;
 
     // Обновляем геометрию сенсорных кнопок
-    this.touchControls.updateLayout(vp.mode, vp.width, vp.height, vp.safeArea.bottom);
+    this.touchControls.updateLayout(vp.mode, vp.width, vp.height, vp.safeArea.bottom, vp.safeArea.top);
 
     // Центрирование HUD
     if (vp.mode === 'portrait') {

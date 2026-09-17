@@ -18,7 +18,10 @@ const config: Phaser.Types.Core.GameConfig = {
     height: window.innerHeight
   },
   input: {
-    activePointers: 3
+    activePointers: 4,
+    touch: {
+      capture: true
+    }
   },
   physics: {
     default: 'arcade',
@@ -31,6 +34,9 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   scene: [BootScene, MenuScene, LevelSelectScene, GameScene, UIScene]
 };
+
+// Защита от системных меню и паразитных жестов на мобильных устройствах
+window.addEventListener('contextmenu', (e) => e.preventDefault());
 
 // Запуск игры
 window.addEventListener('DOMContentLoaded', () => {

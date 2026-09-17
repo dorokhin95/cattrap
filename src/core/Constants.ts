@@ -26,8 +26,8 @@ export const CONSTANTS = {
   VARIABLE_JUMP_CUTOFF: 0.5, // Срез скорости при раннем отпускании прыжка
 
   // Честные тайминги
-  COYOTE_TIME_MS: 100,   // 90-110 мс
-  JUMP_BUFFER_MS: 120,   // 100-130 мс
+  COYOTE_TIME_MS: 110,   // 90-110 мс
+  JUMP_BUFFER_MS: 130,   // 100-130 мс
 
   // Тайминги смерти и рестарта
   HITSTOP_DURATION_MS: 60,
