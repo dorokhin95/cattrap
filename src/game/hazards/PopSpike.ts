@@ -8,8 +8,8 @@ export class PopSpike extends HazardBase {
   private spikeSprite: Phaser.Physics.Arcade.Sprite;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    // В скрытом состоянии основание выглядит как монолитная плита пола со щелью
-    super(scene, x, y, 'pop_spike_floor');
+    // В скрытом состоянии основание неотличимо от обычного монолитного блока
+    super(scene, x, y, 'tile_solid');
     this.initialY = y;
     this.setDepth(2); // Плита пола находится поверх выезжающего шипа, пока он внутри
 

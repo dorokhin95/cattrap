@@ -55,7 +55,7 @@ export interface LevelTriggerData {
   conditionType: 'player_x_greater' | 'player_x_less' | 'player_dist_portal';
   conditionValue: number;
   targetId: string;
-  action: 'pop' | 'drop' | 'collapse' | 'move_portal' | 'chain_pop';
+  action: 'pop' | 'drop' | 'collapse' | 'move_portal' | 'chain_pop' | 'crush';
   delayMs?: number;
   once?: boolean;
   resetOnDeath?: boolean;
@@ -115,6 +115,7 @@ export interface CrusherData {
   holdMs?: number;
   retractMs?: number;
   cycle?: boolean;
+  autoStart?: boolean;
   startDelayMs?: number;
 }
 

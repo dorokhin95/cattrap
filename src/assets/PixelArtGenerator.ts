@@ -646,48 +646,30 @@ export class PixelArtGenerator {
     pbdctx.fillRect(9, 10, 14, 2);
     scene.textures.addCanvas('pressure_button_down', pbdCanvas);
 
-    // 7. Toggle Block Active (32x32)
+    // 7. Toggle Block Active (32x32) — визуально 100% монолитная стена окружения
     const tbCanvas = document.createElement('canvas');
     tbCanvas.width = 32;
     tbCanvas.height = 32;
     const tbctx = tbCanvas.getContext('2d')!;
     tbctx.imageSmoothingEnabled = false;
-    tbctx.fillStyle = '#0f172a';
+    tbctx.fillStyle = C.PLATFORM_OUTLINE;
     tbctx.fillRect(0, 0, 32, 32);
-    tbctx.fillStyle = '#134e4a';
-    tbctx.fillRect(2, 2, 28, 28);
-    tbctx.fillStyle = C.ACCENT_TEAL;
-    // Угловые скобки
-    tbctx.fillRect(2, 2, 6, 2);
-    tbctx.fillRect(2, 2, 2, 6);
-    tbctx.fillRect(24, 2, 6, 2);
-    tbctx.fillRect(28, 2, 2, 6);
-    tbctx.fillRect(2, 28, 6, 2);
-    tbctx.fillRect(2, 24, 2, 6);
-    tbctx.fillRect(24, 28, 6, 2);
-    tbctx.fillRect(28, 24, 2, 6);
-    // Центральный энергетический кристалл
-    tbctx.fillStyle = '#5eead4';
-    tbctx.fillRect(14, 10, 4, 12);
-    tbctx.fillRect(10, 14, 12, 4);
+    tbctx.fillStyle = C.PLATFORM_DARK;
+    tbctx.fillRect(1, 1, 30, 30);
+    tbctx.fillStyle = C.PLATFORM_LIGHT;
+    tbctx.fillRect(1, 1, 30, 3);
+    tbctx.fillStyle = C.PLATFORM_OUTLINE;
+    tbctx.fillRect(0, 31, 32, 1);
+    tbctx.fillRect(31, 0, 1, 32);
     scene.textures.addCanvas('toggle_block', tbCanvas);
 
-    // 8. Toggle Block Inactive (32x32)
+    // 8. Toggle Block Inactive (32x32) — полностью скрытый (пустой) холст
     const tbiCanvas = document.createElement('canvas');
     tbiCanvas.width = 32;
     tbiCanvas.height = 32;
     const tbictx = tbiCanvas.getContext('2d')!;
     tbictx.imageSmoothingEnabled = false;
-    tbictx.fillStyle = 'rgba(15, 23, 42, 0.3)';
-    tbictx.fillRect(0, 0, 32, 32);
-    // Пунктирная рамка
-    tbictx.fillStyle = 'rgba(34, 211, 197, 0.4)';
-    for (let i = 2; i < 30; i += 6) {
-      tbictx.fillRect(i, 2, 3, 2);
-      tbictx.fillRect(i, 28, 3, 2);
-      tbictx.fillRect(2, i, 2, 3);
-      tbictx.fillRect(28, i, 2, 3);
-    }
+    tbictx.clearRect(0, 0, 32, 32);
     scene.textures.addCanvas('toggle_block_inactive', tbiCanvas);
 
     // 9. Crusher (32x32)

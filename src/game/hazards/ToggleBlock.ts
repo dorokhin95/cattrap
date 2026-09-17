@@ -11,8 +11,7 @@ export class ToggleBlock extends HazardBase {
   private initialY: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number, id: string = '', initiallyActive = true) {
-    const texture = initiallyActive ? 'toggle_block' : 'toggle_block_inactive';
-    super(scene, x, y, texture);
+    super(scene, x, y, 'toggle_block');
     this.id = id;
     this.initiallyActive = initiallyActive;
     this.isActiveState = initiallyActive;
@@ -26,7 +25,8 @@ export class ToggleBlock extends HazardBase {
 
     if (!initiallyActive) {
       body.enable = false;
-      this.setAlpha(0.35);
+      this.setVisible(false);
+      this.setAlpha(0);
     }
   }
 
@@ -51,15 +51,18 @@ export class ToggleBlock extends HazardBase {
       const body = this.body as Phaser.Physics.Arcade.Body;
       body.enable = true;
       this.setTexture('toggle_block');
-      this.setAlpha(1);
+      this.setVisible(true);
 
       this.scene.tweens.killTweensOf(this);
-      this.setScale(0.8, 0.8);
+      this.setScale(0.5, 0.5);
+      this.setAlpha(0);
       this.scene.tweens.add({
         targets: this,
         scaleX: 1,
         scaleY: 1,
-        duration: 120
+        alpha: 1,
+        duration: 120,
+        ease: 'Back.easeOut'
       });
     } else {
       this.isActiveState = false;
@@ -68,14 +71,17 @@ export class ToggleBlock extends HazardBase {
 
       AudioManager.getInstance().playSFX('toggleDissolve');
 
-      // Анимация растворения
+      // Анимация растворения в невидимость
       this.scene.tweens.killTweensOf(this);
       this.scene.tweens.add({
         targets: this,
-        alpha: 0.35,
-        duration: 140,
+        alpha: 0,
+        scaleX: 0.6,
+        scaleY: 0.6,
+        duration: 130,
         onComplete: () => {
-          this.setTexture('toggle_block_inactive');
+          this.setVisible(false);
+          this.setScale(1, 1);
         }
       });
     }
@@ -96,11 +102,12 @@ export class ToggleBlock extends HazardBase {
     if (this.initiallyActive) {
       body.enable = true;
       this.setTexture('toggle_block');
+      this.setVisible(true);
       this.setAlpha(1);
     } else {
       body.enable = false;
-      this.setTexture('toggle_block_inactive');
-      this.setAlpha(0.35);
+      this.setVisible(false);
+      this.setAlpha(0);
     }
   }
 }

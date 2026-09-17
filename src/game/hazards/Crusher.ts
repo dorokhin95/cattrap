@@ -20,7 +20,9 @@ export class Crusher extends HazardBase {
   private holdMs: number;
   private retractMs: number;
   private cycle: boolean;
+  private autoStart: boolean;
   private startDelayMs: number;
+  private isCrushing = false;
 
   constructor(
     scene: Phaser.Scene,
@@ -35,7 +37,8 @@ export class Crusher extends HazardBase {
     holdMs: number = CONSTANTS.CRUSHER_HOLD_MS,
     retractMs: number = CONSTANTS.CRUSHER_RETRACT_MS,
     cycle: boolean = true,
-    startDelayMs: number = 300
+    startDelayMs: number = 300,
+    autoStart: boolean = true
   ) {
     super(scene, startX, startY, 'crusher');
     this.id = id;
@@ -51,6 +54,7 @@ export class Crusher extends HazardBase {
     this.retractMs = retractMs;
     this.cycle = cycle;
     this.startDelayMs = startDelayMs;
+    this.autoStart = autoStart;
 
     if (orientation === 'left') {
       this.setAngle(90);
@@ -63,10 +67,17 @@ export class Crusher extends HazardBase {
     body.setImmovable(true);
     body.setSize(30, 30);
 
-    // Запуск начального цикла
-    if (this.cycle) {
+    // Запуск начального цикла, если включен autoStart
+    if (this.autoStart && this.cycle) {
+      this.isCrushing = true;
       this.schedule(this.startDelayMs, () => this.startWarning());
     }
+  }
+
+  public triggerCrush(): void {
+    if (this.isCrushing) return;
+    this.isCrushing = true;
+    this.startWarning();
   }
 
   private startWarning(): void {
@@ -127,7 +138,9 @@ export class Crusher extends HazardBase {
       ease: 'Linear',
       onComplete: () => {
         this.setPosition(this.startX, this.startY);
+        this.isCrushing = false;
         if (this.cycle) {
+          this.isCrushing = true;
           this.schedule(450, () => this.startWarning());
         }
       }
@@ -138,9 +151,11 @@ export class Crusher extends HazardBase {
     this.cancelScheduledEvents();
     this.scene.tweens.killTweensOf(this);
     this.isLethal = false;
+    this.isCrushing = false;
     this.setPosition(this.startX, this.startY);
 
-    if (this.cycle) {
+    if (this.autoStart && this.cycle) {
+      this.isCrushing = true;
       this.schedule(this.startDelayMs, () => this.startWarning());
     }
   }

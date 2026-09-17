@@ -171,4 +171,40 @@ describe('Audit Fixes Verification', () => {
       expect(count).toBe(1); // Не должен сработать повторно
     });
   });
+
+  describe('Crusher dynamic traps and Level 15 redesign', () => {
+    it('в Level 15 все прессы имеют autoStart: false и детерминированные триггеры активации', () => {
+      const l15 = LevelRegistry.getLevel(15);
+      expect(l15).toBeDefined();
+      expect(l15.crushers).toBeDefined();
+      expect(l15.crushers!.length).toBeGreaterThanOrEqual(4);
+
+      // Каждый пресс должен быть отключен от автоматического долбления со старта уровня
+      for (const cr of l15.crushers!) {
+        expect(cr.autoStart).toBe(false);
+      }
+
+      // Для всех прессов должны существовать соответствующие триггеры с action 'crush'
+      const crushTriggers = l15.triggers.filter(t => t.action === 'crush');
+      expect(crushTriggers.length).toBe(l15.crushers!.length);
+
+      const triggeredCrusherIds = crushTriggers.map(t => t.targetId);
+      for (const cr of l15.crushers!) {
+        expect(triggeredCrusherIds).toContain(cr.id);
+      }
+    });
+
+    it('в Level 13 в ямах установлены шипы для предотвращения софтлока', () => {
+      const l13 = LevelRegistry.getLevel(13);
+      expect(l13).toBeDefined();
+      expect(l13.staticSpikes).toBeDefined();
+      expect(l13.staticSpikes!.length).toBeGreaterThan(0);
+
+      // Проверяем, что под платформами расставлены шипы
+      const spikeXCoords = l13.staticSpikes!.map(s => s.x);
+      expect(spikeXCoords).toContain(6);
+      expect(spikeXCoords).toContain(15);
+      expect(spikeXCoords).toContain(24);
+    });
+  });
 });

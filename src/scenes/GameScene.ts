@@ -211,11 +211,18 @@ export class GameScene extends Phaser.Scene {
     }
 
     // 2. Статические шипы
-    this.staticSpikesGroup = this.physics.add.group();
+    this.staticSpikesGroup = this.physics.add.group({ allowGravity: false, immovable: true });
     if (this.levelData.staticSpikes) {
       for (const s of this.levelData.staticSpikes) {
         const spike = new StaticSpike(this, (s.x + 0.5) * T, (s.y + 0.5) * T, s.upsideDown);
         this.staticSpikesGroup.add(spike);
+        const b = spike.body as Phaser.Physics.Arcade.Body;
+        if (b) {
+          b.setAllowGravity(false);
+          b.setImmovable(true);
+          b.setVelocity(0, 0);
+          b.moves = false;
+        }
       }
     }
 
@@ -367,7 +374,8 @@ export class GameScene extends Phaser.Scene {
           cr.holdMs,
           cr.retractMs,
           cr.cycle !== false,
-          cr.startDelayMs
+          cr.startDelayMs,
+          cr.autoStart !== false
         );
         this.crushers.push(c);
       }
@@ -438,6 +446,11 @@ export class GameScene extends Phaser.Scene {
         });
         this.chainPopTimers.push(timer);
       });
+    } else if (action === 'crush') {
+      const crusher = this.crushers.find(c => c.id === targetId);
+      if (crusher) {
+        crusher.triggerCrush();
+      }
     }
   }
 
@@ -493,15 +506,7 @@ export class GameScene extends Phaser.Scene {
     // Кот <-> Зоны модификаторов (уменьшение / гравитация)
     for (const mz of this.modifierZones) {
       this.physics.add.overlap(this.cat, mz, () => {
-        if (mz.modifierType === 'shrink') {
-          this.cat.setSizeModifier('small');
-        } else if (mz.modifierType === 'restore_size') {
-          this.cat.setSizeModifier('normal');
-        } else if (mz.modifierType === 'gravity_invert') {
-          this.cat.setGravityModifier('inverted');
-        } else if (mz.modifierType === 'gravity_normal') {
-          this.cat.setGravityModifier('normal');
-        }
+        mz.applyModifier(this.cat);
       });
     }
 
@@ -719,6 +724,11 @@ export class GameScene extends Phaser.Scene {
 
     // Сброс триггеров и интерактивных ловушек
     this.triggerManager.reset();
+    if (this.staticSpikesGroup) {
+      this.staticSpikesGroup.getChildren().forEach((s: any) => {
+        if (s.reset) s.reset();
+      });
+    }
     for (const spike of this.popSpikes) spike.reset();
     for (const crumble of this.crumbleBlocks) crumble.reset();
     for (const fb of this.fallingBlocks) fb.reset();

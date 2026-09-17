@@ -60,7 +60,8 @@ export const level15: LevelData = {
       warningMs: 240,
       slamMs: 120,
       retractMs: 320,
-      cycle: true
+      cycle: true,
+      autoStart: false
     },
 
     // Section B: Два пресса в противофазе со смещением
@@ -75,7 +76,8 @@ export const level15: LevelData = {
       slamMs: 120,
       retractMs: 300,
       cycle: true,
-      startDelayMs: 150
+      startDelayMs: 150,
+      autoStart: false
     },
     {
       id: 'crush_b2',
@@ -88,7 +90,8 @@ export const level15: LevelData = {
       slamMs: 120,
       retractMs: 300,
       cycle: true,
-      startDelayMs: 850
+      startDelayMs: 850,
+      autoStart: false
     },
 
     // Section C: Горизонтальный пресс, бьющий справа налево над нишей (x=31 -> x=29, y=9)
@@ -102,7 +105,8 @@ export const level15: LevelData = {
       warningMs: 280,
       slamMs: 140,
       retractMs: 350,
-      cycle: true
+      cycle: true,
+      autoStart: false
     }
   ],
 
@@ -111,5 +115,42 @@ export const level15: LevelData = {
     y: 10
   },
 
-  triggers: []
+  triggers: [
+    // Активация пресса Section A при приближении кота
+    {
+      id: 'trig_15_crush_a',
+      conditionType: 'player_x_greater',
+      conditionValue: 5.5,
+      targetId: 'crush_a',
+      action: 'crush',
+      once: true
+    },
+    // Активация первого пресса Section B на входе в секцию
+    {
+      id: 'trig_15_crush_b1',
+      conditionType: 'player_x_greater',
+      conditionValue: 12.5,
+      targetId: 'crush_b1',
+      action: 'crush',
+      once: true
+    },
+    // Активация второго пресса Section B при подходе к карману безопасности
+    {
+      id: 'trig_15_crush_b2',
+      conditionType: 'player_x_greater',
+      conditionValue: 17.5,
+      targetId: 'crush_b2',
+      action: 'crush',
+      once: true
+    },
+    // Активация бокового пресса Section C при приближении к нише
+    {
+      id: 'trig_15_crush_c',
+      conditionType: 'player_x_greater',
+      conditionValue: 25.5,
+      targetId: 'crush_c_side',
+      action: 'crush',
+      once: true
+    }
+  ]
 };
