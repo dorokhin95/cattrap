@@ -114,11 +114,11 @@ export const level10: LevelData = {
       action: 'pop',
       once: true
     },
-    // Секция E: приближение к порталу -> портал убегает, волна шипов сзади!
+    // Секция E: приближение к порталу -> портал убегает, волна шипов щелкает сзади!
     {
       id: 'trig_l10_portal_run',
       conditionType: 'player_x_greater',
-      conditionValue: 43.5,
+      conditionValue: 43.2,
       targetId: 'portal',
       action: 'move_portal',
       once: true
@@ -126,37 +126,73 @@ export const level10: LevelData = {
     {
       id: 'trig_l10_wave_1',
       conditionType: 'player_x_greater',
-      conditionValue: 43.5,
+      conditionValue: 45.2,
       targetId: 'l10_wave_1',
       action: 'pop',
-      delayMs: 50,
+      delayMs: 40,
       once: true
     },
     {
       id: 'trig_l10_wave_2',
       conditionType: 'player_x_greater',
-      conditionValue: 43.5,
+      conditionValue: 46.2,
       targetId: 'l10_wave_2',
       action: 'pop',
-      delayMs: 180,
+      delayMs: 40,
       once: true
     },
     {
       id: 'trig_l10_wave_3',
       conditionType: 'player_x_greater',
-      conditionValue: 43.5,
+      conditionValue: 47.2,
       targetId: 'l10_wave_3',
       action: 'pop',
-      delayMs: 310,
+      delayMs: 40,
       once: true
     },
     {
       id: 'trig_l10_wave_4',
       conditionType: 'player_x_greater',
+      conditionValue: 48.2,
+      targetId: 'l10_wave_4',
+      action: 'pop',
+      delayMs: 40,
+      once: true
+    },
+    {
+      id: 'trig_l10_wave_fuse_1',
+      conditionType: 'player_x_greater',
+      conditionValue: 43.5,
+      targetId: 'l10_wave_1',
+      action: 'pop',
+      delayMs: 550,
+      once: true
+    },
+    {
+      id: 'trig_l10_wave_fuse_2',
+      conditionType: 'player_x_greater',
+      conditionValue: 43.5,
+      targetId: 'l10_wave_2',
+      action: 'pop',
+      delayMs: 800,
+      once: true
+    },
+    {
+      id: 'trig_l10_wave_fuse_3',
+      conditionType: 'player_x_greater',
+      conditionValue: 43.5,
+      targetId: 'l10_wave_3',
+      action: 'pop',
+      delayMs: 1050,
+      once: true
+    },
+    {
+      id: 'trig_l10_wave_fuse_4',
+      conditionType: 'player_x_greater',
       conditionValue: 43.5,
       targetId: 'l10_wave_4',
       action: 'pop',
-      delayMs: 440,
+      delayMs: 1300,
       once: true
     }
   ]
