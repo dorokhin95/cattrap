@@ -23,6 +23,10 @@ export class CameraSystem {
     this.currentMode = mode;
     const tileSize = CONSTANTS.TILE_SIZE;
 
+    // Гарантируем, что камера сцены имеет точные габариты нового окна
+    this.camera.setViewport(0, 0, viewportWidth, viewportHeight);
+    this.camera.setSize(viewportWidth, viewportHeight);
+
     let visibleTilesX: number = CONSTANTS.LANDSCAPE_TILES_X; // 18
     if (mode === 'portrait') {
       visibleTilesX = CONSTANTS.PORTRAIT_TILES_X; // 10

@@ -24,7 +24,9 @@ export class MenuScene extends Phaser.Scene {
     this.renderMenu(isContinued, highestLevel);
 
     // Подписка на изменение размера окна
-    this.scale.on('resize', () => {
+    this.scale.on('resize', (gameSize: Phaser.Structs.Size) => {
+      this.cameras.main.setViewport(0, 0, gameSize.width, gameSize.height);
+      this.cameras.main.setSize(gameSize.width, gameSize.height);
       this.container.removeAll(true);
       this.renderMenu(isContinued, highestLevel);
     });

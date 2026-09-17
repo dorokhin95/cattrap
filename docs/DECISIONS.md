@@ -52,3 +52,14 @@
   2. В `main.ts` и `style.css` установлены `activePointers: 4`, `touch: { capture: true }`, строгие CSS-правила `overscroll-behavior: none !important; touch-action: none !important;` и отключено системное контекстное меню `contextmenu`.
   3. Буфер ввода прыжка увеличен до 130 мс, а Coyote Time — до 110 мс.
 - **Обоснование:** Гарантирует безупречный, плавный и безотказный отклик на любых сенсорных экранах (iOS Safari, Android Chrome, Telegram WebApp) без необходимости выцеливать пиксели кнопок.
+
+---
+
+## ADR-008: Прозрачный ресайз при повороте экрана (без модального окна)
+- **Контекст:** При смене ориентации на мобильных устройствах (iOS Safari) игра зависала: `rotateModal` паузировал игру и отключал тачконтролы (`setEnabled(false)`), но iOS обновляет `window.innerWidth/Height` с задержкой анимации (~300 мс), из-за чего `resize`-событие приходило позже — модалка появлялась, кнопка «Продолжить» не реагировала на касания, зависая намертво.
+- **Решение:**
+  1. Полное удаление `rotateModal` и `previousOrientationMode` из `UIScene`.
+  2. В `main.ts`: `resizeGame()` вызывается через `window.resize` + тройной `setTimeout` (50/150/300 мс) по `orientationchange` + `ResizeObserver` на `#game-container`.
+  3. В `style.css`: `#game-container` переведён на `position: fixed; height: 100dvh` — браузер не задерживает пересчёт layout при повороте.
+  4. В каждой сцене (`GameScene`, `UIScene`, `MenuScene`) и `CameraSystem`: в `handleResize` явный вызов `camera.setViewport(0,0,w,h)` + `camera.setSize(w,h)`, т.к. Phaser 3 в режиме `RESIZE` не обновляет камеры автоматически.
+- **Обоснование:** Устраняет зависание без потери игрового контекста; поворот экрана происходит незаметно для игрока без паузы и без блокировки ввода.

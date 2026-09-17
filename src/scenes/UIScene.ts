@@ -12,7 +12,6 @@ export class UIScene extends Phaser.Scene {
   private hudContainer!: Phaser.GameObjects.Container;
   private pauseModal!: Phaser.GameObjects.Container;
   private settingsModal!: Phaser.GameObjects.Container;
-  private rotateModal!: Phaser.GameObjects.Container;
   private victoryModal!: Phaser.GameObjects.Container;
 
   private pauseBtn!: Phaser.GameObjects.Text;
@@ -23,7 +22,6 @@ export class UIScene extends Phaser.Scene {
   private touchControls!: TouchControls;
   private isPaused = false;
   private isSettingsOpen = false;
-  private previousOrientationMode: string | null = null;
 
   constructor() {
     super({ key: 'UIScene' });
@@ -47,7 +45,6 @@ export class UIScene extends Phaser.Scene {
     // 3. Создание модальных окон
     this.createPauseModal();
     this.createSettingsModal();
-    this.createRotateModal();
     this.createVictoryModal();
 
     if (this.isSettingsOpen) {
@@ -305,46 +302,6 @@ export class UIScene extends Phaser.Scene {
     this.settingsModal.add([bg, lbl]);
   }
 
-  private createRotateModal(): void {
-    this.rotateModal = this.add.container(0, 0);
-    this.rotateModal.setVisible(false);
-  }
-
-  private showOrientationChangeModal(): void {
-    this.rotateModal.removeAll(true);
-    const width = this.cameras.main.width;
-    const height = this.cameras.main.height;
-
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.75)
-      .setInteractive();
-
-    const title = this.add.text(width / 2, height * 0.38, 'Ориентация изменена', {
-      fontSize: '22px',
-      fontStyle: 'bold',
-      color: '#ffffff'
-    }).setOrigin(0.5);
-
-    const btn = this.add.rectangle(width / 2, height * 0.52, 220, 48, 0x0284c7)
-      .setInteractive({ useHandCursor: true });
-
-    const btnText = this.add.text(width / 2, height * 0.52, 'ПРОДОЛЖИТЬ', {
-      fontSize: '17px',
-      fontStyle: 'bold',
-      color: '#ffffff'
-    }).setOrigin(0.5);
-
-    btn.on('pointerdown', () => {
-      AudioManager.getInstance().playSFX('click');
-      this.rotateModal.setVisible(false);
-      this.touchControls.setEnabled(true);
-      this.game.events.emit(EVENTS.PAUSE_REQUEST, false);
-    });
-
-    this.rotateModal.add([overlay, title, btn, btnText]);
-    this.rotateModal.setVisible(true);
-    this.touchControls.setEnabled(false);
-  }
-
   private createVictoryModal(): void {
     this.victoryModal = this.add.container(0, 0);
     this.victoryModal.setVisible(false);
@@ -453,18 +410,18 @@ export class UIScene extends Phaser.Scene {
     });
   }
 
-  private handleResize(): void {
+  private handleResize(gameSize?: Phaser.Structs.Size): void {
+    const width = gameSize ? gameSize.width : this.scale.gameSize.width;
+    const height = gameSize ? gameSize.height : this.scale.gameSize.height;
+
+    // Гарантируем, что камера UIScene строго совпадает с новым окном
+    this.cameras.main.setViewport(0, 0, width, height);
+    this.cameras.main.setSize(width, height);
+
     const vp = PlatformManager.getInstance().getPlatform().getViewport();
 
-    // Проверка смены ориентации во время активной игры (ТЗ пункт 43)
-    if (this.previousOrientationMode && this.previousOrientationMode !== vp.mode && !this.isPaused && !this.isSettingsOpen) {
-      this.game.events.emit(EVENTS.PAUSE_REQUEST, true);
-      this.showOrientationChangeModal();
-    }
-    this.previousOrientationMode = vp.mode;
-
-    // Обновляем геометрию сенсорных кнопок
-    this.touchControls.updateLayout(vp.mode, vp.width, vp.height, vp.safeArea.bottom, vp.safeArea.top);
+    // Обновляем геометрию сенсорных кнопок под новый размер
+    this.touchControls.updateLayout(vp.mode, width, height, vp.safeArea.bottom, vp.safeArea.top);
 
     // Центрирование HUD
     if (vp.mode === 'portrait') {
@@ -477,6 +434,14 @@ export class UIScene extends Phaser.Scene {
       this.levelText.setPosition(vp.safeArea.left + 76, vp.safeArea.top + 24);
       this.timerText.setPosition(vp.safeArea.left + 240, vp.safeArea.top + 24);
       this.deathsText.setPosition(vp.safeArea.left + 330, vp.safeArea.top + 24);
+    }
+
+    // Если открыты модальные окна, обновляем их центрирование под новый размер
+    if (this.isPaused && this.pauseModal && this.pauseModal.visible) {
+      this.renderPauseModalContent();
+    }
+    if (this.isSettingsOpen && this.settingsModal && this.settingsModal.visible) {
+      this.renderSettingsContent(false);
     }
   }
 

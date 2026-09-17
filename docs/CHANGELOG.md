@@ -40,3 +40,9 @@
     - Верхняя полоса экрана изолирована для надежного доступа к HUD и кнопке паузы `⏸`.
   - В `main.ts` и `style.css` установлены `touch: { capture: true }`, `activePointers: 4`, отключен системный zoom/bounce (`overscroll-behavior: none !important; touch-action: none !important;`) и заблокировано выпадающее `contextmenu` при долгом зажатии пальца.
   - Увеличены `JUMP_BUFFER_MS` (до 130 мс) и `COYOTE_TIME_MS` (до 110 мс) для максимальной отзывчивости платформинга на сенсорных экранах.
+- **Исправление зависания при смене ориентации экрана на мобильных:**
+  - Удалено модальное окно «Ориентация изменена» (`rotateModal`), которое паузировало игру + блокировало тачконтролы — на iOS Safari из-за задержки resize никогда не снималось корректно (зависание).
+  - Поворот экрана теперь обрабатывается прозрачно без прерывания игры.
+  - В `main.ts`: принудительный `resizeGame()` с тройным `setTimeout` (50/150/300 мс) для iOS Safari + `ResizeObserver` на `#game-container`.
+  - В `style.css`: `#game-container` — `position: fixed; height: 100dvh`.
+  - В `GameScene`, `UIScene`, `MenuScene`, `CameraSystem`: явный вызов `camera.setViewport` + `camera.setSize` при каждом `handleResize`.

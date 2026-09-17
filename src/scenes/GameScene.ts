@@ -506,8 +506,14 @@ export class GameScene extends Phaser.Scene {
     this.game.events.emit(EVENTS.PAUSE_STATE_CHANGED, this.isPaused);
   }
 
-  private handleResize(): void {
+  private handleResize(gameSize?: Phaser.Structs.Size): void {
+    const width = gameSize ? gameSize.width : this.scale.gameSize.width;
+    const height = gameSize ? gameSize.height : this.scale.gameSize.height;
+
+    this.cameras.main.setViewport(0, 0, width, height);
+    this.cameras.main.setSize(width, height);
+
     const vp = PlatformManager.getInstance().getPlatform().getViewport();
-    this.cameraSystem.updateViewport(vp.mode, vp.width, vp.height);
+    this.cameraSystem.updateViewport(vp.mode, width, height);
   }
 }
