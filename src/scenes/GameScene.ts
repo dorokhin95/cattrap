@@ -491,7 +491,11 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Кот <-> Статические шипы (летальный исход)
-    this.physics.add.overlap(this.cat, this.staticSpikesGroup, () => {
+    this.physics.add.overlap(this.cat, this.staticSpikesGroup, (_, spikeObj) => {
+      const spike = spikeObj as StaticSpike;
+      if (spike && spike.activate) {
+        spike.activate();
+      }
       this.handlePlayerDeath();
     });
 
@@ -676,6 +680,15 @@ export class GameScene extends Phaser.Scene {
     // Завершение кадра для кнопок (сброс флагов текущего контакта enter-edge)
     for (const btn of this.buttons) {
       btn.endFrame();
+    }
+
+    // Внезапная активация скрытых шипов при приближении котика
+    if (this.staticSpikesGroup) {
+      this.staticSpikesGroup.getChildren().forEach((spikeObj: any) => {
+        if (spikeObj.checkProximity) {
+          spikeObj.checkProximity(this.cat.x, this.cat.y);
+        }
+      });
     }
 
     // Падение за пределы уровня (смерть в пропасти)
