@@ -35,6 +35,7 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
   private levelDeathsCount = 0;
 
   private surfaceVelocityX = 0;
+  private isBouncing = false;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'cat', 0);
@@ -155,7 +156,7 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
     }
 
     if (isGroundContact) {
-      // На земле: скорость складывается со скоростью поверхности (конвейер)
+      // На земле: скорость бега игрока строго ограничена [-160, 160]
       let desiredVx = 0;
       if (moveLeft && !moveRight) {
         desiredVx = -CONSTANTS.MOVE_SPEED;
@@ -165,6 +166,7 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
         this.setFlipX(false);
       }
 
+      // Скорость конвейера добавляется к скорости бега
       const targetVx = desiredVx + this.surfaceVelocityX;
 
       if (body.velocity.x < targetVx) {
@@ -175,14 +177,31 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
         body.setVelocityX(Math.max(targetVx, body.velocity.x - step));
       }
     } else {
-      // В воздухе: сохраняем горизонтальный импульс, воздушный контроль слегка подруливает
+      // В воздухе:
+      // Базовый air-control СТРОГО симметричен и ограничен [-160, +160]!
+      // Удержание стрелки в воздухе никогда не создает скорость выше 160 px/s!
       const airAccel = CONSTANTS.ACCELERATION * CONSTANTS.AIR_CONTROL * (deltaMs / 1000);
+      const airDecel = CONSTANTS.DECELERATION * CONSTANTS.AIR_CONTROL * (deltaMs / 1000);
+
       if (moveLeft && !moveRight) {
-        body.setVelocityX(Math.max(-CONSTANTS.MOVE_SPEED, body.velocity.x - airAccel));
+        // Управление влево: ускоряем влево максимум до -160 (если скорость уже не была выше от конвейера)
+        if (body.velocity.x > -CONSTANTS.MOVE_SPEED) {
+          body.setVelocityX(Math.max(-CONSTANTS.MOVE_SPEED, body.velocity.x - airAccel));
+        }
         this.setFlipX(true);
       } else if (moveRight && !moveLeft) {
-        body.setVelocityX(Math.min(CONSTANTS.MOVE_SPEED + CONSTANTS.CONVEYOR_SPEED, body.velocity.x + airAccel));
+        // Управление вправо: ускоряем вправо максимум до +160 (если скорость уже не была выше от конвейера)
+        if (body.velocity.x < CONSTANTS.MOVE_SPEED) {
+          body.setVelocityX(Math.min(CONSTANTS.MOVE_SPEED, body.velocity.x + airAccel));
+        }
         this.setFlipX(false);
+      } else {
+        // При отсутствии ввода в воздухе: торможение с воздушным сопротивлением (как в оригинале)
+        if (body.velocity.x > 0) {
+          body.setVelocityX(Math.max(0, body.velocity.x - airDecel));
+        } else if (body.velocity.x < 0) {
+          body.setVelocityX(Math.min(0, body.velocity.x + airDecel));
+        }
       }
     }
 
@@ -197,12 +216,22 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
       this.executeJump();
     }
 
-    // Variable jump: срез вертикальной скорости при раннем отпускании кнопки прыжка
-    if (input.jumpReleased) {
+    // Variable jump: срез вертикальной скорости при раннем отпускании кнопки прыжка.
+    // Действует ТОЛЬКО на прыжок игрока и НЕ режет импульс батута!
+    if (input.jumpReleased && !this.isBouncing) {
       if (this.gravityState === 'normal' && body.velocity.y < 0) {
         body.setVelocityY(body.velocity.y * CONSTANTS.VARIABLE_JUMP_CUTOFF);
       } else if (this.gravityState === 'inverted' && body.velocity.y > 0) {
         body.setVelocityY(body.velocity.y * CONSTANTS.VARIABLE_JUMP_CUTOFF);
+      }
+    }
+
+    // Сброс флага батута при прохождении верхней точки траектории
+    if (this.isBouncing) {
+      if (this.gravityState === 'normal' && body.velocity.y >= 0) {
+        this.isBouncing = false;
+      } else if (this.gravityState === 'inverted' && body.velocity.y <= 0) {
+        this.isBouncing = false;
       }
     }
 
@@ -400,9 +429,22 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
     this.surfaceVelocityX = speedX;
   }
 
+  public applyBounce(impulse: number): void {
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    if (!body) return;
+
+    this.isBouncing = true;
+    body.setVelocityY(impulse);
+    // Сбрасываем coyote time и jump buffer, чтобы прыжок не интерферировал с батутом
+    this.timeSinceLeftGroundMs = 9999;
+    this.timeSinceJumpRequestedMs = 9999;
+    this.catState = 'jump';
+  }
+
   public respawn(x: number, y: number, deathsCount?: number): void {
     this.scene.tweens.killTweensOf(this);
     this.isDead = false;
+    this.isBouncing = false;
     this.catState = 'idle';
     this.sizeState = 'normal';
     this.gravityState = 'normal';

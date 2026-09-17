@@ -30,21 +30,33 @@ export class BouncePad extends HazardBase {
 
     const catBody = cat.body as Phaser.Physics.Arcade.Body;
     const padBody = this.body as Phaser.Physics.Arcade.Body;
+    if (!catBody || !padBody) return false;
+
     const isCatInverted = cat.getGravityState && cat.getGravityState() === 'inverted';
 
     if (!isCatInverted) {
-      // Обычная гравитация: отскок разрешён только при приземлении сверху
+      // Обычная гравитация: строго приземление сверху на верхнюю грань батута
       if (catBody.velocity.y < -20) return false;
-      if (catBody.bottom > padBody.bottom + 4) return false;
+      // Подошва котика должна быть на уровне верха батута (padBody.top)
+      if (catBody.bottom < padBody.top - 4 || catBody.bottom > padBody.top + 8) return false;
+      // Горизонтальный охват
+      if (catBody.right < padBody.left + 2 || catBody.left > padBody.right - 2) return false;
     } else {
-      // Инвертированная гравитация: отскок разрешён только при приземлении снизу вверх
+      // Инвертированная гравитация: строго касание снизу вверх
       if (catBody.velocity.y > 20) return false;
-      if (catBody.top < padBody.top - 4) return false;
+      if (catBody.top > padBody.bottom + 4 || catBody.top < padBody.bottom - 8) return false;
+      if (catBody.right < padBody.left + 2 || catBody.left > padBody.right - 2) return false;
     }
 
     const impulse = isCatInverted ? -this.power : this.power;
 
-    catBody.setVelocityY(impulse);
+    // Передаем импульс через Cat.applyBounce, чтобы защитить от среза jumpReleased
+    if (typeof cat.applyBounce === 'function') {
+      cat.applyBounce(impulse);
+    } else {
+      catBody.setVelocityY(impulse);
+    }
+
     this.cooldownMs = CONSTANTS.BOUNCE_COOLDOWN_MS;
 
     AudioManager.getInstance().playSFX('bounce');

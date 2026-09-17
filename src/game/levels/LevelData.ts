@@ -112,6 +112,7 @@ export interface CrusherData {
   orientation: 'down' | 'left' | 'right';
   warningMs?: number;
   slamMs?: number;
+  holdMs?: number;
   retractMs?: number;
   cycle?: boolean;
   startDelayMs?: number;

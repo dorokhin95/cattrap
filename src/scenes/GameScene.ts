@@ -364,7 +364,7 @@ export class GameScene extends Phaser.Scene {
           cr.id,
           cr.warningMs,
           cr.slamMs,
-          undefined,
+          cr.holdMs,
           cr.retractMs,
           cr.cycle !== false,
           cr.startDelayMs
