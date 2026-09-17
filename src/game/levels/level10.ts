@@ -17,6 +17,9 @@ export const level10: LevelData = {
     // Низкий потолок туннеля с карманом на x=28 над выдвижным шипом
     ...Array.from({ length: 3 }, (_, i) => ({ x: 25 + i, y: 10 })),
     ...Array.from({ length: 4 }, (_, i) => ({ x: 29 + i, y: 10 })),
+    // Низкий твердый свод лаза (просвет 16 px)
+    ...Array.from({ length: 3 }, (_, i) => ({ x: 25 + i, y: 11, type: 'tunnel_bar' as const })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 29 + i, y: 11, type: 'tunnel_bar' as const })),
     // Секция D: потолочная дорожка гравитации
     ...Array.from({ length: 6 }, (_, i) => ({ x: 35 + i, y: 4 })),
     // Секция E: финишная площадка
@@ -30,14 +33,6 @@ export const level10: LevelData = {
   staticSpikes: [
     // Секция A
     { x: 6, y: 11 },
-    // Секция C: свисающие шипы в туннеле (большой кот не пролезет)
-    { x: 25, y: 11, upsideDown: true },
-    { x: 26, y: 11, upsideDown: true },
-    { x: 27, y: 11, upsideDown: true },
-    { x: 29, y: 11, upsideDown: true },
-    { x: 30, y: 11, upsideDown: true },
-    { x: 31, y: 11, upsideDown: true },
-    { x: 32, y: 11, upsideDown: true },
     // Секция D: перевернутый шип на потолке
     { x: 38, y: 5, upsideDown: true },
     // Шипы на дне пропасти под гравитационной секцией

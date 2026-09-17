@@ -1,7 +1,7 @@
 export interface TileCoord {
   x: number;
   y: number;
-  type?: 'solid' | 'paw';
+  type?: 'solid' | 'paw' | 'tunnel_bar';
 }
 
 export interface SpikeCoord {

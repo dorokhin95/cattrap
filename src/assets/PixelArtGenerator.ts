@@ -264,6 +264,22 @@ export class PixelArtGenerator {
     fbctx.fillStyle = '#f59e42';
     fbctx.fillRect(28, size * 2 - 4, 8, 2);
     scene.textures.addCanvas('falling_block', fallBlockCanvas);
+
+    // 6. Каменная балка низкого свода лаза (32x16 px)
+    const barCanvas = document.createElement('canvas');
+    barCanvas.width = size;
+    barCanvas.height = 16;
+    const barctx = barCanvas.getContext('2d')!;
+    barctx.fillStyle = C.PLATFORM_OUTLINE;
+    barctx.fillRect(0, 0, size, 16);
+    barctx.fillStyle = C.PLATFORM_DARK;
+    barctx.fillRect(1, 1, size - 2, 14);
+    barctx.fillStyle = C.PLATFORM_LIGHT;
+    barctx.fillRect(1, 1, size - 2, 2);
+    // Декоративная фаска на нижней грани свода
+    barctx.fillStyle = '#1e1a2b';
+    barctx.fillRect(1, 14, size - 2, 1);
+    scene.textures.addCanvas('tile_tunnel_bar', barCanvas);
   }
 
   // --- ЛОВУШКИ: ШИПЫ И ВЫДВИЖНЫЕ ЭЛЕМЕНТЫ ---

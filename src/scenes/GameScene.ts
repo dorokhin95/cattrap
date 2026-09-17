@@ -128,9 +128,17 @@ export class GameScene extends Phaser.Scene {
     // 1. Твердые блоки
     this.solidGroup = this.physics.add.staticGroup();
     for (const t of this.levelData.solidTiles) {
-      const tex = t.type === 'paw' ? 'tile_paw' : 'tile_solid';
-      const tile = this.solidGroup.create((t.x + 0.5) * T, (t.y + 0.5) * T, tex);
-      tile.refreshBody();
+      if (t.type === 'tunnel_bar') {
+        // Низкая каменная балка свода лаза (32x16 px)
+        // Занимает верхние 16 px клетки t.y, оставляя снизу 16 px свободного просвета
+        const bar = this.solidGroup.create((t.x + 0.5) * T, t.y * T + 8, 'tile_tunnel_bar');
+        bar.setSize(32, 16);
+        bar.refreshBody();
+      } else {
+        const tex = t.type === 'paw' ? 'tile_paw' : 'tile_solid';
+        const tile = this.solidGroup.create((t.x + 0.5) * T, (t.y + 0.5) * T, tex);
+        tile.refreshBody();
+      }
     }
 
     // 2. Статические шипы
