@@ -214,7 +214,7 @@ export class PixelArtGenerator {
     cctx.fillRect(16, 14, 1, 6);
     scene.textures.addCanvas('tile_crumble', crumbleCanvas);
 
-    // 3. Обманный пол (fake_floor)
+    // 3. Обманный пол (fake_floor) — 100% визуально идентичен безопасной платформе
     const fakeCanvas = document.createElement('canvas');
     fakeCanvas.width = size;
     fakeCanvas.height = size;
@@ -225,12 +225,12 @@ export class PixelArtGenerator {
     fctx.fillRect(1, 1, size - 2, size - 2);
     fctx.fillStyle = C.PLATFORM_LIGHT;
     fctx.fillRect(1, 1, size - 2, 3);
-    // Микро-отличие: едва заметный сдвиг шва
     fctx.fillStyle = C.PLATFORM_OUTLINE;
-    fctx.fillRect(16, 0, 1, 4);
+    fctx.fillRect(0, size - 1, size, 1);
+    fctx.fillRect(size - 1, 0, 1, size);
     scene.textures.addCanvas('tile_fake', fakeCanvas);
 
-    // 4. Декоративная плитка со следами лапок (level 6 подсказка)
+    // 4. Декоративная плитка со следами лапок (сохранена в реестре)
     const pawCanvas = document.createElement('canvas');
     pawCanvas.width = size;
     pawCanvas.height = size;
@@ -250,7 +250,7 @@ export class PixelArtGenerator {
     pctx.fillRect(19, 8, 2, 3);
     scene.textures.addCanvas('tile_paw', pawCanvas);
 
-    // 5. Падающий потолочный блок 2x2 тайла (64x64 px)
+    // 5. Падающий потолочный блок 2x2 тайла (64x64 px) — 100% монолитный блок
     const fallBlockCanvas = document.createElement('canvas');
     fallBlockCanvas.width = size * 2;
     fallBlockCanvas.height = size * 2;
@@ -261,9 +261,6 @@ export class PixelArtGenerator {
     fbctx.fillRect(2, 2, size * 2 - 4, size * 2 - 4);
     fbctx.fillStyle = C.PLATFORM_LIGHT;
     fbctx.fillRect(2, 2, size * 2 - 4, 4);
-    // Отличительные пиксели другого оттенка на нижней грани (ТЗ пункт 10)
-    fbctx.fillStyle = '#f59e42';
-    fbctx.fillRect(28, size * 2 - 4, 8, 2);
     scene.textures.addCanvas('falling_block', fallBlockCanvas);
 
     // 6. Каменная балка низкого свода лаза (32x16 px)
@@ -338,7 +335,7 @@ export class PixelArtGenerator {
     }
     scene.textures.addCanvas('spike_upside', spikeUpCanvas);
 
-    // 3. Скрытая плита Pop Spike в закрытом состоянии (видна лишь тонкая щель)
+    // 3. Скрытая плита Pop Spike в закрытом состоянии (100% идентична tile_solid)
     const popHiddenCanvas = document.createElement('canvas');
     popHiddenCanvas.width = size;
     popHiddenCanvas.height = size;
@@ -349,9 +346,9 @@ export class PixelArtGenerator {
     phctx.fillRect(1, 1, size - 2, size - 2);
     phctx.fillStyle = C.PLATFORM_LIGHT;
     phctx.fillRect(1, 1, size - 2, 3);
-    // Едва заметная щель в полу (ТЗ пункт 10)
-    phctx.fillStyle = '#0f0e17';
-    phctx.fillRect(4, 2, 24, 2);
+    phctx.fillStyle = C.PLATFORM_OUTLINE;
+    phctx.fillRect(0, size - 1, size, 1);
+    phctx.fillRect(size - 1, 0, 1, size);
     scene.textures.addCanvas('pop_spike_floor', popHiddenCanvas);
   }
 

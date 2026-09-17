@@ -8,7 +8,8 @@ export class CrumbleBlock extends HazardBase {
   private initialY: number;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, 'tile_crumble');
+    // До касания осыпающийся блок визуально 100% идентичен безопасной плитке
+    super(scene, x, y, 'tile_solid');
     this.initialX = x;
     this.initialY = y;
 
@@ -21,6 +22,8 @@ export class CrumbleBlock extends HazardBase {
     if (this.isTriggered) return;
     this.isTriggered = true;
 
+    // В момент касания на блоке мгновенно проявляются трещины
+    this.setTexture('tile_crumble');
     AudioManager.getInstance().playSFX('crumble');
 
     // 0-150 мс: появление видимости трещины
@@ -59,6 +62,7 @@ export class CrumbleBlock extends HazardBase {
     this.cancelScheduledEvents();
     this.scene.tweens.killTweensOf(this);
     this.setPosition(this.initialX, this.initialY);
+    this.setTexture('tile_solid');
     this.setAlpha(1);
 
     const body = this.body as Phaser.Physics.Arcade.Body;

@@ -29,9 +29,8 @@ export class ControlZone extends HazardBase {
     body.setImmovable(true);
     body.setSize(width, height);
 
-    if (type === 'normal') {
-      this.setVisible(false);
-    }
+    // Согласно глобальному правилу дизайна зоны управления невидимы до пересечения котиком
+    this.setVisible(false);
   }
 
   public applyModifier(cat: Cat): void {

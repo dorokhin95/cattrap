@@ -11,10 +11,10 @@ export const level06: LevelData = {
     // Пол до провала
     ...Array.from({ length: 10 }, (_, i) => ({ x: i, y: 10 })),
     ...Array.from({ length: 10 }, (_, i) => ({ x: i, y: 11 })),
-    // Верхний карниз со следами кошачьих лапок (подсказка для прыжка)
+    // Верхний карниз (маршрут обхода после изучения ловушки)
     { x: 9, y: 7, type: 'solid' },
-    { x: 10, y: 7, type: 'paw' },
-    { x: 11, y: 7, type: 'paw' },
+    { x: 10, y: 7, type: 'solid' },
+    { x: 11, y: 7, type: 'solid' },
     { x: 12, y: 7, type: 'solid' },
     // Пол после провала
     ...Array.from({ length: 18 }, (_, i) => ({ x: 12 + i, y: 10 })),
