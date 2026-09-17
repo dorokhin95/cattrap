@@ -34,6 +34,8 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
   private isDead = false;
   private levelDeathsCount = 0;
 
+  private surfaceVelocityX = 0;
+
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y, 'cat', 0);
     scene.add.existing(this);
@@ -47,7 +49,7 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setCollideWorldBounds(false);
     this.updateCollider();
-    body.setMaxVelocity(CONSTANTS.MOVE_SPEED, 600);
+    body.setMaxVelocity(CONSTANTS.MOVE_SPEED + CONSTANTS.CONVEYOR_SPEED, 600);
   }
 
   private updateCollider(): void {
@@ -141,9 +143,6 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
     }
 
     // --- 2. ГОРИЗОНТАЛЬНОЕ ПЕРЕМЕЩЕНИЕ ---
-    const controlMultiplier = isGroundContact ? 1 : CONSTANTS.AIR_CONTROL;
-    const accel = CONSTANTS.ACCELERATION * controlMultiplier;
-
     let moveLeft = input.left;
     let moveRight = input.right;
 
@@ -155,26 +154,40 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
       moveRight = true;
     }
 
-    if (moveLeft && !moveRight) {
-      body.setAccelerationX(-accel);
-      this.setFlipX(true);
-    } else if (moveRight && !moveLeft) {
-      body.setAccelerationX(accel);
-      this.setFlipX(false);
+    if (isGroundContact) {
+      // На земле: скорость складывается со скоростью поверхности (конвейер)
+      let desiredVx = 0;
+      if (moveLeft && !moveRight) {
+        desiredVx = -CONSTANTS.MOVE_SPEED;
+        this.setFlipX(true);
+      } else if (moveRight && !moveLeft) {
+        desiredVx = CONSTANTS.MOVE_SPEED;
+        this.setFlipX(false);
+      }
+
+      const targetVx = desiredVx + this.surfaceVelocityX;
+
+      if (body.velocity.x < targetVx) {
+        const step = CONSTANTS.ACCELERATION * (deltaMs / 1000);
+        body.setVelocityX(Math.min(targetVx, body.velocity.x + step));
+      } else if (body.velocity.x > targetVx) {
+        const step = CONSTANTS.DECELERATION * (deltaMs / 1000);
+        body.setVelocityX(Math.max(targetVx, body.velocity.x - step));
+      }
     } else {
-      body.setAccelerationX(0);
-      // Торможение при отпускании кнопок
-      if (Math.abs(body.velocity.x) > 10) {
-        const decel = CONSTANTS.DECELERATION * (deltaMs / 1000);
-        if (body.velocity.x > 0) {
-          body.setVelocityX(Math.max(0, body.velocity.x - decel));
-        } else {
-          body.setVelocityX(Math.min(0, body.velocity.x + decel));
-        }
-      } else {
-        body.setVelocityX(0);
+      // В воздухе: сохраняем горизонтальный импульс, воздушный контроль слегка подруливает
+      const airAccel = CONSTANTS.ACCELERATION * CONSTANTS.AIR_CONTROL * (deltaMs / 1000);
+      if (moveLeft && !moveRight) {
+        body.setVelocityX(Math.max(-CONSTANTS.MOVE_SPEED, body.velocity.x - airAccel));
+        this.setFlipX(true);
+      } else if (moveRight && !moveLeft) {
+        body.setVelocityX(Math.min(CONSTANTS.MOVE_SPEED + CONSTANTS.CONVEYOR_SPEED, body.velocity.x + airAccel));
+        this.setFlipX(false);
       }
     }
+
+    // Сброс скорости поверхности для следующего кадра
+    this.surfaceVelocityX = 0;
 
     // --- 3. ПРЫЖОК (COYOTE TIME + JUMP BUFFER) ---
     const canCoyoteJump = this.timeSinceLeftGroundMs <= CONSTANTS.COYOTE_TIME_MS;
@@ -383,6 +396,10 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
     this.controlModifier = modifier;
   }
 
+  public setSurfaceVelocityX(speedX: number): void {
+    this.surfaceVelocityX = speedX;
+  }
+
   public respawn(x: number, y: number, deathsCount?: number): void {
     this.scene.tweens.killTweensOf(this);
     this.isDead = false;
@@ -390,6 +407,7 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
     this.sizeState = 'normal';
     this.gravityState = 'normal';
     this.controlModifier = 'normal';
+    this.surfaceVelocityX = 0;
     this.timeSinceLeftGroundMs = 9999;
     this.timeSinceJumpRequestedMs = 9999;
     this.idleBlinkTimerMs = 0;

@@ -14,9 +14,6 @@ export const level18: LevelData = {
     ...Array.from({ length: 9 }, (_, i) => ({ x: i, y: 12 })),
     ...Array.from({ length: 9 }, (_, i) => ({ x: i, y: 13 })),
 
-    // Потолочная балка над стеной Section A (x=11, y=0..7)
-    ...Array.from({ length: 8 }, (_, i) => ({ x: 11, y: i })),
-
     // Section B: Нижняя площадка с кнопкой и батутом (x=15..21, y=14..15)
     ...Array.from({ length: 7 }, (_, i) => ({ x: 15 + i, y: 14 })),
     ...Array.from({ length: 7 }, (_, i) => ({ x: 15 + i, y: 15 })),
@@ -24,6 +21,9 @@ export const level18: LevelData = {
     // Section C & E: Верхний открывающийся коридор (x=12..14, y=11) и (x=22..25, y=11)
     ...Array.from({ length: 3 }, (_, i) => ({ x: 12 + i, y: 11 })),
     ...Array.from({ length: 4 }, (_, i) => ({ x: 22 + i, y: 11 })),
+
+    // Потолочная балка над воротами перед конвейерами (x=25, y=0..7)
+    ...Array.from({ length: 8 }, (_, i) => ({ x: 25, y: i })),
 
     // Остров после ямы x=32..34 (x=35..40, y=11..13)
     ...Array.from({ length: 6 }, (_, i) => ({ x: 35 + i, y: 11 })),
@@ -53,14 +53,14 @@ export const level18: LevelData = {
     }
   ],
 
-  // Переключаемая стена на верхнем уровне
+  // Переключаемая стена перед конвейерной секцией (x=25, y=8..10)
   toggleBlocks: [
-    { id: 'tb_gate_a', x: 11, y: 8, initiallyActive: true },
-    { id: 'tb_gate_b', x: 11, y: 9, initiallyActive: true },
-    { id: 'tb_gate_c', x: 11, y: 10, initiallyActive: true }
+    { id: 'tb_gate_a', x: 25, y: 8, initiallyActive: true },
+    { id: 'tb_gate_b', x: 25, y: 9, initiallyActive: true },
+    { id: 'tb_gate_c', x: 25, y: 10, initiallyActive: true }
   ],
 
-  // Кнопка внизу: открывает проход
+  // Кнопка внизу: открывает проход к конвейерам
   buttons: [
     {
       id: 'btn_unlock_corridor',

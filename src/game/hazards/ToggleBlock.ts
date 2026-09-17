@@ -34,10 +34,13 @@ export class ToggleBlock extends HazardBase {
     if (this.isActiveState === active) return;
 
     if (active) {
-      // Безопасная проверка материализации: если котик внутри, ждём пока выйдет
-      if (cat) {
-        const dist = Phaser.Math.Distance.Between(this.x, this.y, cat.x, cat.y);
-        if (dist < 26) {
+      // Безопасная проверка материализации: если котик пересекает блок, ждём пока выйдет
+      if (cat && cat.body) {
+        const catBody = cat.body as Phaser.Physics.Arcade.Body;
+        const catRect = new Phaser.Geom.Rectangle(catBody.x - 2, catBody.y - 2, catBody.width + 4, catBody.height + 4);
+        const blockRect = new Phaser.Geom.Rectangle(this.x - 16, this.y - 16, 32, 32);
+
+        if (Phaser.Geom.Intersects.RectangleToRectangle(catRect, blockRect)) {
           // Откладываем появление на 100 мс
           this.schedule(100, () => this.setBlockActive(true, cat));
           return;

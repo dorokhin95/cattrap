@@ -74,7 +74,8 @@ export const level15: LevelData = {
       warningMs: 220,
       slamMs: 120,
       retractMs: 300,
-      cycle: true
+      cycle: true,
+      startDelayMs: 150
     },
     {
       id: 'crush_b2',
@@ -83,10 +84,11 @@ export const level15: LevelData = {
       targetX: 21,
       targetY: 10,
       orientation: 'down',
-      warningMs: 260,
+      warningMs: 220,
       slamMs: 120,
       retractMs: 300,
-      cycle: true
+      cycle: true,
+      startDelayMs: 850
     },
 
     // Section C: Горизонтальный пресс, бьющий справа налево над нишей (x=31 -> x=29, y=9)

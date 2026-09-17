@@ -114,6 +114,7 @@ export interface CrusherData {
   slamMs?: number;
   retractMs?: number;
   cycle?: boolean;
+  startDelayMs?: number;
 }
 
 export interface ControlZoneData {

@@ -25,19 +25,35 @@ export class ConveyorTile extends HazardBase {
     body.setSize(32, 32);
   }
 
-  public applyConveyorMotion(cat: Cat, deltaMs: number): void {
-    const body = this.body as Phaser.Physics.Arcade.Body;
+  /**
+   * Проверяет, стоит ли котик непосредственно на верхней поверхности данного тайла конвейера.
+   */
+  public isCatStandingOn(cat: Cat): boolean {
     const catBody = cat.body as Phaser.Physics.Arcade.Body;
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    if (!catBody || !body) return false;
 
-    // Проверяем, стоит ли котик на поверхности конвейера
-    const isCatStandingOnTop = (catBody.touching.down || catBody.blocked.down) && 
-      (cat.y <= this.y - 10) && 
-      Math.abs(cat.x - this.x) < 22;
+    const isGround = catBody.touching.down || catBody.blocked.down;
+    if (!isGround) return false;
 
-    if (isCatStandingOnTop) {
-      const dirSign = this.direction === 'right' ? 1 : -1;
-      const moveDelta = dirSign * this.speed * (deltaMs / 1000);
-      cat.x += moveDelta;
+    // Подошва котика на уровне верхней границы конвейера
+    const isAboveTop = catBody.bottom >= body.top - 3 && catBody.bottom <= body.top + 6;
+    // Горизонтальный охват тайла
+    const isWithinX = catBody.right > body.left + 2 && catBody.left < body.right - 2;
+
+    return isAboveTop && isWithinX;
+  }
+
+  public getConveyorVelocity(): number {
+    return (this.direction === 'right' ? 1 : -1) * this.speed;
+  }
+
+  /**
+   * Интеграция скорости конвейера в физику котика без телепортации cat.x +=
+   */
+  public applyConveyorMotion(cat: Cat, _deltaMs: number): void {
+    if (this.isCatStandingOn(cat)) {
+      cat.setSurfaceVelocityX(this.getConveyorVelocity());
     }
   }
 

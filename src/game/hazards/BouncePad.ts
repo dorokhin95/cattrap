@@ -28,11 +28,23 @@ export class BouncePad extends HazardBase {
   public triggerBounce(cat: Cat): boolean {
     if (this.cooldownMs > 0) return false;
 
-    const body = cat.body as Phaser.Physics.Arcade.Body;
+    const catBody = cat.body as Phaser.Physics.Arcade.Body;
+    const padBody = this.body as Phaser.Physics.Arcade.Body;
     const isCatInverted = cat.getGravityState && cat.getGravityState() === 'inverted';
+
+    if (!isCatInverted) {
+      // Обычная гравитация: отскок разрешён только при приземлении сверху
+      if (catBody.velocity.y < -20) return false;
+      if (catBody.bottom > padBody.bottom + 4) return false;
+    } else {
+      // Инвертированная гравитация: отскок разрешён только при приземлении снизу вверх
+      if (catBody.velocity.y > 20) return false;
+      if (catBody.top < padBody.top - 4) return false;
+    }
+
     const impulse = isCatInverted ? -this.power : this.power;
 
-    body.setVelocityY(impulse);
+    catBody.setVelocityY(impulse);
     this.cooldownMs = CONSTANTS.BOUNCE_COOLDOWN_MS;
 
     AudioManager.getInstance().playSFX('bounce');

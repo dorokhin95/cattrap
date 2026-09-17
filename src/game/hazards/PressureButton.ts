@@ -9,6 +9,8 @@ export class PressureButton extends HazardBase {
   public targets: string[];
   public singleUse: boolean;
   public isPressed = false;
+  public isOverlapping = false;
+  private wasOverlappingThisFrame = false;
   private initialX: number;
   private initialY: number;
 
@@ -28,8 +30,12 @@ export class PressureButton extends HazardBase {
   }
 
   public press(toggleBlocksMap: Map<string, ToggleBlock>, cat: Cat): boolean {
-    if (this.isPressed && this.singleUse) return false;
+    this.wasOverlappingThisFrame = true;
 
+    if (this.isPressed && this.singleUse) return false;
+    if (this.isOverlapping) return false;
+
+    this.isOverlapping = true;
     this.isPressed = true;
     this.setTexture('pressure_button_down');
     AudioManager.getInstance().playSFX('button');
@@ -44,9 +50,22 @@ export class PressureButton extends HazardBase {
     return true;
   }
 
+  public endFrame(): void {
+    if (!this.wasOverlappingThisFrame) {
+      this.isOverlapping = false;
+      if (!this.singleUse && this.isPressed) {
+        this.isPressed = false;
+        this.setTexture('pressure_button_up');
+      }
+    }
+    this.wasOverlappingThisFrame = false;
+  }
+
   public reset(): void {
     this.cancelScheduledEvents();
     this.isPressed = false;
+    this.isOverlapping = false;
+    this.wasOverlappingThisFrame = false;
     this.setTexture('pressure_button_up');
     this.setPosition(this.initialX, this.initialY);
   }

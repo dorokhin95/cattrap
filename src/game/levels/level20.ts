@@ -106,20 +106,25 @@ export const level20: LevelData = {
     }
   ],
 
-  // Переключаемая дверь в Section B
+  // Переключаемая дверь и лестница в Section B
   toggleBlocks: [
     { id: 'tb20_b_1', x: 28, y: 9, initiallyActive: true },
     { id: 'tb20_b_2', x: 28, y: 10, initiallyActive: true },
-    { id: 'tb20_b_3', x: 28, y: 11, initiallyActive: true }
+    { id: 'tb20_b_3', x: 28, y: 11, initiallyActive: true },
+    // Ступени к чекпоинту (материализуются при нажатии кнопки)
+    { id: 'tb20_b_step1', x: 25, y: 14, initiallyActive: false },
+    { id: 'tb20_b_step2', x: 26, y: 13, initiallyActive: false },
+    { id: 'tb20_b_step3', x: 27, y: 12, initiallyActive: false },
+    { id: 'tb20_b_step4', x: 28, y: 12, initiallyActive: false }
   ],
 
-  // Кнопка в Section B: открывает путь к чекпоинту
+  // Кнопка в Section B: открывает путь и материализует лестницу к чекпоинту
   buttons: [
     {
       id: 'btn20_b',
       x: 22,
       y: 14,
-      targets: ['tb20_b_1', 'tb20_b_2', 'tb20_b_3'],
+      targets: ['tb20_b_1', 'tb20_b_2', 'tb20_b_3', 'tb20_b_step1', 'tb20_b_step2', 'tb20_b_step3', 'tb20_b_step4'],
       once: true
     }
   ],

@@ -54,6 +54,7 @@ export class GameScene extends Phaser.Scene {
   private toggleBlocksMap: Map<string, ToggleBlock> = new Map();
   private crushers: Crusher[] = [];
   private controlZones: ControlZone[] = [];
+  private chainPopTimers: Phaser.Time.TimerEvent[] = [];
 
   // Состояние попытки
   private currentRespawnPoint = { x: 0, y: 0 };
@@ -170,6 +171,11 @@ export class GameScene extends Phaser.Scene {
     if (this.triggerManager) {
       this.triggerManager.clear();
     }
+
+    for (const t of this.chainPopTimers) {
+      t.remove(false);
+    }
+    this.chainPopTimers = [];
 
     if (this.backgroundRenderer) {
       this.backgroundRenderer.destroy();
@@ -360,7 +366,8 @@ export class GameScene extends Phaser.Scene {
           cr.slamMs,
           undefined,
           cr.retractMs,
-          cr.cycle !== false
+          cr.cycle !== false,
+          cr.startDelayMs
         );
         this.crushers.push(c);
       }
@@ -426,9 +433,10 @@ export class GameScene extends Phaser.Scene {
         }
       });
       matchingSpikes.forEach((spike, idx) => {
-        this.time.delayedCall(idx * 120, () => {
+        const timer = this.time.delayedCall(idx * 120, () => {
           spike?.pop();
         });
+        this.chainPopTimers.push(timer);
       });
     }
   }
@@ -526,7 +534,13 @@ export class GameScene extends Phaser.Scene {
 
     // Кот <-> Движущиеся платформы (MovingPlatform)
     for (const mp of this.movingPlatforms) {
-      this.physics.add.collider(this.cat, mp);
+      this.physics.add.collider(this.cat, mp, () => {
+        const catBody = this.cat.body as Phaser.Physics.Arcade.Body;
+        const mpBody = mp.body as Phaser.Physics.Arcade.Body;
+        if (catBody && mpBody && catBody.touching.down && mpBody.touching.up) {
+          mp.setRiderContact(true);
+        }
+      });
     }
 
     // Кот <-> Переключаемые блоки (ToggleBlock)
@@ -630,9 +644,20 @@ export class GameScene extends Phaser.Scene {
       bp.updatePad(delta);
     }
 
-    // Обновление конвейеров
+    // Обновление конвейеров: находим ближайший конвейер непосредственно под ногами котика
+    let activeConv: ConveyorTile | null = null;
+    let minConvDist = 9999;
     for (const conv of this.conveyors) {
-      conv.applyConveyorMotion(this.cat, delta);
+      if (conv.isCatStandingOn(this.cat)) {
+        const dist = Math.abs(this.cat.x - conv.x);
+        if (dist < minConvDist) {
+          minConvDist = dist;
+          activeConv = conv;
+        }
+      }
+    }
+    if (activeConv) {
+      activeConv.applyConveyorMotion(this.cat, delta);
     }
 
     // Обновление движущихся платформ
@@ -642,6 +667,11 @@ export class GameScene extends Phaser.Scene {
 
     // Обновление котика
     this.cat.updateCat(delta, combinedInput);
+
+    // Завершение кадра для кнопок (сброс флагов текущего контакта enter-edge)
+    for (const btn of this.buttons) {
+      btn.endFrame();
+    }
 
     // Падение за пределы уровня (смерть в пропасти)
     const deadzoneY = (this.levelData.height + 2) * CONSTANTS.TILE_SIZE;
@@ -701,6 +731,11 @@ export class GameScene extends Phaser.Scene {
     for (const cr of this.crushers) cr.reset();
     for (const cz of this.controlZones) cz.reset();
     this.portal.reset();
+
+    for (const t of this.chainPopTimers) {
+      t.remove(false);
+    }
+    this.chainPopTimers = [];
 
     // Сброс зажатых сенсорных кнопок (ТЗ раздел 24)
     this.game.events.emit(EVENTS.LEVEL_RESTART);

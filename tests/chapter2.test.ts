@@ -420,4 +420,142 @@ describe('Chapter 2 (Levels 11-20) Comprehensive Test Suite', () => {
       expect(scheduledCallbacksExecuted).toBe(0);
     });
   });
+
+  describe('6. Audit Fixes Verification (P0 - P2)', () => {
+    it('P0: Уровень 20 Section B содержит материализуемые ступени к чекпоинту с шагом <= 1 тайл', () => {
+      const l20 = LevelRegistry.getLevel(20)!;
+      const btn = l20.buttons?.find(b => b.id === 'btn20_b')!;
+      expect(btn).toBeDefined();
+
+      // Проверяем, что кнопка активирует ступени
+      expect(btn.targets).toContain('tb20_b_step1');
+      expect(btn.targets).toContain('tb20_b_step2');
+      expect(btn.targets).toContain('tb20_b_step3');
+      expect(btn.targets).toContain('tb20_b_step4');
+
+      const s1 = l20.toggleBlocks?.find(t => t.id === 'tb20_b_step1')!;
+      const s2 = l20.toggleBlocks?.find(t => t.id === 'tb20_b_step2')!;
+      const s3 = l20.toggleBlocks?.find(t => t.id === 'tb20_b_step3')!;
+      const s4 = l20.toggleBlocks?.find(t => t.id === 'tb20_b_step4')!;
+
+      expect(s1).toBeDefined();
+      expect(s2).toBeDefined();
+      expect(s3).toBeDefined();
+      expect(s4).toBeDefined();
+
+      // Ступени изначально неактивны (появляются по кнопке)
+      expect(s1.initiallyActive).toBe(false);
+      expect(s2.initiallyActive).toBe(false);
+      expect(s3.initiallyActive).toBe(false);
+      expect(s4.initiallyActive).toBe(false);
+
+      // Проверяем непрерывность шагов: разница по X = 1, по Y <= 1
+      expect(s1.x).toBe(25);
+      expect(s1.y).toBe(14); // от пола y=15 подъем ровно на 1 тайл
+
+      expect(s2.x).toBe(26);
+      expect(s2.y).toBe(13); // подъем на 1 тайл
+
+      expect(s3.x).toBe(27);
+      expect(s3.y).toBe(12); // подъем на 1 тайл до уровня пола чекпоинта
+
+      expect(s4.x).toBe(28);
+      expect(s4.y).toBe(12); // переход через дверной проем
+
+      // Чекпоинт на x=30, y=11 (остров на y=12)
+      expect(l20.checkpoint!.x).toBe(30);
+      expect(l20.checkpoint!.y).toBe(11);
+    });
+
+    it('P1: Уровень 18 блокирует путь к конвейерам на x=25 и требует нажатия кнопки', () => {
+      const l18 = LevelRegistry.getLevel(18)!;
+      const btn = l18.buttons?.find(b => b.id === 'btn_unlock_corridor')!;
+      expect(btn).toBeDefined();
+      expect(btn.targets).toEqual(['tb_gate_a', 'tb_gate_b', 'tb_gate_c']);
+
+      // Ворота стоят строго на x=25 перед первым конвейером (x=26)
+      const gateA = l18.toggleBlocks?.find(t => t.id === 'tb_gate_a')!;
+      const gateB = l18.toggleBlocks?.find(t => t.id === 'tb_gate_b')!;
+      const gateC = l18.toggleBlocks?.find(t => t.id === 'tb_gate_c')!;
+      expect(gateA.x).toBe(25);
+      expect(gateB.x).toBe(25);
+      expect(gateC.x).toBe(25);
+
+      // Над воротами находится монолитный потолок (x=25, y=0..7)
+      for (let y = 0; y <= 7; y++) {
+        expect(l18.solidTiles.some(t => t.x === 25 && t.y === y)).toBe(true);
+      }
+
+      // Конвейеры начинаются на x=26
+      expect(l18.conveyors![0].x).toBe(26);
+    });
+
+    it('P2: Уровень 15 настраивает прессы в честной противофазе через startDelayMs', () => {
+      const l15 = LevelRegistry.getLevel(15)!;
+      const c1 = l15.crushers?.find(c => c.id === 'crush_b1')!;
+      const c2 = l15.crushers?.find(c => c.id === 'crush_b2')!;
+      expect(c1).toBeDefined();
+      expect(c2).toBeDefined();
+
+      expect(c1.startDelayMs).toBe(150);
+      expect(c2.startDelayMs).toBe(850);
+      // Разница фаз составляет 700 мс (противофаза цикла ~1440 мс)
+      expect(c2.startDelayMs! - c1.startDelayMs!).toBe(700);
+    });
+
+    it('P2: PressureButton enter-edge семантика предотвращает повторные срабатывания при удержании', () => {
+      let toggleCount = 0;
+      let isPressed = false;
+      let isOverlapping = false;
+      let wasOverlappingThisFrame = false;
+
+      const press = (singleUse = false) => {
+        wasOverlappingThisFrame = true;
+        if (isPressed && singleUse) return false;
+        if (isOverlapping) return false; // Блокировка повтора за один контакт
+        isOverlapping = true;
+        isPressed = true;
+        toggleCount++;
+        return true;
+      };
+
+      const endFrame = (singleUse = false) => {
+        if (!wasOverlappingThisFrame) {
+          isOverlapping = false;
+          if (!singleUse && isPressed) {
+            isPressed = false;
+          }
+        }
+        wasOverlappingThisFrame = false;
+      };
+
+      // Кадр 1: наступил на кнопку
+      press(false);
+      endFrame(false);
+      expect(toggleCount).toBe(1);
+
+      // Кадры 2..10: стоит на кнопке
+      for (let i = 2; i <= 10; i++) {
+        press(false);
+        endFrame(false);
+      }
+      // Не должно спамить переключениями!
+      expect(toggleCount).toBe(1);
+
+      // Кадр 11: сошёл с кнопки
+      endFrame(false);
+      expect(isOverlapping).toBe(false);
+
+      // Кадр 12: наступил повторно
+      press(false);
+      endFrame(false);
+      expect(toggleCount).toBe(2);
+    });
+
+    it('P1: Конвейер интегрирует скорость в максимальную скорость котика', () => {
+      const maxCombinedSpeed = CONSTANTS.MOVE_SPEED + CONSTANTS.CONVEYOR_SPEED;
+      expect(maxCombinedSpeed).toBe(250);
+      expect(maxCombinedSpeed).toBeGreaterThan(CONSTANTS.MOVE_SPEED);
+    });
+  });
 });

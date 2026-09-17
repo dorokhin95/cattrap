@@ -17,6 +17,8 @@ export class MovingPlatform extends HazardBase {
   private deltaX = 0;
   private deltaY = 0;
 
+  public hasRiderContact = false;
+
   constructor(
     scene: Phaser.Scene,
     startX: number,
@@ -40,6 +42,10 @@ export class MovingPlatform extends HazardBase {
     body.setAllowGravity(false);
     body.setImmovable(true);
     body.setSize(64, 16);
+  }
+
+  public setRiderContact(contact: boolean): void {
+    this.hasRiderContact = contact;
   }
 
   public updatePlatform(deltaMs: number, cat: Cat): void {
@@ -72,19 +78,22 @@ export class MovingPlatform extends HazardBase {
 
     this.setPosition(nextX, nextY);
 
-    // Проверка сцепки с котиком (перемещение вместе с платформой)
+    // Проверка физического контакта с платформой
     const catBody = cat.body as Phaser.Physics.Arcade.Body;
-    const isCatRiding = (catBody.touching.down || catBody.blocked.down) &&
-      (cat.y <= this.y - 6) &&
-      Math.abs(cat.x - this.x) <= 34;
+    const body = this.body as Phaser.Physics.Arcade.Body;
+
+    const isWithinX = catBody.right > body.left + 2 && catBody.left < body.right - 2;
+    const isVerticallyAligned = catBody.bottom >= body.top - 3 && catBody.bottom <= body.top + 6;
+    const isGrounded = catBody.touching.down || catBody.blocked.down;
+
+    const isCatRiding = (this.hasRiderContact || (isVerticallyAligned && isGrounded)) && isWithinX;
 
     if (isCatRiding) {
       cat.x += this.deltaX;
-      // Если платформа движется вниз, котик должен плавно следовать за ней без отставания
-      if (this.deltaY > 0) {
-        cat.y += this.deltaY;
-      }
+      cat.y += this.deltaY;
     }
+
+    this.hasRiderContact = false;
   }
 
   public reset(): void {
@@ -93,6 +102,7 @@ export class MovingPlatform extends HazardBase {
     this.isForward = true;
     this.deltaX = 0;
     this.deltaY = 0;
+    this.hasRiderContact = false;
     this.setPosition(this.startX, this.startY);
   }
 }

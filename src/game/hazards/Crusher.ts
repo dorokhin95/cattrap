@@ -20,6 +20,7 @@ export class Crusher extends HazardBase {
   private holdMs: number;
   private retractMs: number;
   private cycle: boolean;
+  private startDelayMs: number;
 
   constructor(
     scene: Phaser.Scene,
@@ -33,7 +34,8 @@ export class Crusher extends HazardBase {
     slamMs: number = CONSTANTS.CRUSHER_SLAM_MS,
     holdMs: number = CONSTANTS.CRUSHER_HOLD_MS,
     retractMs: number = CONSTANTS.CRUSHER_RETRACT_MS,
-    cycle: boolean = true
+    cycle: boolean = true,
+    startDelayMs: number = 300
   ) {
     super(scene, startX, startY, 'crusher');
     this.id = id;
@@ -48,6 +50,7 @@ export class Crusher extends HazardBase {
     this.holdMs = holdMs;
     this.retractMs = retractMs;
     this.cycle = cycle;
+    this.startDelayMs = startDelayMs;
 
     if (orientation === 'left') {
       this.setAngle(90);
@@ -62,7 +65,7 @@ export class Crusher extends HazardBase {
 
     // Запуск начального цикла
     if (this.cycle) {
-      this.schedule(300, () => this.startWarning());
+      this.schedule(this.startDelayMs, () => this.startWarning());
     }
   }
 
@@ -138,7 +141,7 @@ export class Crusher extends HazardBase {
     this.setPosition(this.startX, this.startY);
 
     if (this.cycle) {
-      this.schedule(300, () => this.startWarning());
+      this.schedule(this.startDelayMs, () => this.startWarning());
     }
   }
 }
