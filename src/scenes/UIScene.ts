@@ -311,8 +311,10 @@ export class UIScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
+    // overlay — самый нижний слой, иначе он перекроет кнопки
     const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x120e24, 0.96)
       .setInteractive();
+    this.victoryModal.add(overlay);
 
     const title = this.add.text(width / 2, height * 0.18, 'ГЛАВА 1 ПРОЙДЕНА!', {
       fontSize: '32px',
@@ -332,12 +334,18 @@ export class UIScene extends Phaser.Scene {
       lineSpacing: 10
     }).setOrigin(0.5);
 
+    this.victoryModal.add([title, cat, stats]);
+
+    // Кнопки добавляются последними — поверх всего
     this.createModalButton(this.victoryModal, width / 2, height * 0.74, 'В ГЛАВНОЕ МЕНЮ', '#38bdf8', () => {
       this.scene.stop('GameScene');
       this.scene.start('MenuScene');
     });
+    this.createModalButton(this.victoryModal, width / 2, height * 0.74 + 56, 'ВЫБОР УРОВНЯ', '#94a3b8', () => {
+      this.scene.stop('GameScene');
+      this.scene.start('LevelSelectScene');
+    });
 
-    this.victoryModal.add([overlay, title, cat, stats]);
     this.victoryModal.setVisible(true);
     this.hudContainer.setVisible(false);
     this.touchControls.setVisible(false);
