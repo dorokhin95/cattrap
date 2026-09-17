@@ -3,7 +3,6 @@ import { EVENTS } from '../core/Events';
 import { TouchControls } from '../ui/TouchControls';
 import { SaveProvider } from '../save/SaveProvider';
 import { AudioManager } from '../audio/AudioManager';
-import { PlatformManager } from '../platform/PlatformManager';
 
 export class UIScene extends Phaser.Scene {
   private levelId = 1;
@@ -242,12 +241,12 @@ export class UIScene extends Phaser.Scene {
         if (settings.touchOpacity === 0.75) nextOpacity = 1.0;
         else if (settings.touchOpacity === 1.0) nextOpacity = 0.5;
         save.updateSettings({ touchOpacity: nextOpacity });
-        const vp = PlatformManager.getInstance().getPlatform().getViewport();
-        this.touchControls.updateLayout(
-          vp.mode,
-          width, height,
-          vp.safeArea.bottom, vp.safeArea.top
-        );
+        const aspect = width / (height || 1);
+        const modeNow = aspect < 0.85 ? 'portrait' : aspect <= 1.15 ? 'compact' : 'landscape';
+        const rootNow = getComputedStyle(document.documentElement);
+        const sab = parseFloat(rootNow.getPropertyValue('--sab')) || 0;
+        const sat = parseFloat(rootNow.getPropertyValue('--sat')) || 0;
+        this.touchControls.updateLayout(modeNow, width, height, sab, sat);
         this.renderSettingsContent(fromMenu);
       }
     );
@@ -418,22 +417,30 @@ export class UIScene extends Phaser.Scene {
     this.cameras.main.setViewport(0, 0, width, height);
     this.cameras.main.setSize(width, height);
 
-    const vp = PlatformManager.getInstance().getPlatform().getViewport();
+    // Вычисляем mode прямо из известных w/h — НЕ из window.innerWidth (может быть устаревшим на iOS)
+    const aspect = width / (height || 1);
+    const mode = aspect < 0.85 ? 'portrait' : aspect <= 1.15 ? 'compact' : 'landscape';
+
+    // safe-area читаем из CSS-переменных (они обновляются синхронно браузером)
+    const rootStyle = getComputedStyle(document.documentElement);
+    const safeTop = parseFloat(rootStyle.getPropertyValue('--sat')) || 0;
+    const safeBottom = parseFloat(rootStyle.getPropertyValue('--sab')) || 0;
+    const safeLeft = parseFloat(rootStyle.getPropertyValue('--sal')) || 0;
 
     // Обновляем геометрию сенсорных кнопок под новый размер
-    this.touchControls.updateLayout(vp.mode, width, height, vp.safeArea.bottom, vp.safeArea.top);
+    this.touchControls.updateLayout(mode, width, height, safeBottom, safeTop);
 
     // Центрирование HUD
-    if (vp.mode === 'portrait') {
-      this.pauseBtn.setPosition(vp.safeArea.left + 16, vp.safeArea.top + 16);
-      this.levelText.setPosition(vp.safeArea.left + 64, vp.safeArea.top + 20);
-      this.timerText.setPosition(vp.safeArea.left + 180, vp.safeArea.top + 20);
-      this.deathsText.setPosition(vp.safeArea.left + 250, vp.safeArea.top + 20);
+    if (mode === 'portrait') {
+      this.pauseBtn.setPosition(safeLeft + 16, safeTop + 16);
+      this.levelText.setPosition(safeLeft + 64, safeTop + 20);
+      this.timerText.setPosition(safeLeft + 180, safeTop + 20);
+      this.deathsText.setPosition(safeLeft + 250, safeTop + 20);
     } else {
-      this.pauseBtn.setPosition(vp.safeArea.left + 24, vp.safeArea.top + 20);
-      this.levelText.setPosition(vp.safeArea.left + 76, vp.safeArea.top + 24);
-      this.timerText.setPosition(vp.safeArea.left + 240, vp.safeArea.top + 24);
-      this.deathsText.setPosition(vp.safeArea.left + 330, vp.safeArea.top + 24);
+      this.pauseBtn.setPosition(safeLeft + 24, safeTop + 20);
+      this.levelText.setPosition(safeLeft + 76, safeTop + 24);
+      this.timerText.setPosition(safeLeft + 240, safeTop + 24);
+      this.deathsText.setPosition(safeLeft + 330, safeTop + 24);
     }
 
     // Если открыты модальные окна, обновляем их центрирование под новый размер

@@ -513,7 +513,10 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setViewport(0, 0, width, height);
     this.cameras.main.setSize(width, height);
 
-    const vp = PlatformManager.getInstance().getPlatform().getViewport();
-    this.cameraSystem.updateViewport(vp.mode, width, height);
+    // Вычисляем mode прямо из известных w/h — НЕ из window.innerWidth (может быть устаревшим)
+    const aspect = width / (height || 1);
+    const mode = aspect < 0.85 ? 'portrait' : aspect <= 1.15 ? 'compact' : 'landscape';
+
+    this.cameraSystem.updateViewport(mode, width, height);
   }
 }

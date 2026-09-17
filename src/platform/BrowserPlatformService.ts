@@ -12,9 +12,8 @@ export class BrowserPlatformService implements PlatformService {
     // No-op в веб
   }
 
-  public getViewport(): ViewportInfo {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+  /** Вычисляет ViewportInfo по явно переданным w/h (не читает window.innerWidth) */
+  public static computeViewport(width: number, height: number): ViewportInfo {
     const aspectRatio = width / (height || 1);
 
     let mode: OrientationMode = 'landscape';
@@ -38,6 +37,10 @@ export class BrowserPlatformService implements PlatformService {
       mode,
       safeArea: { top, bottom, left, right }
     };
+  }
+
+  public getViewport(): ViewportInfo {
+    return BrowserPlatformService.computeViewport(window.innerWidth, window.innerHeight);
   }
 
   public haptic(type: HapticType): void {
