@@ -8,9 +8,10 @@ export class PopSpike extends HazardBase {
   private spikeSprite: Phaser.Physics.Arcade.Sprite;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
-    // В скрытом состоянии основание выглядит как пол со щелью
+    // В скрытом состоянии основание выглядит как монолитная плита пола со щелью
     super(scene, x, y, 'pop_spike_floor');
     this.initialY = y;
+    this.setDepth(2); // Плита пола находится поверх выезжающего шипа, пока он внутри
 
     const baseBody = this.body as Phaser.Physics.Arcade.Body;
     baseBody.setAllowGravity(false);
@@ -18,7 +19,9 @@ export class PopSpike extends HazardBase {
 
     // Дополнительный выезжающий шип
     this.spikeSprite = scene.physics.add.sprite(x, y, 'spike_static');
+    this.spikeSprite.setDepth(1); // Шип скрыт под плитой, пока не выйдет наружу
     this.spikeSprite.setVisible(false);
+
     const spikeBody = this.spikeSprite.body as Phaser.Physics.Arcade.Body;
     spikeBody.setAllowGravity(false);
     spikeBody.setImmovable(true);
@@ -36,14 +39,15 @@ export class PopSpike extends HazardBase {
     this.isTriggered = true;
 
     this.spikeSprite.setVisible(true);
-    this.spikeSprite.setY(this.initialY + 16); // Начинает снизу
+    this.spikeSprite.setY(this.initialY); // Начинает внутри плиты пола
 
     AudioManager.getInstance().playSFX('spike');
 
-    // Подъём за ~120 мс
+    // Подъём НАВЕРХ из пола за ~120 мс (выходит наружу на клетку выше пола)
+    const targetY = this.initialY - CONSTANTS.TILE_SIZE;
     this.scene.tweens.add({
       targets: this.spikeSprite,
-      y: this.initialY,
+      y: targetY,
       duration: CONSTANTS.POP_SPIKE_RISE_TIME_MS,
       ease: 'Power2',
       onStart: () => {
@@ -54,6 +58,7 @@ export class PopSpike extends HazardBase {
 
   public reset(): void {
     this.isTriggered = false;
+    this.scene.tweens.killTweensOf(this.spikeSprite);
     this.spikeSprite.setVisible(false);
     this.spikeSprite.setY(this.initialY);
     (this.spikeSprite.body as Phaser.Physics.Arcade.Body).enable = false;

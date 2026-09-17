@@ -290,8 +290,9 @@ export class GameScene extends Phaser.Scene {
       this.handlePlayerDeath();
     });
 
-    // Кот <-> Выдвижные шипы
+    // Кот <-> Выдвижные шипы (основание твердое, а шип смертельный)
     for (const ps of this.popSpikes) {
+      this.physics.add.collider(this.cat, ps);
       this.physics.add.overlap(this.cat, ps.getSpikeColliderSprite(), () => {
         this.handlePlayerDeath();
       });
