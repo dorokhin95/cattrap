@@ -39,4 +39,12 @@ describe('Cat Physics & Fairness Rules', () => {
     const tilesPerSec = CONSTANTS.MOVE_SPEED / CONSTANTS.TILE_SIZE;
     expect(tilesPerSec).toBe(5);
   });
+
+  it('высота прыжка должна строго попадать в диапазон 2.7-3.0 тайла', () => {
+    // h = v^2 / (2 * g)
+    const heightPx = (CONSTANTS.JUMP_VELOCITY * CONSTANTS.JUMP_VELOCITY) / (2 * CONSTANTS.GRAVITY);
+    const heightTiles = heightPx / CONSTANTS.TILE_SIZE;
+    expect(heightTiles).toBeGreaterThanOrEqual(2.7);
+    expect(heightTiles).toBeLessThanOrEqual(3.0);
+  });
 });
