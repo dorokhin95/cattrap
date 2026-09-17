@@ -43,6 +43,7 @@ export class GameScene extends Phaser.Scene {
   private isTimerRunning = false;
   private isLevelFinished = false;
   private isPaused = false;
+  private isDying = false;
 
   // Клавиатурный ввод
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -63,6 +64,7 @@ export class GameScene extends Phaser.Scene {
     this.isTimerRunning = false;
     this.isLevelFinished = false;
     this.isPaused = false;
+    this.isDying = false;
   }
 
   public create(): void {
@@ -355,7 +357,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   public update(_time: number, delta: number): void {
-    if (this.isPaused || this.isLevelFinished) return;
+    if (this.isPaused || this.isLevelFinished || this.isDying) return;
 
     // Считываем клавиатурный ввод
     const keyLeft = (this.cursors?.left?.isDown || this.keyA?.isDown) ?? false;
@@ -424,7 +426,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handlePlayerDeath(): void {
-    if (this.isLevelFinished) return;
+    if (this.isLevelFinished || this.isDying) return;
+    this.isDying = true;
+
     this.levelDeaths++;
     SaveProvider.getInstance().recordDeath(this.levelId);
     PlatformManager.getInstance().getPlatform().haptic('medium');
@@ -443,6 +447,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   public instantRestart(): void {
+    this.isDying = false;
+
     // Сброс таймера текущей попытки (ТЗ пункт 64)
     this.attemptTimerSeconds = 0;
     this.isTimerRunning = false;

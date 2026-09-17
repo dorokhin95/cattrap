@@ -252,8 +252,19 @@ export class UIScene extends Phaser.Scene {
       }
     );
 
+    // Кнопка сброса смертей и прогресса
+    this.createOptionButton(
+      width / 2, startY + idx++ * spacing,
+      'Сбросить смерти и прогресс',
+      () => {
+        save.resetProgress();
+        this.renderSettingsContent(fromMenu);
+      },
+      '#f43f5e'
+    );
+
     // Кнопка Назад / Сохранить
-    this.createModalButton(this.settingsModal, width / 2, startY + (idx + 0.5) * spacing, 'НАЗАД', '#38bdf8', () => {
+    this.createModalButton(this.settingsModal, width / 2, startY + (idx + 0.3) * spacing, 'НАЗАД', '#38bdf8', () => {
       this.settingsModal.setVisible(false);
       this.isSettingsOpen = false;
       if (fromMenu) {
