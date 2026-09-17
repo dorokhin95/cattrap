@@ -45,18 +45,18 @@ export class PixelArtGenerator {
     if (frame === 4 || frame === 6) bobY = -1; // Run подпрыгивает
     if (frame === 9) bobY = 2; // Landing squash
 
-    // 1. Хвост-вопросительный знак (огибает спину справа)
+    // 1. Хвост-вопросительный знак (сзади котика, слева при взгляде направо)
     ctx.fillStyle = C.CAT_DARK; // Контур хвоста
-    ctx.fillRect(ox + 18, oy + 12 + bobY, 4, 2);
-    ctx.fillRect(ox + 20, oy + 13 + bobY, 2, 5);
-    ctx.fillRect(ox + 17, oy + 17 + bobY, 4, 2);
+    ctx.fillRect(ox + 2, oy + 12 + bobY, 4, 2);
+    ctx.fillRect(ox + 2, oy + 13 + bobY, 2, 5);
+    ctx.fillRect(ox + 3, oy + 17 + bobY, 4, 2);
     // Кончик хвоста тёмный
     ctx.fillStyle = '#1e1b24';
-    ctx.fillRect(ox + 17, oy + 12 + bobY, 2, 2);
+    ctx.fillRect(ox + 5, oy + 12 + bobY, 2, 2);
 
     // Заливка хвоста
     ctx.fillStyle = C.CAT_BODY;
-    ctx.fillRect(ox + 19, oy + 13 + bobY, 2, 4);
+    ctx.fillRect(ox + 3, oy + 13 + bobY, 2, 4);
 
     // 2. Ушки с выемкой на левом
     ctx.fillStyle = C.CAT_DARK;
