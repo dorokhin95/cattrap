@@ -840,125 +840,106 @@ export class PixelArtGenerator {
     sctx.fillRect(28, 2, 2, 2);
     scene.textures.addCanvas('tile_solid_c3', solidCanvas);
 
-    // 2. Фазовый блок A (Активный - Циан) 32x32
+    // 2. Фазовый блок A (Активный - Твёрдая платформа с циановым кантом) 32x32
     const gbaCanvas = document.createElement('canvas');
     gbaCanvas.width = 32;
     gbaCanvas.height = 32;
     const gbactx = gbaCanvas.getContext('2d')!;
     gbactx.imageSmoothingEnabled = false;
-    gbactx.fillStyle = 'rgba(6, 182, 212, 0.25)';
+    gbactx.fillStyle = C.PLATFORM_CH3;
     gbactx.fillRect(0, 0, 32, 32);
+    gbactx.fillStyle = C.PLATFORM_CH3_LIGHT;
+    gbactx.fillRect(2, 2, 28, 28);
+    // Внутренняя микросхема
+    gbactx.fillStyle = '#0e2238';
+    gbactx.fillRect(6, 6, 20, 20);
+    // Неоновый кант фазы A (Циан)
     gbactx.fillStyle = C.NEON_CYAN;
-    gbactx.fillRect(1, 1, 30, 4);
-    gbactx.fillRect(1, 27, 30, 4);
-    gbactx.fillRect(1, 1, 4, 30);
-    gbactx.fillRect(27, 1, 4, 30);
-    // Голографическое ядро
-    gbactx.fillStyle = '#e0f2fe';
-    gbactx.fillRect(12, 12, 8, 8);
+    gbactx.fillRect(0, 0, 32, 3);
+    gbactx.fillRect(0, 0, 2, 32);
+    gbactx.fillRect(30, 0, 2, 32);
+    gbactx.fillRect(0, 30, 32, 2);
+    // Угловые неоновые пиксели
+    gbactx.fillStyle = '#ffffff';
+    gbactx.fillRect(2, 1, 3, 2);
+    gbactx.fillRect(27, 1, 3, 2);
     scene.textures.addCanvas('tile_glitch_a_active', gbaCanvas);
 
-    // 3. Фазовый блок A (Неактивный - Пунктирный призрак) 32x32
+    // 3. Фазовый блок A (Неактивный - Пустое пространство без подсказок!) 32x32
     const gbiaCanvas = document.createElement('canvas');
     gbiaCanvas.width = 32;
     gbiaCanvas.height = 32;
-    const gbiactx = gbiaCanvas.getContext('2d')!;
-    gbiactx.imageSmoothingEnabled = false;
-    gbiactx.fillStyle = 'rgba(6, 182, 212, 0.4)';
-    for (let x = 0; x < 32; x += 6) {
-      gbiactx.fillRect(x, 0, 3, 2);
-      gbiactx.fillRect(x, 30, 3, 2);
-    }
-    for (let y = 0; y < 32; y += 6) {
-      gbiactx.fillRect(0, y, 2, 3);
-      gbiactx.fillRect(30, y, 2, 3);
-    }
+    // Чистый прозрачный холст: в CatTrap нет пунктирных подсказок
     scene.textures.addCanvas('tile_glitch_a_inactive', gbiaCanvas);
 
-    // 4. Фазовый блок B (Активный - Маджента) 32x32
+    // 4. Фазовый блок B (Активный - Твёрдая платформа с маджента-кантом) 32x32
     const gbbCanvas = document.createElement('canvas');
     gbbCanvas.width = 32;
     gbbCanvas.height = 32;
     const gbbctx = gbbCanvas.getContext('2d')!;
     gbbctx.imageSmoothingEnabled = false;
-    gbbctx.fillStyle = 'rgba(236, 72, 153, 0.25)';
+    gbbctx.fillStyle = C.PLATFORM_CH3;
     gbbctx.fillRect(0, 0, 32, 32);
+    gbbctx.fillStyle = C.PLATFORM_CH3_LIGHT;
+    gbbctx.fillRect(2, 2, 28, 28);
+    // Внутренняя микросхема
+    gbbctx.fillStyle = '#2b0f27';
+    gbbctx.fillRect(6, 6, 20, 20);
+    // Неоновый кант фазы B (Маджента)
     gbbctx.fillStyle = C.NEON_MAGENTA;
-    gbbctx.fillRect(1, 1, 30, 4);
-    gbbctx.fillRect(1, 27, 30, 4);
-    gbbctx.fillRect(1, 1, 4, 30);
-    gbbctx.fillRect(27, 1, 4, 30);
-    // Голографическое ядро
-    gbbctx.fillStyle = '#fce7f3';
-    gbbctx.fillRect(12, 12, 8, 8);
+    gbbctx.fillRect(0, 0, 32, 3);
+    gbbctx.fillRect(0, 0, 2, 32);
+    gbbctx.fillRect(30, 0, 2, 32);
+    gbbctx.fillRect(0, 30, 32, 2);
+    // Угловые неоновые пиксели
+    gbbctx.fillStyle = '#ffffff';
+    gbbctx.fillRect(2, 1, 3, 2);
+    gbbctx.fillRect(27, 1, 3, 2);
     scene.textures.addCanvas('tile_glitch_b_active', gbbCanvas);
 
-    // 5. Фазовый блок B (Неактивный - Пунктирный призрак) 32x32
+    // 5. Фазовый блок B (Неактивный - Пустое пространство без подсказок!) 32x32
     const gbibCanvas = document.createElement('canvas');
     gbibCanvas.width = 32;
     gbibCanvas.height = 32;
-    const gbibctx = gbibCanvas.getContext('2d')!;
-    gbibctx.imageSmoothingEnabled = false;
-    gbibctx.fillStyle = 'rgba(236, 72, 153, 0.4)';
-    for (let x = 0; x < 32; x += 6) {
-      gbibctx.fillRect(x, 0, 3, 2);
-      gbibctx.fillRect(x, 30, 3, 2);
-    }
-    for (let y = 0; y < 32; y += 6) {
-      gbibctx.fillRect(0, y, 2, 3);
-      gbibctx.fillRect(30, y, 2, 3);
-    }
+    // Чистый прозрачный холст: в CatTrap нет пунктирных подсказок
     scene.textures.addCanvas('tile_glitch_b_inactive', gbibCanvas);
 
-    // 6. Лазерный эмиттер (32x32) - футуристическая турель с рубиновым кристаллом
+    // 6. Лазерный эмиттер (Скрытый) 32x32 - прозрачный холст
     const leCanvas = document.createElement('canvas');
     leCanvas.width = 32;
     leCanvas.height = 32;
-    const lectx = leCanvas.getContext('2d')!;
-    lectx.imageSmoothingEnabled = false;
-    lectx.fillStyle = '#1e293b';
-    lectx.fillRect(4, 4, 24, 24);
-    lectx.fillStyle = '#475569';
-    lectx.fillRect(8, 8, 16, 16);
-    // Кристалл
-    lectx.fillStyle = C.LASER_BEAM;
-    lectx.fillRect(12, 12, 8, 8);
-    lectx.fillStyle = C.LASER_CORE;
-    lectx.fillRect(14, 14, 4, 4);
     scene.textures.addCanvas('laser_emitter', leCanvas);
 
-    // 7. Варп-портал Вход (Циан) 32x32
+    // 7. Варп-портал Вход (Кибернетическая пространственная червоточина) 32x32
     const wpiCanvas = document.createElement('canvas');
     wpiCanvas.width = 32;
     wpiCanvas.height = 32;
     const wpictx = wpiCanvas.getContext('2d')!;
     wpictx.imageSmoothingEnabled = false;
-    wpictx.fillStyle = 'rgba(6, 182, 212, 0.2)';
+    // Тёмный гравитационный вихрь
+    wpictx.fillStyle = 'rgba(6, 182, 212, 0.25)';
     wpictx.beginPath();
     wpictx.arc(16, 16, 14, 0, Math.PI * 2);
     wpictx.fill();
-    wpictx.lineWidth = 3;
     wpictx.strokeStyle = C.NEON_CYAN;
+    wpictx.lineWidth = 2;
     wpictx.stroke();
+    // Внутренние спиральные точки
+    wpictx.fillStyle = '#38bdf8';
+    wpictx.fillRect(10, 8, 3, 3);
+    wpictx.fillRect(20, 9, 3, 3);
+    wpictx.fillRect(22, 18, 3, 3);
+    wpictx.fillRect(9, 21, 3, 3);
+    // Ядро сингулярности
     wpictx.fillStyle = '#ffffff';
     wpictx.fillRect(14, 14, 4, 4);
     scene.textures.addCanvas('warp_gate_in', wpiCanvas);
 
-    // 8. Варп-портал Выход (Маджента) 32x32
+    // 8. Варп-портал Выход (Скрытая точка выхода, без подсказок!) 32x32
     const wpoCanvas = document.createElement('canvas');
     wpoCanvas.width = 32;
     wpoCanvas.height = 32;
-    const wpoctx = wpoCanvas.getContext('2d')!;
-    wpoctx.imageSmoothingEnabled = false;
-    wpoctx.fillStyle = 'rgba(236, 72, 153, 0.2)';
-    wpoctx.beginPath();
-    wpoctx.arc(16, 16, 14, 0, Math.PI * 2);
-    wpoctx.fill();
-    wpoctx.lineWidth = 3;
-    wpoctx.strokeStyle = C.NEON_MAGENTA;
-    wpoctx.stroke();
-    wpoctx.fillStyle = '#ffffff';
-    wpoctx.fillRect(14, 14, 4, 4);
+    // Чистый прозрачный холст: точка выхода не должна выдавать себя заранее
     scene.textures.addCanvas('warp_gate_out', wpoCanvas);
 
     // 9. Эхо-кот (24x24) - полупрозрачный голографический силуэт
@@ -978,22 +959,23 @@ export class PixelArtGenerator {
     ecctx.fillRect(10, 14, 4, 2);  // Глитч-полоска
     scene.textures.addCanvas('echo_cat', ecCanvas);
 
-    // 10. Time Zone Slow (32x64)
+    // 10. Time Zone Slow (32x32 бесшовный хроно-туман)
     const tzCanvas = document.createElement('canvas');
     tzCanvas.width = 32;
-    tzCanvas.height = 64;
+    tzCanvas.height = 32;
     const tzctx = tzCanvas.getContext('2d')!;
     tzctx.imageSmoothingEnabled = false;
-    tzctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
-    tzctx.fillRect(0, 0, 32, 64);
-    tzctx.fillStyle = C.NEON_CYAN;
-    tzctx.fillRect(0, 0, 2, 64);
-    tzctx.fillRect(30, 0, 2, 64);
-    // Символ песочных часов / хроно
-    tzctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    tzctx.fillRect(12, 28, 8, 2);
-    tzctx.fillRect(14, 30, 4, 4);
-    tzctx.fillRect(12, 34, 8, 2);
+    tzctx.fillStyle = 'rgba(6, 182, 212, 0.12)';
+    tzctx.fillRect(0, 0, 32, 32);
+    // Тонкие цифровые скан-линии
+    tzctx.fillStyle = 'rgba(6, 182, 212, 0.2)';
+    tzctx.fillRect(0, 8, 32, 1);
+    tzctx.fillRect(0, 24, 32, 1);
+    // Частицы хроно-пыли
+    tzctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+    tzctx.fillRect(6, 4, 1, 1);
+    tzctx.fillRect(22, 14, 1, 1);
+    tzctx.fillRect(14, 28, 1, 1);
     scene.textures.addCanvas('time_zone_slow', tzCanvas);
 
     // 11. Фон Главы 3: Дальний план (64x64) - Цифровая бездна

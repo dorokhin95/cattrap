@@ -35,19 +35,14 @@ export class WarpGate {
 
     this.entrySprite = scene.add.sprite(entryX, entryY, 'warp_gate_in').setDepth(5);
     this.exitSprite = scene.add.sprite(exitX, exitY, 'warp_gate_out').setDepth(5);
+    // В CatTrap выход из червоточины не подсвечивается маркером
+    this.exitSprite.setVisible(false);
 
-    // Вращение колец червоточин
+    // Мягкое вращение входной червоточины
     scene.tweens.add({
       targets: this.entrySprite,
       angle: 360,
-      duration: 3000,
-      repeat: -1
-    });
-
-    scene.tweens.add({
-      targets: this.exitSprite,
-      angle: -360,
-      duration: 3000,
+      duration: 3500,
       repeat: -1
     });
   }

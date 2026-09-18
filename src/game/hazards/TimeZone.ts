@@ -30,7 +30,7 @@ export class TimeZone extends Phaser.GameObjects.Sprite {
 
     this.setDisplaySize(width, height);
     this.setDepth(2);
-    this.setAlpha(0.6);
+    this.setAlpha(0.35);
 
     scene.add.existing(this);
 
@@ -41,11 +41,11 @@ export class TimeZone extends Phaser.GameObjects.Sprite {
       height
     );
 
-    // Мягкая анимация пульсации хроно-поля
+    // Мягкая анимация хроно-поля
     scene.tweens.add({
       targets: this,
-      alpha: { from: 0.35, to: 0.65 },
-      duration: 1200,
+      alpha: { from: 0.2, to: 0.4 },
+      duration: 1500,
       yoyo: true,
       repeat: -1
     });
