@@ -55,7 +55,7 @@ export interface LevelTriggerData {
   conditionType: 'player_x_greater' | 'player_x_less' | 'player_dist_portal';
   conditionValue: number;
   targetId: string;
-  action: 'pop' | 'drop' | 'collapse' | 'move_portal' | 'chain_pop' | 'crush' | 'fire_laser' | 'spawn_echo';
+  action: 'pop' | 'drop' | 'collapse' | 'move_portal' | 'chain_pop' | 'crush' | 'fire_laser' | 'spawn_echo' | 'trigger_glitch';
   delayMs?: number;
   once?: boolean;
   resetOnDeath?: boolean;
@@ -86,6 +86,7 @@ export interface MovingPlatformData {
   targetY: number;
   speed?: number;
   pingPong?: boolean;
+  autoStart?: boolean;
 }
 
 export interface ButtonData {
@@ -151,6 +152,7 @@ export interface GlitchBlockData {
   activeMs?: number;
   inactiveMs?: number;
   initialPhase?: 'active' | 'inactive';
+  autoStart?: boolean;
 }
 
 export interface WarpGateData {

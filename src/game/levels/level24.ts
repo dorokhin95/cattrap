@@ -41,11 +41,11 @@ export const level24: LevelData = {
     ...Array.from({ length: 15 }, (_, i) => ({ x: 47, y: i }))
   ],
 
-  // Теневой клон, гонящийся по пятам
+  // Теневой клон, гонящийся по пятам (активируется строго по триггеру при выходе со спавна)
   echoCat: {
     id: 'echo_24',
     delayMs: 750,
-    autoStart: true
+    autoStart: false
   },
 
   // Одиночные статические шипы на беговой дорожке
@@ -61,5 +61,15 @@ export const level24: LevelData = {
     y: 10
   },
 
-  triggers: []
+  triggers: [
+    // Активация эхо-кота только когда игрок начинает забег и сходит со стартовой площадки
+    {
+      id: 'trig_24_echo',
+      conditionType: 'player_x_greater',
+      conditionValue: 5.5,
+      targetId: 'echo_24',
+      action: 'spawn_echo',
+      once: true
+    }
+  ]
 };

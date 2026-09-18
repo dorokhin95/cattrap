@@ -14,43 +14,48 @@ export const level25: LevelData = {
     ...Array.from({ length: 7 }, (_, i) => ({ x: i, y: 12 })),
     ...Array.from({ length: 7 }, (_, i) => ({ x: i, y: 13 })),
 
-    // Остров в зоне замедления (x=17..20, y=11..13)
-    ...Array.from({ length: 4 }, (_, i) => ({ x: 17 + i, y: 11 })),
-    ...Array.from({ length: 4 }, (_, i) => ({ x: 17 + i, y: 12 })),
-    ...Array.from({ length: 4 }, (_, i) => ({ x: 17 + i, y: 13 })),
+    // Остров 1 в зоне замедления (x=10..13, y=11..13)
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 10 + i, y: 11 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 10 + i, y: 12 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 10 + i, y: 13 })),
 
-    // Остров 2 в зоне замедления (x=27..29, y=10..13)
-    ...Array.from({ length: 3 }, (_, i) => ({ x: 27 + i, y: 10 })),
-    ...Array.from({ length: 3 }, (_, i) => ({ x: 27 + i, y: 11 })),
-    ...Array.from({ length: 3 }, (_, i) => ({ x: 27 + i, y: 12 })),
+    // Остров 2 в зоне замедления (x=18..21, y=11..13)
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 18 + i, y: 11 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 18 + i, y: 12 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 18 + i, y: 13 })),
 
-    // Финишная платформа после выхода из зоны (x=36..45, y=11..13)
-    ...Array.from({ length: 10 }, (_, i) => ({ x: 36 + i, y: 11 })),
-    ...Array.from({ length: 10 }, (_, i) => ({ x: 36 + i, y: 12 })),
-    ...Array.from({ length: 10 }, (_, i) => ({ x: 36 + i, y: 13 })),
+    // Остров 3 в зоне замедления (x=26..29, y=10..13)
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 26 + i, y: 10 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 26 + i, y: 11 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 26 + i, y: 12 })),
+
+    // Финишная платформа после выхода из зоны (x=34..45, y=11..13)
+    ...Array.from({ length: 12 }, (_, i) => ({ x: 34 + i, y: 11 })),
+    ...Array.from({ length: 12 }, (_, i) => ({ x: 34 + i, y: 12 })),
+    ...Array.from({ length: 12 }, (_, i) => ({ x: 34 + i, y: 13 })),
 
     // Стены
     ...Array.from({ length: 15 }, (_, i) => ({ x: 0, y: i })),
     ...Array.from({ length: 15 }, (_, i) => ({ x: 45, y: i }))
   ],
 
-  // Зона замедления времени (Slow-Mo) от x=8 до x=34
+  // Зона замедления времени (Slow-Mo) от x=6 до x=36
   timeZones: [
     {
       id: 'tz_25_main',
-      x: 21,
-      y: 8,
-      width: 26,
-      height: 12,
+      x: 6,
+      y: 1,
+      width: 30,
+      height: 13,
       timeScale: 0.45
     }
   ],
 
-  // Лазерные лучи в зоне замедления (срабатывают при приближении котика)
+  // Лазерные лучи между островами в зоне замедления (срабатывают при приближении котика)
   lasers: [
     {
       id: 'laser_25_1',
-      x: 12,
+      x: 15,
       y: 2,
       length: 10,
       direction: 'vertical',
@@ -74,7 +79,7 @@ export const level25: LevelData = {
     },
     {
       id: 'laser_25_3',
-      x: 32,
+      x: 31,
       y: 2,
       length: 10,
       direction: 'vertical',
@@ -86,11 +91,12 @@ export const level25: LevelData = {
     }
   ],
 
-  // Шипы на дне пропасти
+  // Шипы на дне пропастей между островами
   staticSpikes: [
-    ...Array.from({ length: 10 }, (_, i) => ({ x: 7 + i, y: 14 })),
-    ...Array.from({ length: 6 }, (_, i) => ({ x: 21 + i, y: 14 })),
-    ...Array.from({ length: 6 }, (_, i) => ({ x: 30 + i, y: 14 }))
+    ...Array.from({ length: 3 }, (_, i) => ({ x: 7 + i, y: 14 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 14 + i, y: 14 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 22 + i, y: 14 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 30 + i, y: 14 }))
   ],
 
   portal: {
@@ -102,7 +108,7 @@ export const level25: LevelData = {
     {
       id: 'trig_25_1',
       conditionType: 'player_x_greater',
-      conditionValue: 9.5,
+      conditionValue: 12.0,
       targetId: 'laser_25_1',
       action: 'fire_laser',
       once: true
@@ -110,7 +116,7 @@ export const level25: LevelData = {
     {
       id: 'trig_25_2',
       conditionType: 'player_x_greater',
-      conditionValue: 19.5,
+      conditionValue: 20.0,
       targetId: 'laser_25_2',
       action: 'fire_laser',
       once: true
@@ -118,7 +124,7 @@ export const level25: LevelData = {
     {
       id: 'trig_25_3',
       conditionType: 'player_x_greater',
-      conditionValue: 28.5,
+      conditionValue: 28.0,
       targetId: 'laser_25_3',
       action: 'fire_laser',
       once: true

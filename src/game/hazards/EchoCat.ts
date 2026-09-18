@@ -21,7 +21,7 @@ export class EchoCat extends Phaser.GameObjects.Sprite {
   private hasSpawned = false;
   private hasStartedMoving = false;
 
-  constructor(scene: Phaser.Scene, id = 'echo_cat', delayMs = 700, autoStart = true) {
+  constructor(scene: Phaser.Scene, id = 'echo_cat', delayMs = 700, autoStart = false) {
     super(scene, -999, -999, 'echo_cat');
     this.id = id;
     this.delayMs = delayMs;
@@ -38,21 +38,18 @@ export class EchoCat extends Phaser.GameObjects.Sprite {
   }
 
   public activate(): void {
+    if (this.isActive) return;
     this.isActive = true;
+    this.history = [];
+    this.totalTimeMs = 0;
+    this.hasSpawned = false;
+    this.isLethal = false;
+    this.setVisible(false);
+    this.setPosition(-999, -999);
   }
 
   public recordPlayer(cat: Cat, deltaMs: number): void {
     if (!this.isActive) return;
-
-    // Пока игрок стоит на спавне и не начал движение, эхо-кот не начинает отсчёт
-    if (!this.hasStartedMoving) {
-      const body = cat.body as Phaser.Physics.Arcade.Body;
-      const isMoving = body && (Math.abs(body.velocity.x) > 15 || Math.abs(body.velocity.y) > 15);
-      if (!isMoving) {
-        return;
-      }
-      this.hasStartedMoving = true;
-    }
 
     this.totalTimeMs += deltaMs;
     this.history.push({

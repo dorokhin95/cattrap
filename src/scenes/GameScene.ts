@@ -444,7 +444,8 @@ export class GameScene extends Phaser.Scene {
           gb.phaseGroup,
           gb.activeMs,
           gb.inactiveMs,
-          gb.initialPhase
+          gb.initialPhase,
+          gb.autoStart ?? false
         );
         this.glitchBlocks.push(block);
       }
@@ -478,7 +479,7 @@ export class GameScene extends Phaser.Scene {
         this,
         this.levelData.echoCat.id,
         this.levelData.echoCat.delayMs,
-        this.levelData.echoCat.autoStart !== false
+        this.levelData.echoCat.autoStart === true
       );
     }
 
@@ -559,6 +560,12 @@ export class GameScene extends Phaser.Scene {
     } else if (action === 'spawn_echo') {
       if (this.echoCat) {
         this.echoCat.activate();
+      }
+    } else if (action === 'trigger_glitch' || action === 'start_glitch') {
+      for (const gb of this.glitchBlocks) {
+        if (!targetId || gb.id === targetId || gb.id.startsWith(targetId)) {
+          gb.triggerGlitch();
+        }
       }
     }
   }
@@ -682,7 +689,12 @@ export class GameScene extends Phaser.Scene {
     // --- Коллизии Главы 3 ---
     // Кот <-> Фазовые блоки (GlitchBlock)
     for (const gb of this.glitchBlocks) {
-      this.physics.add.collider(this.cat, gb);
+      this.physics.add.collider(this.cat, gb, () => {
+        const catBody = this.cat.body as Phaser.Physics.Arcade.Body;
+        if (catBody && catBody.touching.down && !gb.isCycling) {
+          gb.triggerGlitch();
+        }
+      });
     }
 
     // Кот <-> Портал (финиш уровня)

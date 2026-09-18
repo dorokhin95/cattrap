@@ -32,24 +32,24 @@ export const level22: LevelData = {
   // Фазовые платформы над пропастями (полноценные двухблочные платформы вместо одиночных кубиков)
   glitchBlocks: [
     // Первая пропасть (x=7..18): Островки из 2 блоков с чередованием фаз A и B
-    { id: 'gb_22_1a', x: 8, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
-    { id: 'gb_22_1b', x: 9, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
+    { id: 'gb_22_c1_1a', x: 8, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
+    { id: 'gb_22_c1_1b', x: 9, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
 
-    { id: 'gb_22_2a', x: 12, y: 11, phaseGroup: 'B', activeMs: 1100, inactiveMs: 1100, initialPhase: 'inactive' },
-    { id: 'gb_22_2b', x: 13, y: 11, phaseGroup: 'B', activeMs: 1100, inactiveMs: 1100, initialPhase: 'inactive' },
+    { id: 'gb_22_c1_2a', x: 12, y: 11, phaseGroup: 'B', activeMs: 1100, inactiveMs: 1100, initialPhase: 'inactive' },
+    { id: 'gb_22_c1_2b', x: 13, y: 11, phaseGroup: 'B', activeMs: 1100, inactiveMs: 1100, initialPhase: 'inactive' },
 
-    { id: 'gb_22_3a', x: 16, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
-    { id: 'gb_22_3b', x: 17, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
+    { id: 'gb_22_c1_3a', x: 16, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
+    { id: 'gb_22_c1_3b', x: 17, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
 
     // Вторая пропасть (x=23..35): Островки из 2 блоков
-    { id: 'gb_22_4a', x: 24, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
-    { id: 'gb_22_4b', x: 25, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
+    { id: 'gb_22_c2_4a', x: 24, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
+    { id: 'gb_22_c2_4b', x: 25, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
 
-    { id: 'gb_22_5a', x: 28, y: 11, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' },
-    { id: 'gb_22_5b', x: 29, y: 11, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' },
+    { id: 'gb_22_c2_5a', x: 28, y: 11, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' },
+    { id: 'gb_22_c2_5b', x: 29, y: 11, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' },
 
-    { id: 'gb_22_6a', x: 32, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
-    { id: 'gb_22_6b', x: 33, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' }
+    { id: 'gb_22_c2_6a', x: 32, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
+    { id: 'gb_22_c2_6b', x: 33, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' }
   ],
 
   // Шипы на дне пропасти
@@ -63,5 +63,24 @@ export const level22: LevelData = {
     y: 10
   },
 
-  triggers: []
+  triggers: [
+    // Неожиданная активация фазовых платформ первой пропасти при приближении к яме
+    {
+      id: 'trig_22_glitch1',
+      conditionType: 'player_x_greater',
+      conditionValue: 5.8,
+      targetId: 'gb_22_c1_',
+      action: 'trigger_glitch',
+      once: true
+    },
+    // Неожиданная активация фазовых платформ второй пропасти при выходе с центрального островка
+    {
+      id: 'trig_22_glitch2',
+      conditionType: 'player_x_greater',
+      conditionValue: 21.5,
+      targetId: 'gb_22_c2_',
+      action: 'trigger_glitch',
+      once: true
+    }
+  ]
 };

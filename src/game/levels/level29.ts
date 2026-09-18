@@ -39,11 +39,11 @@ export const level29: LevelData = {
     ...Array.from({ length: 15 }, (_, i) => ({ x: 49, y: i }))
   ],
 
-  // Теневой двойник-эхо
+  // Теневой двойник-эхо (активируется строго по триггеру при сходе со спавна)
   echoCat: {
     id: 'echo_29',
     delayMs: 780,
-    autoStart: true
+    autoStart: false
   },
 
   // Пресс-сюрприз (срабатывает при приближении, cycle: false)
@@ -90,6 +90,15 @@ export const level29: LevelData = {
   },
 
   triggers: [
+    // Активация эхо-кота только при начале движения по трассе
+    {
+      id: 'trig_29_echo',
+      conditionType: 'player_x_greater',
+      conditionValue: 6.0,
+      targetId: 'echo_29',
+      action: 'spawn_echo',
+      once: true
+    },
     // Активация пресса
     {
       id: 'trig_29_crush',
