@@ -65,43 +65,46 @@ export const level26: LevelData = {
     { id: 'bp_26', x: 24, y: 10, power: -520 }
   ],
 
-  // Лазеры
+  // Лазеры - внезапные засады
   lasers: [
-    // Горизонтальный лазер над первым конвейером
+    // Горизонтальный лазер над первым конвейером (срабатывает при входе на конвейер)
     {
       id: 'laser_26_h',
       x: 9,
       y: 10,
       length: 8,
       direction: 'horizontal',
-      warningMs: 320,
+      warningMs: 140,
       activeMs: 480,
       cooldownMs: 1300,
-      cycle: true
+      cycle: false,
+      autoStart: false
     },
-    // Вертикальный лазер над траекторией отскока батута
+    // Вертикальный лазер над траекторией отскока батута (срабатывает при прыжке на батут)
     {
       id: 'laser_26_v1',
       x: 26,
       y: 1,
       length: 8,
       direction: 'vertical',
-      warningMs: 280,
+      warningMs: 140,
       activeMs: 450,
       cooldownMs: 1200,
-      cycle: true
+      cycle: false,
+      autoStart: false
     },
-    // Лазер над вторым конвейером
+    // Лазер над вторым конвейером (срабатывает при приземлении)
     {
       id: 'laser_26_v2',
       x: 34,
       y: 3,
       length: 8,
       direction: 'vertical',
-      warningMs: 300,
+      warningMs: 140,
       activeMs: 450,
       cooldownMs: 1400,
-      cycle: true
+      cycle: false,
+      autoStart: false
     }
   ],
 
@@ -118,5 +121,30 @@ export const level26: LevelData = {
     y: 10
   },
 
-  triggers: []
+  triggers: [
+    {
+      id: 'trig_26_1',
+      conditionType: 'player_x_greater',
+      conditionValue: 8.5,
+      targetId: 'laser_26_h',
+      action: 'fire_laser',
+      once: true
+    },
+    {
+      id: 'trig_26_2',
+      conditionType: 'player_x_greater',
+      conditionValue: 23.0,
+      targetId: 'laser_26_v1',
+      action: 'fire_laser',
+      once: true
+    },
+    {
+      id: 'trig_26_3',
+      conditionType: 'player_x_greater',
+      conditionValue: 29.5,
+      targetId: 'laser_26_v2',
+      action: 'fire_laser',
+      once: true
+    }
+  ]
 };

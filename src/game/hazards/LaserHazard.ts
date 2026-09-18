@@ -27,11 +27,11 @@ export class LaserHazard extends HazardBase {
     lengthTiles: number,
     direction: 'horizontal' | 'vertical' = 'horizontal',
     id: string = '',
-    warningMs = 350,
+    warningMs = 200,
     activeMs = 450,
     cooldownMs = 1200,
-    cycle = true,
-    autoStart = true,
+    cycle = false,
+    autoStart = false,
     tripwire = false
   ) {
     super(scene, startX, startY, 'laser_emitter');
@@ -44,6 +44,9 @@ export class LaserHazard extends HazardBase {
     this.cycle = cycle;
     this.autoStart = autoStart;
     this.tripwire = tripwire;
+
+    // В игре CatTrap ловушки не выдают себя висящими в воздухе блоками!
+    this.setVisible(false);
 
     if (direction === 'vertical') {
       this.setAngle(90);
@@ -60,9 +63,9 @@ export class LaserHazard extends HazardBase {
 
     // Расчёт прямоугольника луча
     if (direction === 'horizontal') {
-      this.beamBounds = new Phaser.Geom.Rectangle(startX + 12, startY - 8, this.lengthPx, 16);
+      this.beamBounds = new Phaser.Geom.Rectangle(startX, startY - 8, this.lengthPx, 16);
     } else {
-      this.beamBounds = new Phaser.Geom.Rectangle(startX - 8, startY + 12, 16, this.lengthPx);
+      this.beamBounds = new Phaser.Geom.Rectangle(startX - 8, startY, 16, this.lengthPx);
     }
 
     if (this.autoStart && this.cycle) {
@@ -83,6 +86,10 @@ export class LaserHazard extends HazardBase {
   }
 
   private startWarning(): void {
+    if (this.warningMs <= 0) {
+      this.startFiring();
+      return;
+    }
     AudioManager.getInstance().playSFX('laserWarning');
     this.renderWarningBeam();
 
@@ -112,9 +119,9 @@ export class LaserHazard extends HazardBase {
     this.graphics.clear();
     this.graphics.lineStyle(1, 0xf43f5e, 0.45);
     if (this.direction === 'horizontal') {
-      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x + 12, this.y, this.x + 12 + this.lengthPx, this.y));
+      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y, this.x + this.lengthPx, this.y));
     } else {
-      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y + 12, this.x, this.y + 12 + this.lengthPx));
+      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y, this.x, this.y + this.lengthPx));
     }
   }
 
@@ -125,25 +132,25 @@ export class LaserHazard extends HazardBase {
     // Внешнее свечение
     this.graphics.lineStyle(10, 0xf43f5e, 0.35);
     if (isH) {
-      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x + 12, this.y, this.x + 12 + this.lengthPx, this.y));
+      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y, this.x + this.lengthPx, this.y));
     } else {
-      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y + 12, this.x, this.y + 12 + this.lengthPx));
+      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y, this.x, this.y + this.lengthPx));
     }
 
     // Основной луч
     this.graphics.lineStyle(4, 0xf43f5e, 0.95);
     if (isH) {
-      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x + 12, this.y, this.x + 12 + this.lengthPx, this.y));
+      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y, this.x + this.lengthPx, this.y));
     } else {
-      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y + 12, this.x, this.y + 12 + this.lengthPx));
+      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y, this.x, this.y + this.lengthPx));
     }
 
     // Белое ядро
     this.graphics.lineStyle(2, 0xffffff, 1.0);
     if (isH) {
-      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x + 12, this.y, this.x + 12 + this.lengthPx, this.y));
+      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y, this.x + this.lengthPx, this.y));
     } else {
-      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y + 12, this.x, this.y + 12 + this.lengthPx));
+      this.graphics.strokeLineShape(new Phaser.Geom.Line(this.x, this.y, this.x, this.y + this.lengthPx));
     }
   }
 

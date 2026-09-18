@@ -105,31 +105,33 @@ export const level30: LevelData = {
     }
   ],
 
-  // Лазеры
+  // Лазеры - внезапные засады
   lasers: [
-    // Лазер в начале уровня
+    // Лазер в начале уровня (срабатывает при приближении к яме Section A)
     {
       id: 'laser30_start',
       x: 6,
       y: 2,
       length: 9,
       direction: 'vertical',
-      warningMs: 300,
+      warningMs: 140,
       activeMs: 450,
       cooldownMs: 1300,
-      cycle: true
+      cycle: false,
+      autoStart: false
     },
-    // Лазер над финишной зоной
+    // Лазер над финишной зоной (срабатывает перед порталом)
     {
       id: 'laser30_end',
       x: 55,
       y: 3,
       length: 8,
       direction: 'vertical',
-      warningMs: 320,
+      warningMs: 140,
       activeMs: 500,
       cooldownMs: 1500,
-      cycle: true
+      cycle: false,
+      autoStart: false
     }
   ],
 
@@ -150,6 +152,24 @@ export const level30: LevelData = {
   },
 
   triggers: [
+    // Внезапный лазер в Section A
+    {
+      id: 'trig30_laser_start',
+      conditionType: 'player_x_greater',
+      conditionValue: 5.2,
+      targetId: 'laser30_start',
+      action: 'fire_laser',
+      once: true
+    },
+    // Внезапный лазер перед порталом
+    {
+      id: 'trig30_laser_end',
+      conditionType: 'player_x_greater',
+      conditionValue: 53.5,
+      targetId: 'laser30_end',
+      action: 'fire_laser',
+      once: true
+    },
     // Побег портала на постамент
     {
       id: 'trig30_portal_shift',

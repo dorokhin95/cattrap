@@ -46,7 +46,7 @@ export const level25: LevelData = {
     }
   ],
 
-  // Лазерные лучи в зоне замедления (паря в слоу-мо, нужно уклоняться)
+  // Лазерные лучи в зоне замедления (срабатывают при приближении котика)
   lasers: [
     {
       id: 'laser_25_1',
@@ -54,10 +54,11 @@ export const level25: LevelData = {
       y: 2,
       length: 10,
       direction: 'vertical',
-      warningMs: 400,
-      activeMs: 600,
+      warningMs: 250,
+      activeMs: 650,
       cooldownMs: 1600,
-      cycle: true
+      cycle: false,
+      autoStart: false
     },
     {
       id: 'laser_25_2',
@@ -65,10 +66,11 @@ export const level25: LevelData = {
       y: 2,
       length: 10,
       direction: 'vertical',
-      warningMs: 400,
-      activeMs: 600,
+      warningMs: 250,
+      activeMs: 650,
       cooldownMs: 1600,
-      cycle: true
+      cycle: false,
+      autoStart: false
     },
     {
       id: 'laser_25_3',
@@ -76,10 +78,11 @@ export const level25: LevelData = {
       y: 2,
       length: 10,
       direction: 'vertical',
-      warningMs: 400,
-      activeMs: 600,
+      warningMs: 250,
+      activeMs: 650,
       cooldownMs: 1600,
-      cycle: true
+      cycle: false,
+      autoStart: false
     }
   ],
 
@@ -95,5 +98,30 @@ export const level25: LevelData = {
     y: 10
   },
 
-  triggers: []
+  triggers: [
+    {
+      id: 'trig_25_1',
+      conditionType: 'player_x_greater',
+      conditionValue: 9.5,
+      targetId: 'laser_25_1',
+      action: 'fire_laser',
+      once: true
+    },
+    {
+      id: 'trig_25_2',
+      conditionType: 'player_x_greater',
+      conditionValue: 19.5,
+      targetId: 'laser_25_2',
+      action: 'fire_laser',
+      once: true
+    },
+    {
+      id: 'trig_25_3',
+      conditionType: 'player_x_greater',
+      conditionValue: 28.5,
+      targetId: 'laser_25_3',
+      action: 'fire_laser',
+      once: true
+    }
+  ]
 };
