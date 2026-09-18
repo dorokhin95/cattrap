@@ -29,19 +29,27 @@ export const level22: LevelData = {
     ...Array.from({ length: 15 }, (_, i) => ({ x: 43, y: i }))
   ],
 
-  // Фазовые блоки над пропастями
+  // Фазовые платформы над пропастями (полноценные двухблочные платформы вместо одиночных кубиков)
   glitchBlocks: [
-    // Первая пропасть (x=7..18): Группа A (активна первой) и B
-    { id: 'gb_22_1', x: 8, y: 10, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
-    { id: 'gb_22_2', x: 11, y: 9, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
-    { id: 'gb_22_3', x: 14, y: 10, phaseGroup: 'B', activeMs: 1100, inactiveMs: 1100, initialPhase: 'inactive' },
-    { id: 'gb_22_4', x: 17, y: 11, phaseGroup: 'B', activeMs: 1100, inactiveMs: 1100, initialPhase: 'inactive' },
+    // Первая пропасть (x=7..18): Островки из 2 блоков с чередованием фаз A и B
+    { id: 'gb_22_1a', x: 8, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
+    { id: 'gb_22_1b', x: 9, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
 
-    // Вторая пропасть (x=23..35): Чередование групп в ритме
-    { id: 'gb_22_5', x: 24, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
-    { id: 'gb_22_6', x: 27, y: 10, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' },
-    { id: 'gb_22_7', x: 30, y: 9, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
-    { id: 'gb_22_8', x: 33, y: 10, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' }
+    { id: 'gb_22_2a', x: 12, y: 11, phaseGroup: 'B', activeMs: 1100, inactiveMs: 1100, initialPhase: 'inactive' },
+    { id: 'gb_22_2b', x: 13, y: 11, phaseGroup: 'B', activeMs: 1100, inactiveMs: 1100, initialPhase: 'inactive' },
+
+    { id: 'gb_22_3a', x: 16, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
+    { id: 'gb_22_3b', x: 17, y: 11, phaseGroup: 'A', activeMs: 1100, inactiveMs: 1100, initialPhase: 'active' },
+
+    // Вторая пропасть (x=23..35): Островки из 2 блоков
+    { id: 'gb_22_4a', x: 24, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
+    { id: 'gb_22_4b', x: 25, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
+
+    { id: 'gb_22_5a', x: 28, y: 11, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' },
+    { id: 'gb_22_5b', x: 29, y: 11, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' },
+
+    { id: 'gb_22_6a', x: 32, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
+    { id: 'gb_22_6b', x: 33, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' }
   ],
 
   // Шипы на дне пропасти

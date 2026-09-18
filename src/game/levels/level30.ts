@@ -50,10 +50,12 @@ export const level30: LevelData = {
     y: 10
   },
 
-  // Фазовые блоки в Section A (x=11..16)
+  // Фазовые платформы в Section A (x=11..17)
   glitchBlocks: [
-    { id: 'gb30_1', x: 12, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
-    { id: 'gb30_2', x: 15, y: 10, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' }
+    { id: 'gb30_1a', x: 12, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
+    { id: 'gb30_1b', x: 13, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
+    { id: 'gb30_2a', x: 16, y: 10, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' },
+    { id: 'gb30_2b', x: 17, y: 10, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' }
   ],
 
   // Варп-портал из Section A в Section B (к чекпоинту)

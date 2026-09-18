@@ -840,29 +840,12 @@ export class PixelArtGenerator {
     sctx.fillRect(28, 2, 2, 2);
     scene.textures.addCanvas('tile_solid_c3', solidCanvas);
 
-    // 2. Фазовый блок A (Активный - Твёрдая платформа с циановым кантом) 32x32
+    // 2. Фазовый блок A (Активный - 100% идентичен обычной платформе tile_solid_c3)
     const gbaCanvas = document.createElement('canvas');
     gbaCanvas.width = 32;
     gbaCanvas.height = 32;
     const gbactx = gbaCanvas.getContext('2d')!;
-    gbactx.imageSmoothingEnabled = false;
-    gbactx.fillStyle = C.PLATFORM_CH3;
-    gbactx.fillRect(0, 0, 32, 32);
-    gbactx.fillStyle = C.PLATFORM_CH3_LIGHT;
-    gbactx.fillRect(2, 2, 28, 28);
-    // Внутренняя микросхема
-    gbactx.fillStyle = '#0e2238';
-    gbactx.fillRect(6, 6, 20, 20);
-    // Неоновый кант фазы A (Циан)
-    gbactx.fillStyle = C.NEON_CYAN;
-    gbactx.fillRect(0, 0, 32, 3);
-    gbactx.fillRect(0, 0, 2, 32);
-    gbactx.fillRect(30, 0, 2, 32);
-    gbactx.fillRect(0, 30, 32, 2);
-    // Угловые неоновые пиксели
-    gbactx.fillStyle = '#ffffff';
-    gbactx.fillRect(2, 1, 3, 2);
-    gbactx.fillRect(27, 1, 3, 2);
+    gbactx.drawImage(solidCanvas, 0, 0);
     scene.textures.addCanvas('tile_glitch_a_active', gbaCanvas);
 
     // 3. Фазовый блок A (Неактивный - Пустое пространство без подсказок!) 32x32
@@ -872,29 +855,12 @@ export class PixelArtGenerator {
     // Чистый прозрачный холст: в CatTrap нет пунктирных подсказок
     scene.textures.addCanvas('tile_glitch_a_inactive', gbiaCanvas);
 
-    // 4. Фазовый блок B (Активный - Твёрдая платформа с маджента-кантом) 32x32
+    // 4. Фазовый блок B (Активный - 100% идентичен обычной платформе tile_solid_c3)
     const gbbCanvas = document.createElement('canvas');
     gbbCanvas.width = 32;
     gbbCanvas.height = 32;
     const gbbctx = gbbCanvas.getContext('2d')!;
-    gbbctx.imageSmoothingEnabled = false;
-    gbbctx.fillStyle = C.PLATFORM_CH3;
-    gbbctx.fillRect(0, 0, 32, 32);
-    gbbctx.fillStyle = C.PLATFORM_CH3_LIGHT;
-    gbbctx.fillRect(2, 2, 28, 28);
-    // Внутренняя микросхема
-    gbbctx.fillStyle = '#2b0f27';
-    gbbctx.fillRect(6, 6, 20, 20);
-    // Неоновый кант фазы B (Маджента)
-    gbbctx.fillStyle = C.NEON_MAGENTA;
-    gbbctx.fillRect(0, 0, 32, 3);
-    gbbctx.fillRect(0, 0, 2, 32);
-    gbbctx.fillRect(30, 0, 2, 32);
-    gbbctx.fillRect(0, 30, 32, 2);
-    // Угловые неоновые пиксели
-    gbbctx.fillStyle = '#ffffff';
-    gbbctx.fillRect(2, 1, 3, 2);
-    gbbctx.fillRect(27, 1, 3, 2);
+    gbbctx.drawImage(solidCanvas, 0, 0);
     scene.textures.addCanvas('tile_glitch_b_active', gbbCanvas);
 
     // 5. Фазовый блок B (Неактивный - Пустое пространство без подсказок!) 32x32

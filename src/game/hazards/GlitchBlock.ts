@@ -23,9 +23,8 @@ export class GlitchBlock extends Phaser.Physics.Arcade.Sprite {
     inactiveMs = 1200,
     initialPhase: 'active' | 'inactive' = 'active'
   ) {
-    const tex = phaseGroup === 'A' ? 'tile_glitch_a_active' : 'tile_glitch_b_active';
-
-    super(scene, x, y, tex);
+    // В CatTrap блоки визуально 100% идентичны безопасным плиткам главы (Zero-Hint Trap Rule)
+    super(scene, x, y, 'tile_solid_c3');
     this.id = id;
     this.phaseGroup = phaseGroup;
     this.activeMs = activeMs;
@@ -44,7 +43,7 @@ export class GlitchBlock extends Phaser.Physics.Arcade.Sprite {
     body.moves = false;
     body.enable = this.isActive;
 
-    // В неактивном состоянии блок 100% невидим - никаких пунктиров!
+    // В неактивном состоянии блок 100% невидим - никаких рамок или подсказок!
     this.setVisible(this.isActive);
 
     this.startPhaseCycle();
@@ -53,26 +52,7 @@ export class GlitchBlock extends Phaser.Physics.Arcade.Sprite {
   private startPhaseCycle(): void {
     const delay = this.isActive ? this.activeMs : this.inactiveMs;
 
-    // Предупреждающая дрожь за 160 мс до исчезновения активного блока
-    if (this.isActive && delay > 200 && this.scene) {
-      this.scene.time.delayedCall(delay - 160, () => {
-        if (this.isActive && this.scene) {
-          this.scene.tweens.add({
-            targets: this,
-            x: this.initialX + 2,
-            alpha: 0.55,
-            duration: 40,
-            yoyo: true,
-            repeat: 2,
-            onComplete: () => {
-              this.setAlpha(1);
-              this.setX(this.initialX);
-            }
-          });
-        }
-      });
-    }
-
+    // Никаких предупреждающих подёргиваний и дрожания перед исчезновением!
     this.timerEvent = this.scene.time.delayedCall(delay, () => {
       this.togglePhase();
     });
@@ -89,8 +69,9 @@ export class GlitchBlock extends Phaser.Physics.Arcade.Sprite {
     this.setVisible(this.isActive);
     this.setAlpha(1);
     this.setX(this.initialX);
+    this.setY(this.initialY);
 
-    if (!silent && this.phaseGroup === 'A') {
+    if (!silent && this.phaseGroup === 'A' && this.isActive) {
       AudioManager.getInstance().playSFX('glitchSwitch');
     }
 

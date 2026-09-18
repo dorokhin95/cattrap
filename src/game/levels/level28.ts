@@ -49,17 +49,27 @@ export const level28: LevelData = {
     }
   ],
 
-  // Фазовые блоки: котик бежит автоматически вправо, нужно прыгать с блока на блок в такт
+  // Фазовые платформы: полноценные двухблочные островки в такт автобега
   glitchBlocks: [
     // Первая связка
-    { id: 'gb_28_1', x: 9, y: 11, phaseGroup: 'A', activeMs: 900, inactiveMs: 900, initialPhase: 'active' },
-    { id: 'gb_28_2', x: 13, y: 10, phaseGroup: 'B', activeMs: 900, inactiveMs: 900, initialPhase: 'inactive' },
-    { id: 'gb_28_3', x: 17, y: 10, phaseGroup: 'A', activeMs: 900, inactiveMs: 900, initialPhase: 'active' },
+    { id: 'gb_28_1a', x: 9, y: 11, phaseGroup: 'A', activeMs: 900, inactiveMs: 900, initialPhase: 'active' },
+    { id: 'gb_28_1b', x: 10, y: 11, phaseGroup: 'A', activeMs: 900, inactiveMs: 900, initialPhase: 'active' },
+
+    { id: 'gb_28_2a', x: 13, y: 10, phaseGroup: 'B', activeMs: 900, inactiveMs: 900, initialPhase: 'inactive' },
+    { id: 'gb_28_2b', x: 14, y: 10, phaseGroup: 'B', activeMs: 900, inactiveMs: 900, initialPhase: 'inactive' },
+
+    { id: 'gb_28_3a', x: 17, y: 10, phaseGroup: 'A', activeMs: 900, inactiveMs: 900, initialPhase: 'active' },
+    { id: 'gb_28_3b', x: 18, y: 10, phaseGroup: 'A', activeMs: 900, inactiveMs: 900, initialPhase: 'active' },
 
     // Вторая связка
-    { id: 'gb_28_4', x: 27, y: 11, phaseGroup: 'A', activeMs: 850, inactiveMs: 850, initialPhase: 'active' },
-    { id: 'gb_28_5', x: 31, y: 10, phaseGroup: 'B', activeMs: 850, inactiveMs: 850, initialPhase: 'inactive' },
-    { id: 'gb_28_6', x: 35, y: 9, phaseGroup: 'A', activeMs: 850, inactiveMs: 850, initialPhase: 'active' }
+    { id: 'gb_28_4a', x: 27, y: 11, phaseGroup: 'A', activeMs: 850, inactiveMs: 850, initialPhase: 'active' },
+    { id: 'gb_28_4b', x: 28, y: 11, phaseGroup: 'A', activeMs: 850, inactiveMs: 850, initialPhase: 'active' },
+
+    { id: 'gb_28_5a', x: 31, y: 10, phaseGroup: 'B', activeMs: 850, inactiveMs: 850, initialPhase: 'inactive' },
+    { id: 'gb_28_5b', x: 32, y: 10, phaseGroup: 'B', activeMs: 850, inactiveMs: 850, initialPhase: 'inactive' },
+
+    { id: 'gb_28_6a', x: 35, y: 9, phaseGroup: 'A', activeMs: 850, inactiveMs: 850, initialPhase: 'active' },
+    { id: 'gb_28_6b', x: 36, y: 9, phaseGroup: 'A', activeMs: 850, inactiveMs: 850, initialPhase: 'active' }
   ],
 
   // Батут на среднем острове
