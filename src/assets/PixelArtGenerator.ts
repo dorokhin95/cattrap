@@ -508,31 +508,35 @@ export class PixelArtGenerator {
   private static generateChapter2(scene: Phaser.Scene): void {
     const C = CONSTANTS.COLORS;
 
-    // 1. BouncePad (32x16)
+    // 1. BouncePad (32x32)
     const bpCanvas = document.createElement('canvas');
     bpCanvas.width = 32;
-    bpCanvas.height = 16;
+    bpCanvas.height = 32;
     const bpctx = bpCanvas.getContext('2d')!;
     bpctx.imageSmoothingEnabled = false;
-    // Металлическое основание
+    // Металлическое основание, прилегающее к полу (y=26..31)
     bpctx.fillStyle = '#0f172a';
-    bpctx.fillRect(2, 12, 28, 4);
+    bpctx.fillRect(1, 26, 30, 6);
     bpctx.fillStyle = '#334155';
-    bpctx.fillRect(4, 13, 24, 2);
-    // Пружины
+    bpctx.fillRect(3, 27, 26, 4);
+    // Болты крепления к полу
+    bpctx.fillStyle = '#64748b';
+    bpctx.fillRect(4, 29, 2, 2);
+    bpctx.fillRect(26, 29, 2, 2);
+    // Пружины (y=17..26)
     bpctx.fillStyle = '#f59e0b';
-    bpctx.fillRect(8, 7, 4, 5);
-    bpctx.fillRect(20, 7, 4, 5);
+    bpctx.fillRect(7, 17, 4, 9);
+    bpctx.fillRect(21, 17, 4, 9);
     bpctx.fillStyle = '#fbbf24';
-    bpctx.fillRect(9, 8, 2, 4);
-    bpctx.fillRect(21, 8, 2, 4);
-    // Верхняя упругая площадка
+    bpctx.fillRect(8, 18, 2, 8);
+    bpctx.fillRect(22, 18, 2, 8);
+    // Верхняя упругая площадка (y=12..17)
     bpctx.fillStyle = '#b45309';
-    bpctx.fillRect(2, 3, 28, 5);
+    bpctx.fillRect(2, 12, 28, 6);
     bpctx.fillStyle = '#facc15';
-    bpctx.fillRect(3, 4, 26, 3);
+    bpctx.fillRect(3, 13, 26, 4);
     bpctx.fillStyle = '#fef08a';
-    bpctx.fillRect(5, 4, 22, 1);
+    bpctx.fillRect(5, 13, 22, 2);
     scene.textures.addCanvas('bounce_pad', bpCanvas);
 
     // 2. Conveyor Left (32x32)
@@ -610,40 +614,63 @@ export class PixelArtGenerator {
     mpctx.fillRect(52, 9, 8, 3);
     scene.textures.addCanvas('moving_platform', mpCanvas);
 
-    // 5. Pressure Button Up (32x16)
+    // 5. Pressure Button Up (32x32)
     const pbuCanvas = document.createElement('canvas');
     pbuCanvas.width = 32;
-    pbuCanvas.height = 16;
+    pbuCanvas.height = 32;
     const pbuctx = pbuCanvas.getContext('2d')!;
     pbuctx.imageSmoothingEnabled = false;
+    // Металлическое основание, прилегающее к полу (y=26..31)
     pbuctx.fillStyle = '#0f172a';
-    pbuctx.fillRect(2, 11, 28, 5);
+    pbuctx.fillRect(1, 26, 30, 6);
     pbuctx.fillStyle = '#334155';
-    pbuctx.fillRect(4, 12, 24, 3);
-    // Кнопка поднята (красная)
+    pbuctx.fillRect(3, 27, 26, 4);
+    // Болты крепления к полу
+    pbuctx.fillStyle = '#64748b';
+    pbuctx.fillRect(4, 29, 2, 2);
+    pbuctx.fillRect(26, 29, 2, 2);
+    // Стальной фланец направляющей (y=22..26)
+    pbuctx.fillStyle = '#1e293b';
+    pbuctx.fillRect(6, 22, 20, 5);
+    pbuctx.fillStyle = '#475569';
+    pbuctx.fillRect(8, 22, 16, 4);
+    // Кнопка поднята (красная, y=14..22)
     pbuctx.fillStyle = '#9f1239';
-    pbuctx.fillRect(8, 5, 16, 7);
+    pbuctx.fillRect(7, 14, 18, 8);
     pbuctx.fillStyle = '#e11d48';
-    pbuctx.fillRect(9, 6, 14, 5);
+    pbuctx.fillRect(8, 15, 16, 6);
     pbuctx.fillStyle = '#fb7185';
-    pbuctx.fillRect(10, 6, 12, 2);
+    pbuctx.fillRect(9, 15, 14, 2);
+    // Неоновый индикатор в центре
+    pbuctx.fillStyle = '#ffffff';
+    pbuctx.fillRect(14, 17, 4, 2);
     scene.textures.addCanvas('pressure_button_up', pbuCanvas);
 
-    // 6. Pressure Button Down (32x16)
+    // 6. Pressure Button Down (32x32)
     const pbdCanvas = document.createElement('canvas');
     pbdCanvas.width = 32;
-    pbdCanvas.height = 16;
+    pbdCanvas.height = 32;
     const pbdctx = pbdCanvas.getContext('2d')!;
     pbdctx.imageSmoothingEnabled = false;
+    // Металлическое основание, прилегающее к полу (y=26..31)
     pbdctx.fillStyle = '#0f172a';
-    pbdctx.fillRect(2, 11, 28, 5);
+    pbdctx.fillRect(1, 26, 30, 6);
     pbdctx.fillStyle = '#334155';
-    pbdctx.fillRect(4, 12, 24, 3);
-    // Кнопка утоплена (зелёная)
+    pbdctx.fillRect(3, 27, 26, 4);
+    // Болты крепления к полу
+    pbdctx.fillStyle = '#64748b';
+    pbdctx.fillRect(4, 29, 2, 2);
+    pbdctx.fillRect(26, 29, 2, 2);
+    // Стальной фланец направляющей (y=22..26)
+    pbdctx.fillStyle = '#1e293b';
+    pbdctx.fillRect(6, 22, 20, 5);
+    // Кнопка утоплена (зелёная, y=21..25)
     pbdctx.fillStyle = '#065f46';
-    pbdctx.fillRect(8, 9, 16, 3);
+    pbdctx.fillRect(7, 21, 18, 5);
     pbdctx.fillStyle = '#10b981';
-    pbdctx.fillRect(9, 10, 14, 2);
+    pbdctx.fillRect(8, 22, 16, 3);
+    pbdctx.fillStyle = '#a7f3d0';
+    pbdctx.fillRect(9, 22, 14, 1);
     scene.textures.addCanvas('pressure_button_down', pbdCanvas);
 
     // 7. Toggle Block Active (32x32) — визуально 100% монолитная стена окружения

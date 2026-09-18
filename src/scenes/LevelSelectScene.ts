@@ -42,21 +42,21 @@ export class LevelSelectScene extends Phaser.Scene {
     const highestUnlocked = save.getData().highestUnlockedLevel;
     const isChapter2Unlocked = highestUnlocked >= 11;
 
-    // Главный заголовок
-    const isWide = width >= 760 && height <= 620;
-    const titleY = Math.max(22, height * (isWide ? 0.07 : 0.06));
+    const isWide = width >= 720;
+    const titleY = Math.max(24, height * 0.06);
 
+    // Главный заголовок
     const title = this.add.text(width / 2, titleY, 'ВЫБОР УРОВНЯ', {
-      fontSize: isWide ? '24px' : '26px',
+      fontSize: isWide ? '26px' : '22px',
       fontStyle: 'bold',
       color: '#f59e42'
     }).setOrigin(0.5);
     this.container.add(title);
 
     // Кнопка назад в меню
-    const backBtnY = Math.min(height - 24, height * 0.94);
+    const backBtnY = Math.min(height - 22, height * 0.94);
     const backBtn = this.add.text(width / 2, backBtnY, '◀ НАЗАД В МЕНЮ', {
-      fontSize: '16px',
+      fontSize: '15px',
       color: '#94a3b8'
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
@@ -66,142 +66,160 @@ export class LevelSelectScene extends Phaser.Scene {
     });
     this.container.add(backBtn);
 
-    if (isWide) {
-      // Горизонтальный макет: Глава 1 слева, Глава 2 справа
-      const ch1CenterX = width * 0.28;
-      const ch2CenterX = width * 0.72;
-      const startGridY = Math.max(70, height * 0.22);
+    const availableHeight = backBtnY - titleY - 24;
 
-      this.renderChapterSection(
+    if (isWide) {
+      // Горизонтальный макет: 2 карточки-панели бок о бок
+      const cardWidth = Math.min(480, Math.floor((width - 60) / 2));
+      const cardHeight = Math.min(availableHeight - 10, Math.max(260, Math.floor(height * 0.72)));
+      const cardY = (titleY + 16 + backBtnY) / 2;
+
+      const card1X = width / 2 - cardWidth / 2 - 14;
+      const card2X = width / 2 + cardWidth / 2 + 14;
+
+      this.renderChapterCard(
         1, 10,
         'ГЛАВА 1: ПОДВОХИ',
         '#f59e42',
         true,
-        ch1CenterX,
-        startGridY,
+        card1X,
+        cardY,
+        cardWidth,
+        cardHeight,
+        false,
+        highestUnlocked,
+        save,
+        '10 уровней с внезапными ловушками'
+      );
+
+      this.renderChapterCard(
+        11, 20,
+        isChapter2Unlocked ? '⚡ ГЛАВА 2: ПРАВИЛА ДВИЖЕНИЯ' : '🔒 ГЛАВА 2: ПРАВИЛА ДВИЖЕНИЯ',
+        isChapter2Unlocked ? '#38bdf8' : '#94a3b8',
+        isChapter2Unlocked,
+        card2X,
+        cardY,
+        cardWidth,
+        cardHeight,
+        true,
+        highestUnlocked,
+        save,
+        !isChapter2Unlocked ? 'Пройдите Уровень 10 для доступа' : '10 уровней с новой физикой и механикой'
+      );
+    } else {
+      // Вертикальный макет: 2 карточки-панели друг под другом
+      const cardWidth = Math.min(390, width - 20);
+      const cardHeight = Math.min(210, Math.floor((availableHeight - 16) / 2));
+
+      const card1Y = titleY + 18 + cardHeight / 2;
+      const card2Y = card1Y + cardHeight + 14;
+
+      this.renderChapterCard(
+        1, 10,
+        'ГЛАВА 1: ПОДВОХИ',
+        '#f59e42',
+        true,
+        width / 2,
+        card1Y,
+        cardWidth,
+        cardHeight,
         false,
         highestUnlocked,
         save
       );
 
-      this.renderChapterSection(
+      this.renderChapterCard(
         11, 20,
         isChapter2Unlocked ? '⚡ ГЛАВА 2: ПРАВИЛА ДВИЖЕНИЯ' : '🔒 ГЛАВА 2: ПРАВИЛА ДВИЖЕНИЯ',
-        isChapter2Unlocked ? '#38bdf8' : '#64748b',
+        isChapter2Unlocked ? '#38bdf8' : '#94a3b8',
         isChapter2Unlocked,
-        ch2CenterX,
-        startGridY,
+        width / 2,
+        card2Y,
+        cardWidth,
+        cardHeight,
         true,
         highestUnlocked,
         save,
         !isChapter2Unlocked ? 'Пройдите Уровень 10' : undefined
       );
-    } else {
-      // Вертикальный адаптивный макет: Глава 1 сверху, Глава 2 снизу
-      const centerX = width / 2;
-      const ch1HeaderY = titleY + 32;
-      const tileSize = Math.min(46, Math.max(34, Math.floor((width - 48) / 5.5)));
-      const gap = Math.max(6, Math.floor(tileSize * 0.22));
-
-      const ch1GridY = ch1HeaderY + 22 + tileSize / 2;
-      this.renderChapterSection(
-        1, 10,
-        'ГЛАВА 1: ПОДВОХИ',
-        '#f59e42',
-        true,
-        centerX,
-        ch1GridY,
-        false,
-        highestUnlocked,
-        save,
-        undefined,
-        ch1HeaderY,
-        tileSize,
-        gap
-      );
-
-      // Глава 2
-      const ch1BottomY = ch1GridY + tileSize + gap * 2 + tileSize / 2;
-      const ch2HeaderY = ch1BottomY + 22;
-      const ch2GridY = ch2HeaderY + 22 + tileSize / 2;
-
-      this.renderChapterSection(
-        11, 20,
-        isChapter2Unlocked ? '⚡ ГЛАВА 2: ПРАВИЛА ДВИЖЕНИЯ' : '🔒 ГЛАВА 2: ПРАВИЛА ДВИЖЕНИЯ',
-        isChapter2Unlocked ? '#38bdf8' : '#64748b',
-        isChapter2Unlocked,
-        centerX,
-        ch2GridY,
-        true,
-        highestUnlocked,
-        save,
-        !isChapter2Unlocked ? 'Пройдите Уровень 10' : undefined,
-        ch2HeaderY,
-        tileSize,
-        gap
-      );
     }
   }
 
-  private renderChapterSection(
+  private renderChapterCard(
     fromLevel: number,
     toLevel: number,
     titleText: string,
     titleColor: string,
     isChapterUnlocked: boolean,
-    centerX: number,
-    startY: number,
+    cardX: number,
+    cardY: number,
+    cardWidth: number,
+    cardHeight: number,
     isChapter2: boolean,
     highestUnlocked: number,
     save: SaveProvider,
-    hintText?: string,
-    headerY?: number,
-    customTileSize?: number,
-    customGap?: number
+    subtitleText?: string
   ): void {
-    const width = this.cameras.main.width;
-    const cols = 5;
-    const tileSize = customTileSize ?? Math.min(48, Math.max(32, Math.floor((width * 0.42) / 5.5)));
-    const gap = customGap ?? Math.max(6, Math.floor(tileSize * 0.22));
+    // 1. Панель-карточка с рамкой
+    const cardBgColor = isChapter2
+      ? (isChapterUnlocked ? 0x0c1e2c : 0x111822)
+      : 0x1c172a;
+    const cardStrokeColor = isChapter2
+      ? (isChapterUnlocked ? 0x14b8a6 : 0x223242)
+      : 0x3d3559;
 
-    // Заголовок главы
-    const actualHeaderY = headerY ?? (startY - 26);
-    const header = this.add.text(centerX, actualHeaderY, titleText, {
+    const cardPanel = this.add.rectangle(cardX, cardY, cardWidth, cardHeight, cardBgColor, 0.85)
+      .setStrokeStyle(2, cardStrokeColor);
+    this.container.add(cardPanel);
+
+    // 2. Заголовок карточки
+    const headerY = cardY - cardHeight / 2 + 20;
+    const header = this.add.text(cardX, headerY, titleText, {
       fontSize: '15px',
       fontStyle: 'bold',
       color: titleColor
     }).setOrigin(0.5);
     this.container.add(header);
 
-    if (hintText) {
-      const hint = this.add.text(centerX, actualHeaderY + 16, hintText, {
+    // 3. Подзаголовок / подсказка
+    let contentTopOffset = 36;
+    if (subtitleText) {
+      const subY = headerY + 16;
+      const subtitle = this.add.text(cardX, subY, subtitleText, {
         fontSize: '11px',
-        color: '#64748b'
+        color: isChapter2 && !isChapterUnlocked ? '#f59e0b' : '#64748b'
       }).setOrigin(0.5);
-      this.container.add(hint);
+      this.container.add(subtitle);
+      contentTopOffset = 48;
     }
 
-    const startX = centerX - ((cols - 1) * (tileSize + gap)) / 2;
+    // 4. Сетка кнопок (5 колонок × 2 ряда)
+    const cols = 5;
+    const tileSize = Math.min(50, Math.max(32, Math.floor((cardWidth - 50) / 5.5)));
+    const gap = Math.max(6, Math.floor(tileSize * 0.22));
+
+    const startX = cardX - ((cols - 1) * (tileSize + gap)) / 2;
+    const startY = cardY - cardHeight / 2 + contentTopOffset + tileSize / 2 + 6;
 
     for (let i = fromLevel; i <= toLevel; i++) {
       const indexInChapter = i - fromLevel;
       const col = indexInChapter % cols;
       const row = Math.floor(indexInChapter / cols);
       const x = startX + col * (tileSize + gap);
-      const y = startY + row * (tileSize + gap * 1.9);
+      const y = startY + row * (tileSize + gap * 1.8);
 
       const isUnlocked = isChapterUnlocked && i <= highestUnlocked;
       const isCompleted = save.isLevelCompleted(i);
       const isCurrent = i === highestUnlocked;
 
       // Цветовая схема
-      let bgColor = isChapter2 ? 0x111c26 : 0x242033;
-      let strokeColor = isChapter2 ? 0x1f3042 : 0x3e3857;
+      let bgColor = isChapter2 ? 0x131c26 : 0x252033;
+      let strokeColor = isChapter2 ? 0x223242 : 0x3e3857;
       let textColor = '#64748b';
 
       if (isUnlocked) {
         if (isChapter2) {
-          bgColor = isCurrent ? 0x0284c7 : 0x0c2738;
+          bgColor = isCurrent ? 0x0284c7 : 0x0e2738;
           strokeColor = isCurrent ? 0x38bdf8 : 0x14b8a6;
           textColor = '#e0f2fe';
         } else {
@@ -222,7 +240,7 @@ export class LevelSelectScene extends Phaser.Scene {
       }
 
       const label = this.add.text(x, y, labelText, {
-        fontSize: isUnlocked ? '15px' : '18px',
+        fontSize: isUnlocked ? '15px' : '17px',
         fontStyle: 'bold',
         color: textColor,
         align: 'center'
@@ -257,7 +275,7 @@ export class LevelSelectScene extends Phaser.Scene {
             deaths !== undefined && deaths > 0 ? `☠${deaths}` : null
           ].filter(Boolean).join(' ');
 
-          const statsText = this.add.text(x, y + tileSize / 2 + 8, statsStr, {
+          const statsText = this.add.text(x, y + tileSize / 2 + 7, statsStr, {
             fontSize: '9px',
             color: isChapter2 ? '#38bdf8' : '#10b981'
           }).setOrigin(0.5);

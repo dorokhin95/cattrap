@@ -20,6 +20,10 @@ export const level20: LevelData = {
     ...Array.from({ length: 4 }, (_, i) => ({ x: 14 + i, y: 13 })),
     ...Array.from({ length: 4 }, (_, i) => ({ x: 14 + i, y: 14 })),
 
+    // Опора-колонна под батут Section A (x=9)
+    { x: 9, y: 13 },
+    { x: 9, y: 14 },
+
     // Section B: Нижняя площадка с кнопкой (x=20..24, y=15..16)
     ...Array.from({ length: 5 }, (_, i) => ({ x: 20 + i, y: 15 })),
     ...Array.from({ length: 5 }, (_, i) => ({ x: 20 + i, y: 16 })),

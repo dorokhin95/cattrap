@@ -21,8 +21,8 @@ export class BouncePad extends HazardBase {
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setAllowGravity(false);
     body.setImmovable(true);
-    body.setSize(28, 12);
-    body.setOffset(2, 4);
+    body.setSize(28, 20);
+    body.setOffset(2, 12);
   }
 
   public triggerBounce(cat: Cat): boolean {

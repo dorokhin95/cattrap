@@ -25,8 +25,8 @@ export class PressureButton extends HazardBase {
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setAllowGravity(false);
     body.setImmovable(true);
-    body.setSize(28, 10);
-    body.setOffset(2, 6);
+    body.setSize(26, 18);
+    body.setOffset(3, 14);
   }
 
   public press(toggleBlocksMap: Map<string, ToggleBlock>, cat: Cat): boolean {
