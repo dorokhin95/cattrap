@@ -114,7 +114,7 @@ export const level30: LevelData = {
       y: 2,
       length: 9,
       direction: 'vertical',
-      warningMs: 140,
+      warningMs: 160,
       activeMs: 450,
       cooldownMs: 1300,
       cycle: false,
@@ -127,7 +127,7 @@ export const level30: LevelData = {
       y: 3,
       length: 8,
       direction: 'vertical',
-      warningMs: 140,
+      warningMs: 160,
       activeMs: 500,
       cooldownMs: 1500,
       cycle: false,
@@ -156,7 +156,7 @@ export const level30: LevelData = {
     {
       id: 'trig30_laser_start',
       conditionType: 'player_x_greater',
-      conditionValue: 5.2,
+      conditionValue: 4.6,
       targetId: 'laser30_start',
       action: 'fire_laser',
       once: true

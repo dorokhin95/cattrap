@@ -63,17 +63,16 @@ export const level29: LevelData = {
     }
   ],
 
-  // Лазер-растяжка в секции ступеней
+  // Лазер в секции ступеней (срабатывает заранее при приближении)
   lasers: [
     {
-      id: 'laser_29_trip',
+      id: 'laser_29',
       x: 32,
       y: 2,
       length: 8,
       direction: 'vertical',
-      warningMs: 220,
+      warningMs: 200,
       activeMs: 450,
-      tripwire: true,
       cycle: false,
       autoStart: false
     }
@@ -107,6 +106,15 @@ export const level29: LevelData = {
       conditionValue: 21.0,
       targetId: 'ps_29_1',
       action: 'pop',
+      once: true
+    },
+    // Активация лазера заранее при подходе к ступеням
+    {
+      id: 'trig_29_laser',
+      conditionType: 'player_x_greater',
+      conditionValue: 29.8,
+      targetId: 'laser_29',
+      action: 'fire_laser',
       once: true
     },
     // Выдвижение финишного шипа-сюрприза

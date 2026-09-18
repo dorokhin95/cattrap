@@ -63,16 +63,16 @@ export const level21: LevelData = {
       cycle: false,
       autoStart: false
     },
-    // Лазер 3: Скрытая растяжка (tripwire) над платформой Section C
+    // Лазер 3: Секущий горизонтальный луч над платформой Section C (можно перепрыгнуть или забайтить)
     {
-      id: 'laser_21_3_trip',
-      x: 27,
-      y: 2,
-      length: 8,
-      direction: 'vertical',
-      warningMs: 0,
+      id: 'laser_21_3',
+      x: 26,
+      y: 9,
+      length: 4,
+      direction: 'horizontal',
+      warningMs: 160,
       activeMs: 450,
-      tripwire: true,
+      cooldownMs: 1200,
       cycle: false,
       autoStart: false
     }
@@ -107,6 +107,15 @@ export const level21: LevelData = {
       conditionType: 'player_x_greater',
       conditionValue: 20.0,
       targetId: 'laser_21_2',
+      action: 'fire_laser',
+      once: true
+    },
+    // Внезапная активация Лазера 3 при продвижении по платформе C (срабатывает заранее на x=24.8)
+    {
+      id: 'trig_21_laser3',
+      conditionType: 'player_x_greater',
+      conditionValue: 24.8,
+      targetId: 'laser_21_3',
       action: 'fire_laser',
       once: true
     }
