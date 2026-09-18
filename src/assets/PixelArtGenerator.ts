@@ -10,6 +10,7 @@ export class PixelArtGenerator {
     PixelArtGenerator.generateParticles(scene);
     PixelArtGenerator.generateChapter2(scene);
     PixelArtGenerator.generateChapter3(scene);
+    PixelArtGenerator.generateChapter4(scene);
   }
 
   // --- КОТИК: Спрайтшит 24x24 px ---
@@ -976,4 +977,100 @@ export class PixelArtGenerator {
     bgmctx.fillRect(0, 32, 64, 2);
     scene.textures.addCanvas('bg_ch3_mid', bgmCanvas);
   }
+
+  // --- ГЛАВА 4: Катакомбы и Камнепад ---
+  private static generateChapter4(scene: Phaser.Scene): void {
+    const C = CONSTANTS.COLORS;
+
+    // 1. Монолитная каменная плита Главы 4 (32x32) - tile_solid_c4
+    // 100% Zero-Hint: темный каменный монолит со сколами в тон, без единого цветного пикселя
+    const tileC4 = document.createElement('canvas');
+    tileC4.width = 32;
+    tileC4.height = 32;
+    const tctx = tileC4.getContext('2d')!;
+    tctx.imageSmoothingEnabled = false;
+
+    // Базовый цвет сланца
+    tctx.fillStyle = C.PLATFORM_CH4;
+    tctx.fillRect(0, 0, 32, 32);
+
+    // Верхняя фаска монолита (чуть светлее)
+    tctx.fillStyle = C.PLATFORM_CH4_LIGHT;
+    tctx.fillRect(1, 1, 30, 2);
+
+    // Внутренние каменные прожилки и фактура
+    tctx.fillStyle = C.BG_OBJECT_CH4;
+    tctx.fillRect(4, 10, 8, 1);
+    tctx.fillRect(18, 18, 10, 1);
+    tctx.fillRect(8, 24, 6, 1);
+
+    // Тёмный контур
+    tctx.strokeStyle = C.BG_SECONDARY_CH4;
+    tctx.lineWidth = 1;
+    tctx.strokeRect(0.5, 0.5, 31, 31);
+    scene.textures.addCanvas('tile_solid_c4', tileC4);
+
+    // 2. Катящийся валун (Rolling Boulder) (32x32) - rolling_boulder
+    const bCanvas = document.createElement('canvas');
+    bCanvas.width = 32;
+    bCanvas.height = 32;
+    const bctx = bCanvas.getContext('2d')!;
+    bctx.imageSmoothingEnabled = false;
+
+    // Круглое каменное тело валуна
+    bctx.fillStyle = C.BOULDER_DARK;
+    bctx.beginPath();
+    bctx.arc(16, 16, 15, 0, Math.PI * 2);
+    bctx.fill();
+
+    bctx.fillStyle = C.BOULDER_MID;
+    bctx.beginPath();
+    bctx.arc(16, 16, 13, 0, Math.PI * 2);
+    bctx.fill();
+
+    // Каменные трещины и рельеф (чтобы было видно вращение при качении)
+    bctx.fillStyle = C.BOULDER_LIGHT;
+    bctx.fillRect(11, 7, 6, 3);
+    bctx.fillRect(8, 16, 4, 3);
+    bctx.fillRect(18, 21, 5, 3);
+
+    bctx.fillStyle = C.BG_BASE_CH4;
+    // Глубокая расселина поперек валуна
+    bctx.fillRect(14, 10, 2, 12);
+    bctx.fillRect(16, 16, 7, 2);
+    bctx.fillRect(9, 14, 6, 2);
+    scene.textures.addCanvas('rolling_boulder', bCanvas);
+
+    // 3. Фон Главы 4: Дальний план (64x64) - Свод катакомб
+    const bgFar = document.createElement('canvas');
+    bgFar.width = 64;
+    bgFar.height = 64;
+    const fctx = bgFar.getContext('2d')!;
+    fctx.imageSmoothingEnabled = false;
+    fctx.fillStyle = C.BG_BASE_CH4;
+    fctx.fillRect(0, 0, 64, 64);
+    fctx.fillStyle = C.BG_SECONDARY_CH4;
+    fctx.fillRect(4, 4, 56, 56);
+    // Каменная кладка вдали
+    fctx.fillStyle = C.BG_OBJECT_CH4;
+    fctx.fillRect(8, 16, 20, 2);
+    fctx.fillRect(36, 32, 22, 2);
+    fctx.fillRect(14, 48, 24, 2);
+    scene.textures.addCanvas('bg_ch4_far', bgFar);
+
+    // 4. Фон Главы 4: Средний план (64x64) - Массивные колонны
+    const bgMid = document.createElement('canvas');
+    bgMid.width = 64;
+    bgMid.height = 64;
+    const mctx = bgMid.getContext('2d')!;
+    mctx.imageSmoothingEnabled = false;
+    mctx.clearRect(0, 0, 64, 64);
+    // Вертикальная опора/колонна
+    mctx.fillStyle = 'rgba(35, 34, 46, 0.4)';
+    mctx.fillRect(20, 0, 10, 64);
+    mctx.fillStyle = 'rgba(42, 40, 56, 0.5)';
+    mctx.fillRect(22, 0, 6, 64);
+    scene.textures.addCanvas('bg_ch4_mid', bgMid);
+  }
 }
+

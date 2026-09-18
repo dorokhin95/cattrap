@@ -26,6 +26,7 @@ import { GlitchBlock } from '../game/hazards/GlitchBlock';
 import { WarpGate } from '../game/hazards/WarpGate';
 import { EchoCat } from '../game/hazards/EchoCat';
 import { TimeZone } from '../game/hazards/TimeZone';
+import { RollingBoulder } from '../game/hazards/RollingBoulder';
 import { BackgroundRenderer } from '../game/BackgroundRenderer';
 import { SaveProvider } from '../save/SaveProvider';
 import { PlatformManager } from '../platform/PlatformManager';
@@ -64,6 +65,7 @@ export class GameScene extends Phaser.Scene {
   private warpGates: WarpGate[] = [];
   private echoCat: EchoCat | null = null;
   private timeZones: TimeZone[] = [];
+  private rollingBoulders: RollingBoulder[] = [];
   private chainPopTimers: Phaser.Time.TimerEvent[] = [];
 
   // Состояние попытки
@@ -214,7 +216,11 @@ export class GameScene extends Phaser.Scene {
         bar.setSize(32, 16);
         bar.refreshBody();
       } else {
-        const defaultTileTex = this.levelData.theme === 'chapter3' ? 'tile_solid_c3' : 'tile_solid';
+        const defaultTileTex = this.levelData.theme === 'chapter4'
+          ? 'tile_solid_c4'
+          : this.levelData.theme === 'chapter3'
+            ? 'tile_solid_c3'
+            : 'tile_solid';
         const tex = t.type === 'paw' ? 'tile_paw' : defaultTileTex;
         const tile = this.solidGroup.create((t.x + 0.5) * T, (t.y + 0.5) * T, tex);
         tile.refreshBody();
@@ -500,7 +506,24 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    // 22. Регистрация триггеров уровня
+    // 22. Катящиеся валуны Главы 4 (RollingBoulder)
+    this.rollingBoulders = [];
+    if (this.levelData.rollingBoulders) {
+      for (const rb of this.levelData.rollingBoulders) {
+        const boulder = new RollingBoulder(
+          this,
+          (rb.x + 0.5) * T,
+          (rb.y + 0.5) * T,
+          rb.id,
+          rb.speedX || 190,
+          rb.autoStart === true,
+          rb.bounce || 0.2
+        );
+        this.rollingBoulders.push(boulder);
+      }
+    }
+
+    // 23. Регистрация триггеров уровня
     this.registerTriggers();
   }
 
@@ -565,6 +588,12 @@ export class GameScene extends Phaser.Scene {
       for (const gb of this.glitchBlocks) {
         if (!targetId || gb.id === targetId || gb.id.startsWith(targetId)) {
           gb.triggerGlitch();
+        }
+      }
+    } else if (action === 'release_boulder') {
+      for (const rb of this.rollingBoulders) {
+        if (!targetId || rb.id === targetId || rb.id.startsWith(targetId)) {
+          rb.release();
         }
       }
     }
@@ -695,6 +724,12 @@ export class GameScene extends Phaser.Scene {
           gb.triggerGlitch();
         }
       });
+    }
+
+    // --- Коллизии Главы 4 ---
+    // Валуны <-> Твердые блоки
+    for (const rb of this.rollingBoulders) {
+      this.physics.add.collider(rb, this.solidGroup);
     }
 
     // Кот <-> Портал (финиш уровня)
@@ -861,6 +896,14 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    // Обновление и проверка катящихся валунов (RollingBoulder)
+    for (const rb of this.rollingBoulders) {
+      rb.updateBoulder(delta);
+      if (rb.checkOverlap(this.cat)) {
+        this.handlePlayerDeath();
+      }
+    }
+
     // Внезапная активация скрытых шипов при приближении котика
     if (this.staticSpikesGroup) {
       this.staticSpikesGroup.getChildren().forEach((spikeObj: any) => {
@@ -937,6 +980,7 @@ export class GameScene extends Phaser.Scene {
     for (const wg of this.warpGates) wg.reset();
     if (this.echoCat) this.echoCat.reset();
     for (const tz of this.timeZones) tz.reset();
+    for (const rb of this.rollingBoulders) rb.reset();
     this.portal.reset();
 
     for (const t of this.chainPopTimers) {

@@ -43,10 +43,10 @@ describe('Audit Fixes Verification', () => {
       expect(save.getData().highestUnlockedLevel).toBe(1);
     });
 
-    it('прохождение финального 30-го уровня не открывает несуществующий уровень 31', () => {
+    it('прохождение финального 40-го уровня не открывает несуществующий уровень 41', () => {
       const save = SaveProvider.getInstance();
       const totalLevels = LevelRegistry.getTotalLevels();
-      expect(totalLevels).toBe(30);
+      expect(totalLevels).toBe(40);
 
       // Прохождение 10 уровня открывает 11
       save.recordLevelCompletion(10, 15.0);
@@ -58,14 +58,19 @@ describe('Audit Fixes Verification', () => {
       expect(save.getData().highestUnlockedLevel).toBeGreaterThanOrEqual(21);
       expect(save.isLevelUnlocked(21)).toBe(true);
 
-      // Проходим все уровни от 1 до 30
-      for (let i = 1; i <= 30; i++) {
+      // Прохождение 30 уровня открывает 31
+      save.recordLevelCompletion(30, 15.0);
+      expect(save.getData().highestUnlockedLevel).toBeGreaterThanOrEqual(31);
+      expect(save.isLevelUnlocked(31)).toBe(true);
+
+      // Проходим все уровни от 1 до 40
+      for (let i = 1; i <= 40; i++) {
         save.recordLevelCompletion(i, 10.0 + i);
       }
 
-      expect(save.getData().highestUnlockedLevel).toBe(30);
-      expect(save.isLevelUnlocked(30)).toBe(true);
-      expect(save.isLevelUnlocked(31)).toBe(false);
+      expect(save.getData().highestUnlockedLevel).toBe(40);
+      expect(save.isLevelUnlocked(40)).toBe(true);
+      expect(save.isLevelUnlocked(41)).toBe(false);
     });
 
     it('loadFromStorage санитизирует поврежденные или злонамеренные данные', () => {
@@ -88,7 +93,7 @@ describe('Audit Fixes Verification', () => {
       // Имитируем загрузку из хранилища с испорченными данными
       const sanitized = (save as any).loadFromStorage();
 
-      expect(sanitized.highestUnlockedLevel).toBe(30);
+      expect(sanitized.highestUnlockedLevel).toBe(40);
       expect(sanitized.completedLevels).toEqual([1]);
       expect(sanitized.bestTimes[1]).toBe(12.35);
       expect(sanitized.bestTimes['bad']).toBeUndefined();

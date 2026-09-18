@@ -2,14 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { LevelRegistry } from '../src/game/levels/LevelRegistry';
 
 describe('LevelRegistry & Level Data Integrity', () => {
-  it('должен содержать ровно 30 уровней для Глав 1, 2 и 3', () => {
-    expect(LevelRegistry.getTotalLevels()).toBe(30);
+  it('должен содержать ровно 40 уровней для Глав 1, 2, 3 и 4', () => {
+    expect(LevelRegistry.getTotalLevels()).toBe(40);
     const all = LevelRegistry.getAllLevels();
-    expect(all.length).toBe(30);
+    expect(all.length).toBe(40);
   });
 
   it('каждый уровень должен иметь корректные размеры, спаун, портал и имя', () => {
-    for (let i = 1; i <= 30; i++) {
+    for (let i = 1; i <= 40; i++) {
       const level = LevelRegistry.getLevel(i);
       expect(level).toBeDefined();
       expect(level!.id).toBe(i);
@@ -34,7 +34,7 @@ describe('LevelRegistry & Level Data Integrity', () => {
     }
   });
 
-  it('уровни 10, 20 и 30 должны иметь контрольную точку (чекпоинт)', () => {
+  it('уровни 10, 20, 30 и 40 должны иметь контрольную точку (чекпоинт)', () => {
     const level10 = LevelRegistry.getLevel(10);
     expect(level10).toBeDefined();
     expect(level10!.checkpoint).toBeDefined();
@@ -49,6 +49,11 @@ describe('LevelRegistry & Level Data Integrity', () => {
     expect(level30).toBeDefined();
     expect(level30!.checkpoint).toBeDefined();
     expect(level30!.checkpoint!.x).toBeGreaterThan(20);
+
+    const level40 = LevelRegistry.getLevel(40);
+    expect(level40).toBeDefined();
+    expect(level40!.checkpoint).toBeDefined();
+    expect(level40!.checkpoint!.x).toBeGreaterThan(20);
   });
 
   it('уровень 3 и 9 должны содержать цели для перемещения портала', () => {

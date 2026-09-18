@@ -55,7 +55,7 @@ export interface LevelTriggerData {
   conditionType: 'player_x_greater' | 'player_x_less' | 'player_dist_portal';
   conditionValue: number;
   targetId: string;
-  action: 'pop' | 'drop' | 'collapse' | 'move_portal' | 'chain_pop' | 'crush' | 'fire_laser' | 'spawn_echo' | 'trigger_glitch';
+  action: 'pop' | 'drop' | 'collapse' | 'move_portal' | 'chain_pop' | 'crush' | 'fire_laser' | 'spawn_echo' | 'trigger_glitch' | 'release_boulder' | 'collapse_ceiling';
   delayMs?: number;
   once?: boolean;
   resetOnDeath?: boolean;
@@ -180,6 +180,25 @@ export interface TimeZoneData {
   timeScale: number; // Например 0.4 для Slow-Mo
 }
 
+// Механики Главы 4
+export interface RollingBoulderData {
+  id: string;
+  x: number;
+  y: number;
+  speedX?: number; // Скорость качения (например 190 или -190 px/s)
+  autoStart?: boolean;
+  bounce?: number;
+  radius?: number;
+}
+
+export interface FallingCeilingData {
+  id: string;
+  x: number;
+  y: number;
+  width?: number; // Ширина в тайлах
+  dropSpeed?: number;
+}
+
 export interface LevelData {
   id: number;
   chapter: number;
@@ -217,4 +236,8 @@ export interface LevelData {
   warpGates?: WarpGateData[];
   echoCat?: EchoCatData;
   timeZones?: TimeZoneData[];
+
+  // Механики Главы 4
+  rollingBoulders?: RollingBoulderData[];
+  fallingCeilings?: FallingCeilingData[];
 }

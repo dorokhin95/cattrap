@@ -12,8 +12,9 @@ export class BackgroundRenderer {
   }
 
   private createBackground(widthTiles: number, heightTiles: number, theme?: LevelTheme, levelId: number = 1): void {
-    const isChapter3 = theme === 'chapter3' || levelId >= 21;
-    const isChapter2 = !isChapter3 && (theme === 'chapter2' || levelId >= 11);
+    const isChapter4 = theme === 'chapter4' || levelId >= 31;
+    const isChapter3 = !isChapter4 && (theme === 'chapter3' || levelId >= 21);
+    const isChapter2 = !isChapter4 && !isChapter3 && (theme === 'chapter2' || levelId >= 11);
     const worldW = widthTiles * CONSTANTS.TILE_SIZE;
     const worldH = heightTiles * CONSTANTS.TILE_SIZE;
 
@@ -21,7 +22,31 @@ export class BackgroundRenderer {
     const bgW = Math.max(worldW * 1.5, 1200);
     const bgH = Math.max(worldH * 1.5, 800);
 
-    if (isChapter3) {
+    if (isChapter4) {
+      // Глава 4: Катакомбы и Камнепад
+      const baseRect = this.scene.add.rectangle(bgW / 2, bgH / 2, bgW, bgH, 0x121118)
+        .setScrollFactor(0)
+        .setDepth(-100);
+      this.bgObjects.push(baseRect);
+
+      if (this.scene.textures.exists('bg_ch4_far')) {
+        const farTile = this.scene.add.tileSprite(0, 0, bgW, bgH, 'bg_ch4_far')
+          .setOrigin(0, 0)
+          .setScrollFactor(0.08)
+          .setDepth(-80)
+          .setAlpha(0.9);
+        this.bgObjects.push(farTile);
+      }
+
+      if (this.scene.textures.exists('bg_ch4_mid')) {
+        const midTile = this.scene.add.tileSprite(0, 0, bgW, bgH, 'bg_ch4_mid')
+          .setOrigin(0, 0)
+          .setScrollFactor(0.20)
+          .setDepth(-60)
+          .setAlpha(0.75);
+        this.bgObjects.push(midTile);
+      }
+    } else if (isChapter3) {
       // Глава 3: Матрица и Кибер-Глитч
       const baseRect = this.scene.add.rectangle(bgW / 2, bgH / 2, bgW, bgH, 0x070a14)
         .setScrollFactor(0)

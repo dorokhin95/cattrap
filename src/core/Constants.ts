@@ -110,6 +110,15 @@ export const CONSTANTS = {
     LASER_BEAM: '#f43f5e',
     LASER_CORE: '#ffffff',
     WARP_IN: '#06b6d4',
-    WARP_OUT: '#ec4899'
+    WARP_OUT: '#ec4899',
+    // Глава 4: Катакомбы
+    BG_BASE_CH4: '#121118',
+    BG_SECONDARY_CH4: '#1a1923',
+    BG_OBJECT_CH4: '#23222e',
+    PLATFORM_CH4: '#2a2838',
+    PLATFORM_CH4_LIGHT: '#3d3a52',
+    BOULDER_DARK: '#1f1e29',
+    BOULDER_MID: '#383547',
+    BOULDER_LIGHT: '#524e68'
   }
 } as const;

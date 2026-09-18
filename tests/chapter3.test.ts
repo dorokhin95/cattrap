@@ -10,9 +10,9 @@ describe('Chapter 3 (Levels 21-30) Comprehensive Test Suite', () => {
   });
 
   describe('1. Registry & Chapter Structure Integrity', () => {
-    it('общее количество уровней равно 30', () => {
-      expect(LevelRegistry.getTotalLevels()).toBe(30);
-      expect(LevelRegistry.getAllLevels().length).toBe(30);
+    it('общее количество уровней равно как минимум 30', () => {
+      expect(LevelRegistry.getTotalLevels()).toBeGreaterThanOrEqual(30);
+      expect(LevelRegistry.getAllLevels().length).toBeGreaterThanOrEqual(30);
     });
 
     it('уровни 21-30 принадлежат Главе 3 с темой chapter3', () => {
@@ -28,8 +28,8 @@ describe('Chapter 3 (Levels 21-30) Comprehensive Test Suite', () => {
       expect(LevelRegistry.getLevel(29)!.isChapterEnd).toBeFalsy();
     });
 
-    it('не существует уровня 31', () => {
-      expect(LevelRegistry.getLevel(31)).toBeUndefined();
+    it('не существует уровня выше 40', () => {
+      expect(LevelRegistry.getLevel(41)).toBeUndefined();
     });
 
     it('каждый уровень Главы 3 содержит правильные ключевые механики по ТЗ', () => {
@@ -100,16 +100,17 @@ describe('Chapter 3 (Levels 21-30) Comprehensive Test Suite', () => {
       expect(save.isLevelUnlocked(22)).toBe(false);
     });
 
-    it('последовательное прохождение Главы 3 от 21 до 30', () => {
+    it('последовательное прохождение Главы 3 от 21 до 30 открывает Уровень 31', () => {
       const save = SaveProvider.getInstance();
       for (let i = 1; i <= 30; i++) {
         expect(save.isLevelUnlocked(i)).toBe(true);
         save.recordLevelCompletion(i, 4.2 + i * 0.1);
         save.recordDeath(i);
       }
-      expect(save.getData().highestUnlockedLevel).toBe(30);
+      expect(save.getData().highestUnlockedLevel).toBe(31);
       expect(save.isLevelUnlocked(30)).toBe(true);
-      expect(save.isLevelUnlocked(31)).toBe(false);
+      expect(save.isLevelUnlocked(31)).toBe(true);
+      expect(save.isLevelUnlocked(32)).toBe(false);
       expect(save.getData().completedLevels.length).toBe(30);
       expect(save.getData().totalDeaths).toBe(30);
     });

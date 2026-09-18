@@ -39,7 +39,7 @@ describe('Chapter 2 (Levels 11-20) Comprehensive Test Suite', () => {
     });
 
     it('не существует уровня больше максимального', () => {
-      expect(LevelRegistry.getLevel(31)).toBeUndefined();
+      expect(LevelRegistry.getLevel(41)).toBeUndefined();
     });
 
     it('каждый уровень Главы 2 содержит правильные ключевые механики по ТЗ', () => {

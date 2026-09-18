@@ -39,7 +39,7 @@ export type GravityState = 'normal' | 'inverted';
 
 export type ControlModifier = 'normal' | 'reverse' | 'autorun_right';
 
-export type LevelTheme = 'chapter1' | 'chapter2' | 'chapter3';
+export type LevelTheme = 'chapter1' | 'chapter2' | 'chapter3' | 'chapter4';
 
 export interface ViewportInfo {
   width: number;

@@ -72,6 +72,23 @@ const CHAPTERS: ChapterMeta[] = [
     activeTileStroke: 0xec4899,
     unlockRequirement: 'Пройдите Уровень 20 для доступа',
     description: '10 уровней с глитчами, порталами и временем'
+  },
+  {
+    id: 4,
+    fromLevel: 31,
+    toLevel: 40,
+    title: '⛰️ ГЛАВА 4: КАТАКОМБЫ',
+    tabLabel: '⛰️ ГЛАВА 4',
+    themeColor: '#a855f7',
+    accentColor: '#f97316',
+    cardBg: 0x121118,
+    cardStroke: 0x524e68,
+    tileBg: 0x1a1923,
+    tileStroke: 0x2a2838,
+    activeTileBg: 0x7e22ce,
+    activeTileStroke: 0xf97316,
+    unlockRequirement: 'Пройдите Уровень 30 для доступа',
+    description: '10 уровней с катящимися валунами и лабиринтами'
   }
 ];
 
@@ -86,10 +103,12 @@ export class LevelSelectScene extends Phaser.Scene {
   public init(data?: { chapter?: number }): void {
     const save = SaveProvider.getInstance();
     const highest = save.getData().highestUnlockedLevel;
-    if (data?.chapter && data.chapter >= 1 && data.chapter <= 3) {
+    if (data?.chapter && data.chapter >= 1 && data.chapter <= 4) {
       this.activeChapter = data.chapter;
     } else {
-      if (highest >= 21) {
+      if (highest >= 31) {
+        this.activeChapter = 4;
+      } else if (highest >= 21) {
         this.activeChapter = 3;
       } else if (highest >= 11) {
         this.activeChapter = 2;
@@ -198,7 +217,8 @@ export class LevelSelectScene extends Phaser.Scene {
     const curChapter = CHAPTERS.find(c => c.id === this.activeChapter) || CHAPTERS[0];
     const isCurUnlocked = curChapter.id === 1
       || (curChapter.id === 2 && highestUnlocked >= 11)
-      || (curChapter.id === 3 && highestUnlocked >= 21);
+      || (curChapter.id === 3 && highestUnlocked >= 21)
+      || (curChapter.id === 4 && highestUnlocked >= 31);
 
     const cardTop = tabY + 22;
     const cardBottom = backBtnY - 14;
