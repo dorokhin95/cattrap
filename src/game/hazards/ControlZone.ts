@@ -25,12 +25,21 @@ export class ControlZone extends HazardBase {
     this.setDisplaySize(width, height);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setAllowGravity(false);
-    body.setImmovable(true);
-    body.setSize(width, height);
+    if (body) {
+      body.enable = false; // Отключаем от Arcade Physics, чтобы GetOverlapY не выставлял touching.down котику
+    }
 
     // Согласно глобальному правилу дизайна зоны управления невидимы до пересечения котиком
     this.setVisible(false);
+  }
+
+  public checkOverlap(cat: Cat): boolean {
+    const halfW = this.zoneWidth / 2;
+    const halfH = this.zoneHeight / 2;
+    return cat.x >= (this.initialX - halfW) &&
+           cat.x <= (this.initialX + halfW) &&
+           cat.y >= (this.initialY - halfH) &&
+           cat.y <= (this.initialY + halfH);
   }
 
   public applyModifier(cat: Cat): void {

@@ -126,9 +126,10 @@ export class Cat extends Phaser.Physics.Arcade.Sprite {
     if (this.isDead) return;
 
     const body = this.body as Phaser.Physics.Arcade.Body;
-    const isGroundContact = this.gravityState === 'normal' 
+    const isMovingUp = this.gravityState === 'normal' ? body.velocity.y < -20 : body.velocity.y > 20;
+    const isGroundContact = !isMovingUp && (this.gravityState === 'normal' 
       ? (body.blocked.down || body.touching.down)
-      : (body.blocked.up || body.touching.up);
+      : (body.blocked.up || body.touching.up));
 
     // --- 1. ТАЙМЕРЫ COYOTE TIME & JUMP BUFFER ---
     if (isGroundContact) {

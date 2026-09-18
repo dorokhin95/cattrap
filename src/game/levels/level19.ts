@@ -66,7 +66,7 @@ export const level19: LevelData = {
     }
   ],
 
-  // Пресс в реверс-секции (медленный и читаемый)
+  // Пресс в реверс-секции (ловушка-сюрприз при приближении)
   crushers: [
     {
       id: 'crush_rev',
@@ -75,10 +75,11 @@ export const level19: LevelData = {
       targetX: 15,
       targetY: 10,
       orientation: 'down',
-      warningMs: 320,
-      slamMs: 140,
-      retractMs: 380,
-      cycle: true
+      warningMs: 240,
+      slamMs: 120,
+      retractMs: 320,
+      cycle: false,
+      autoStart: false
     }
   ],
 
@@ -117,6 +118,14 @@ export const level19: LevelData = {
   },
 
   triggers: [
+    {
+      id: 'trig_19_crush',
+      conditionType: 'player_x_greater',
+      conditionValue: 12.0,
+      targetId: 'crush_rev',
+      action: 'crush',
+      once: true
+    },
     {
       id: 'trig_shift_portal_19',
       conditionType: 'player_x_greater',

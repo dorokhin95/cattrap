@@ -507,12 +507,7 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
-    // Кот <-> Зоны модификаторов (уменьшение / гравитация)
-    for (const mz of this.modifierZones) {
-      this.physics.add.overlap(this.cat, mz, () => {
-        mz.applyModifier(this.cat);
-      });
-    }
+    // Кот <-> Зоны модификаторов (уменьшение / гравитация) проверяются геометрически в update() без участия Arcade Physics
 
     // Кот <-> Чекпоинт
     if (this.checkpoint) {
@@ -573,12 +568,7 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
-    // Кот <-> Зоны управления (ControlZone)
-    for (const cz of this.controlZones) {
-      this.physics.add.overlap(this.cat, cz, () => {
-        cz.applyModifier(this.cat);
-      });
-    }
+    // Кот <-> Зоны управления (ControlZone) проверяются геометрически в update() без участия Arcade Physics
 
     // Кот <-> Портал (финиш уровня)
     this.physics.add.overlap(this.cat, this.portal, () => {
@@ -680,6 +670,20 @@ export class GameScene extends Phaser.Scene {
     // Завершение кадра для кнопок (сброс флагов текущего контакта enter-edge)
     for (const btn of this.buttons) {
       btn.endFrame();
+    }
+
+    // Геометрическая проверка зон модификаторов (размер / гравитация)
+    for (const mz of this.modifierZones) {
+      if (mz.checkOverlap(this.cat)) {
+        mz.applyModifier(this.cat);
+      }
+    }
+
+    // Геометрическая проверка зон изменения управления (ControlZone)
+    for (const cz of this.controlZones) {
+      if (cz.checkOverlap(this.cat)) {
+        cz.applyModifier(this.cat);
+      }
     }
 
     // Внезапная активация скрытых шипов при приближении котика

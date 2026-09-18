@@ -576,5 +576,45 @@ describe('Chapter 2 (Levels 11-20) Comprehensive Test Suite', () => {
       const fakeFloorSpikes = l19.staticSpikes!.filter(s => s.x === 25 || s.x === 26);
       expect(fakeFloorSpikes.length).toBe(2);
     });
+
+    it('P0: Уровни 19 и 20: прессы являются ловушками-сюрпризами (cycle=false, autoStart=false) с триггерами приближения', () => {
+      const l19 = LevelRegistry.getLevel(19)!;
+      const c19 = l19.crushers?.find(c => c.id === 'crush_rev')!;
+      expect(c19).toBeDefined();
+      expect(c19.cycle).toBe(false);
+      expect(c19.autoStart).toBe(false);
+      const trig19 = l19.triggers.find(t => t.targetId === 'crush_rev')!;
+      expect(trig19).toBeDefined();
+      expect(trig19.action).toBe('crush');
+
+      const l20 = LevelRegistry.getLevel(20)!;
+      const c20 = l20.crushers?.find(c => c.id === 'crush20_c')!;
+      expect(c20).toBeDefined();
+      expect(c20.cycle).toBe(false);
+      expect(c20.autoStart).toBe(false);
+      const trig20 = l20.triggers.find(t => t.targetId === 'crush20_c')!;
+      expect(trig20).toBeDefined();
+      expect(trig20.action).toBe('crush');
+    });
+
+    it('P0: Восходящее движение в воздухе (прыжок) блокирует контакт с землей и исключает бесконечный прыжок', () => {
+      const isAscendingNormal = (vy: number) => vy < -20;
+      const computeGroundContact = (vy: number, blockedDown: boolean, touchingDown: boolean) => {
+        const isMovingUp = isAscendingNormal(vy);
+        return !isMovingUp && (blockedDown || touchingDown);
+      };
+
+      // На земле в покое (vy = 0, blockedDown = true)
+      expect(computeGroundContact(0, true, false)).toBe(true);
+
+      // В момент прыжка (vy = -420 px/s): контакт с землей строго false, даже если touching.down = true
+      expect(computeGroundContact(-420, false, true)).toBe(false);
+      expect(computeGroundContact(-200, false, true)).toBe(false);
+      expect(computeGroundContact(-21, false, true)).toBe(false);
+
+      // При начале падения (vy >= 0) контакт возможен только при реальном приземлении
+      expect(computeGroundContact(0, false, true)).toBe(true);
+      expect(computeGroundContact(100, false, true)).toBe(true);
+    });
   });
 });

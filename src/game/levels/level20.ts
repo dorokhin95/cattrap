@@ -142,10 +142,11 @@ export const level20: LevelData = {
       targetX: 35,
       targetY: 11,
       orientation: 'down',
-      warningMs: 260,
-      slamMs: 130,
-      retractMs: 340,
-      cycle: true
+      warningMs: 240,
+      slamMs: 120,
+      retractMs: 320,
+      cycle: false,
+      autoStart: false
     }
   ],
 
@@ -220,6 +221,14 @@ export const level20: LevelData = {
       conditionValue: 23,
       targetId: 'ps20_b',
       action: 'pop',
+      once: true
+    },
+    {
+      id: 'trig20_crush',
+      conditionType: 'player_x_greater',
+      conditionValue: 32.5,
+      targetId: 'crush20_c',
+      action: 'crush',
       once: true
     }
   ]

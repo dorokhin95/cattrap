@@ -20,13 +20,18 @@ export class ModifierZone extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setAllowGravity(false);
-    body.setImmovable(true);
-    body.moves = false;
+    if (body) {
+      body.enable = false; // Отключаем от Arcade Physics, чтобы GetOverlapY не выставлял touching.down котику
+    }
     this.setDepth(1);
 
     // Согласно правилу неожиданности ловушек зоны невидимы до пересечения котиком
     this.setVisible(false);
+  }
+
+  public checkOverlap(cat: Cat): boolean {
+    // Зона 32x32 тайла
+    return Math.abs(cat.x - this.x) <= 20 && Math.abs(cat.y - this.y) <= 24;
   }
 
   public applyModifier(cat: Cat): void {
