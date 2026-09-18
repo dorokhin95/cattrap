@@ -73,7 +73,7 @@ export class AudioManager {
     }
   }
 
-  public playSFX(sound: 'jump' | 'land' | 'spike' | 'death' | 'crumble' | 'blockFall' | 'size' | 'gravity' | 'portal' | 'checkpoint' | 'click' | 'bounce' | 'conveyor' | 'button' | 'toggleDissolve' | 'crusherWarning' | 'crusherSlam' | 'controlReverse' | 'autorunStart'): void {
+  public playSFX(sound: 'jump' | 'land' | 'spike' | 'death' | 'crumble' | 'blockFall' | 'size' | 'gravity' | 'portal' | 'checkpoint' | 'click' | 'bounce' | 'conveyor' | 'button' | 'toggleDissolve' | 'crusherWarning' | 'crusherSlam' | 'controlReverse' | 'autorunStart' | 'laserWarning' | 'laserShoot' | 'warpGate' | 'glitchSwitch' | 'echoAlert'): void {
     const settings = SaveProvider.getInstance().getSettings();
     if (!settings.sfx || this.isMutedDueToBackground) return;
 
@@ -135,6 +135,21 @@ export class AudioManager {
         break;
       case 'autorunStart':
         this.synth.playAutorunStart();
+        break;
+      case 'laserWarning':
+        this.synth.playLaserWarning();
+        break;
+      case 'laserShoot':
+        this.synth.playLaserShoot();
+        break;
+      case 'warpGate':
+        this.synth.playWarpGate();
+        break;
+      case 'glitchSwitch':
+        this.synth.playGlitchSwitch();
+        break;
+      case 'echoAlert':
+        this.synth.playEchoAlert();
         break;
     }
   }

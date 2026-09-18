@@ -359,9 +359,13 @@ export class UIScene extends Phaser.Scene {
       .setInteractive();
     this.victoryModal.add(overlay);
 
-    const titleText = chapter === 1 ? 'ГЛАВА 1 ПРОЙДЕНА!' : 'ГЛАВА 2 ПРОЙДЕНА!';
+    const titleText = chapter === 1 
+      ? 'ГЛАВА 1 ПРОЙДЕНА!' 
+      : chapter === 2 
+        ? 'ГЛАВА 2 ПРОЙДЕНА!' 
+        : 'ВСЯ ИГРА ПРОЙДЕНА! 👑';
     const title = this.add.text(width / 2, height * 0.16, titleText, {
-      fontSize: '30px',
+      fontSize: '28px',
       fontStyle: 'bold',
       color: '#facc15',
       stroke: '#451a03',
@@ -373,7 +377,9 @@ export class UIScene extends Phaser.Scene {
 
     const descText = chapter === 1
       ? `Всего смертей: ${totalDeaths}\nКотик готов спуститься глубже! 🐱`
-      : `Всего смертей: ${totalDeaths}\nВсе 20 уровней пройдены!\nКотик победил все ловушки и свободен! 👑🐱`;
+      : chapter === 2
+        ? `Всего смертей: ${totalDeaths}\nМатрица открывает свой портал! 🐱⚡`
+        : `Всего смертей: ${totalDeaths}\nВсе 30 уровней пройдены!\nКотик победил матрицу и свободен! 👑🐱`;
 
     const stats = this.add.text(width / 2, height * 0.52, descText, {
       fontSize: '17px',
@@ -394,6 +400,15 @@ export class UIScene extends Phaser.Scene {
         this.hudContainer.setVisible(true);
         this.scene.stop('GameScene');
         this.scene.start('GameScene', { level: 11 });
+      });
+      btnY += btnSpacing;
+    } else if (chapter === 2) {
+      // Кнопка продолжения в 3-ю главу
+      this.createModalButton(this.victoryModal, width / 2, btnY, 'ПРОДОЛЖИТЬ → ГЛАВА 3', '#06b6d4', () => {
+        this.victoryModal.setVisible(false);
+        this.hudContainer.setVisible(true);
+        this.scene.stop('GameScene');
+        this.scene.start('GameScene', { level: 21 });
       });
       btnY += btnSpacing;
     }

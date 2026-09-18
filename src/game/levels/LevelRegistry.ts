@@ -19,6 +19,16 @@ import { level17 } from './level17';
 import { level18 } from './level18';
 import { level19 } from './level19';
 import { level20 } from './level20';
+import { level21 } from './level21';
+import { level22 } from './level22';
+import { level23 } from './level23';
+import { level24 } from './level24';
+import { level25 } from './level25';
+import { level26 } from './level26';
+import { level27 } from './level27';
+import { level28 } from './level28';
+import { level29 } from './level29';
+import { level30 } from './level30';
 
 export class LevelRegistry {
   private static levels: Map<number, LevelData> = new Map([
@@ -41,7 +51,17 @@ export class LevelRegistry {
     [17, level17],
     [18, level18],
     [19, level19],
-    [20, level20]
+    [20, level20],
+    [21, level21],
+    [22, level22],
+    [23, level23],
+    [24, level24],
+    [25, level25],
+    [26, level26],
+    [27, level27],
+    [28, level28],
+    [29, level29],
+    [30, level30]
   ]);
 
   public static getLevel(id: number): LevelData | undefined {

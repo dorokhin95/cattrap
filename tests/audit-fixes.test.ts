@@ -43,24 +43,29 @@ describe('Audit Fixes Verification', () => {
       expect(save.getData().highestUnlockedLevel).toBe(1);
     });
 
-    it('прохождение финального 20-го уровня не открывает несуществующий уровень 21', () => {
+    it('прохождение финального 30-го уровня не открывает несуществующий уровень 31', () => {
       const save = SaveProvider.getInstance();
       const totalLevels = LevelRegistry.getTotalLevels();
-      expect(totalLevels).toBe(20);
+      expect(totalLevels).toBe(30);
 
       // Прохождение 10 уровня открывает 11
       save.recordLevelCompletion(10, 15.0);
       expect(save.getData().highestUnlockedLevel).toBeGreaterThanOrEqual(11);
       expect(save.isLevelUnlocked(11)).toBe(true);
 
-      // Проходим все уровни от 1 до 20
-      for (let i = 1; i <= 20; i++) {
+      // Прохождение 20 уровня открывает 21
+      save.recordLevelCompletion(20, 15.0);
+      expect(save.getData().highestUnlockedLevel).toBeGreaterThanOrEqual(21);
+      expect(save.isLevelUnlocked(21)).toBe(true);
+
+      // Проходим все уровни от 1 до 30
+      for (let i = 1; i <= 30; i++) {
         save.recordLevelCompletion(i, 10.0 + i);
       }
 
-      expect(save.getData().highestUnlockedLevel).toBe(20);
-      expect(save.isLevelUnlocked(20)).toBe(true);
-      expect(save.isLevelUnlocked(21)).toBe(false);
+      expect(save.getData().highestUnlockedLevel).toBe(30);
+      expect(save.isLevelUnlocked(30)).toBe(true);
+      expect(save.isLevelUnlocked(31)).toBe(false);
     });
 
     it('loadFromStorage санитизирует поврежденные или злонамеренные данные', () => {
@@ -83,7 +88,7 @@ describe('Audit Fixes Verification', () => {
       // Имитируем загрузку из хранилища с испорченными данными
       const sanitized = (save as any).loadFromStorage();
 
-      expect(sanitized.highestUnlockedLevel).toBe(20);
+      expect(sanitized.highestUnlockedLevel).toBe(30);
       expect(sanitized.completedLevels).toEqual([1]);
       expect(sanitized.bestTimes[1]).toBe(12.35);
       expect(sanitized.bestTimes['bad']).toBeUndefined();

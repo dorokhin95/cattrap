@@ -97,6 +97,19 @@ export const CONSTANTS = {
     TOGGLE_INACTIVE: '#162634',
     CRUSHER_BODY: '#334155',
     BUTTON_UP: '#e11d48',
-    BUTTON_DOWN: '#10b981'
+    BUTTON_DOWN: '#10b981',
+    // Глава 3: Матрица
+    BG_BASE_CH3: '#070a14',
+    BG_SECONDARY_CH3: '#0f172a',
+    BG_OBJECT_CH3: '#1e1b4b',
+    PLATFORM_CH3: '#1e2238',
+    PLATFORM_CH3_LIGHT: '#2d3354',
+    NEON_CYAN: '#06b6d4',
+    NEON_MAGENTA: '#ec4899',
+    NEON_PURPLE: '#a855f7',
+    LASER_BEAM: '#f43f5e',
+    LASER_CORE: '#ffffff',
+    WARP_IN: '#06b6d4',
+    WARP_OUT: '#ec4899'
   }
 } as const;

@@ -21,6 +21,11 @@ import { PressureButton } from '../game/hazards/PressureButton';
 import { ToggleBlock } from '../game/hazards/ToggleBlock';
 import { Crusher } from '../game/hazards/Crusher';
 import { ControlZone } from '../game/hazards/ControlZone';
+import { LaserHazard } from '../game/hazards/LaserHazard';
+import { GlitchBlock } from '../game/hazards/GlitchBlock';
+import { WarpGate } from '../game/hazards/WarpGate';
+import { EchoCat } from '../game/hazards/EchoCat';
+import { TimeZone } from '../game/hazards/TimeZone';
 import { BackgroundRenderer } from '../game/BackgroundRenderer';
 import { SaveProvider } from '../save/SaveProvider';
 import { PlatformManager } from '../platform/PlatformManager';
@@ -54,6 +59,11 @@ export class GameScene extends Phaser.Scene {
   private toggleBlocksMap: Map<string, ToggleBlock> = new Map();
   private crushers: Crusher[] = [];
   private controlZones: ControlZone[] = [];
+  private lasers: LaserHazard[] = [];
+  private glitchBlocks: GlitchBlock[] = [];
+  private warpGates: WarpGate[] = [];
+  private echoCat: EchoCat | null = null;
+  private timeZones: TimeZone[] = [];
   private chainPopTimers: Phaser.Time.TimerEvent[] = [];
 
   // Состояние попытки
@@ -204,7 +214,8 @@ export class GameScene extends Phaser.Scene {
         bar.setSize(32, 16);
         bar.refreshBody();
       } else {
-        const tex = t.type === 'paw' ? 'tile_paw' : 'tile_solid';
+        const defaultTileTex = this.levelData.theme === 'chapter3' ? 'tile_solid_c3' : 'tile_solid';
+        const tex = t.type === 'paw' ? 'tile_paw' : defaultTileTex;
         const tile = this.solidGroup.create((t.x + 0.5) * T, (t.y + 0.5) * T, tex);
         tile.refreshBody();
       }
@@ -399,7 +410,96 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    // 17. Регистрация триггеров уровня
+    // 17. Лазеры (LaserHazard)
+    this.lasers = [];
+    if (this.levelData.lasers) {
+      for (const l of this.levelData.lasers) {
+        const laser = new LaserHazard(
+          this,
+          (l.x + 0.5) * T,
+          (l.y + 0.5) * T,
+          l.length,
+          l.direction,
+          l.id,
+          l.warningMs,
+          l.activeMs,
+          l.cooldownMs,
+          l.cycle,
+          l.autoStart,
+          l.tripwire
+        );
+        this.lasers.push(laser);
+      }
+    }
+
+    // 18. Фазовые блоки (GlitchBlock)
+    this.glitchBlocks = [];
+    if (this.levelData.glitchBlocks) {
+      for (const gb of this.levelData.glitchBlocks) {
+        const block = new GlitchBlock(
+          this,
+          (gb.x + 0.5) * T,
+          (gb.y + 0.5) * T,
+          gb.id,
+          gb.phaseGroup,
+          gb.activeMs,
+          gb.inactiveMs,
+          gb.initialPhase
+        );
+        this.glitchBlocks.push(block);
+      }
+    }
+
+    // 19. Варп-порталы (WarpGate)
+    this.warpGates = [];
+    if (this.levelData.warpGates) {
+      for (const wg of this.levelData.warpGates) {
+        const gate = new WarpGate(
+          this,
+          (wg.x + 0.5) * T,
+          (wg.y + 0.5) * T,
+          (wg.targetX + 0.5) * T,
+          (wg.targetY + 0.5) * T,
+          wg.id,
+          wg.exitImpulseX,
+          wg.exitImpulseY
+        );
+        this.warpGates.push(gate);
+      }
+    }
+
+    // 20. Теневой клон (EchoCat)
+    if (this.echoCat) {
+      this.echoCat.destroy();
+      this.echoCat = null;
+    }
+    if (this.levelData.echoCat) {
+      this.echoCat = new EchoCat(
+        this,
+        this.levelData.echoCat.id,
+        this.levelData.echoCat.delayMs,
+        this.levelData.echoCat.autoStart !== false
+      );
+    }
+
+    // 21. Зоны искажения времени (TimeZone)
+    this.timeZones = [];
+    if (this.levelData.timeZones) {
+      for (const tz of this.levelData.timeZones) {
+        const zone = new TimeZone(
+          this,
+          (tz.x + tz.width / 2) * T,
+          (tz.y + tz.height / 2) * T,
+          tz.width * T,
+          tz.height * T,
+          tz.timeScale,
+          tz.id
+        );
+        this.timeZones.push(zone);
+      }
+    }
+
+    // 22. Регистрация триггеров уровня
     this.registerTriggers();
   }
 
@@ -450,6 +550,15 @@ export class GameScene extends Phaser.Scene {
       const crusher = this.crushers.find(c => c.id === targetId);
       if (crusher) {
         crusher.triggerCrush();
+      }
+    } else if (action === 'fire_laser') {
+      const laser = this.lasers.find(l => l.id === targetId);
+      if (laser) {
+        laser.triggerLaser();
+      }
+    } else if (action === 'spawn_echo') {
+      if (this.echoCat) {
+        this.echoCat.activate();
       }
     }
   }
@@ -570,6 +679,12 @@ export class GameScene extends Phaser.Scene {
 
     // Кот <-> Зоны управления (ControlZone) проверяются геометрически в update() без участия Arcade Physics
 
+    // --- Коллизии Главы 3 ---
+    // Кот <-> Фазовые блоки (GlitchBlock)
+    for (const gb of this.glitchBlocks) {
+      this.physics.add.collider(this.cat, gb);
+    }
+
     // Кот <-> Портал (финиш уровня)
     this.physics.add.overlap(this.cat, this.portal, () => {
       this.handleLevelComplete();
@@ -686,6 +801,46 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    // Обновление и проверка варп-порталов (WarpGate)
+    for (const wg of this.warpGates) {
+      wg.updateGate(delta);
+      wg.checkOverlap(this.cat);
+    }
+
+    // Проверка смертоносных лазерных лучей (LaserHazard)
+    for (const laser of this.lasers) {
+      if (laser.checkOverlap(this.cat)) {
+        this.handlePlayerDeath();
+      }
+    }
+
+    // Обновление и проверка теневого эхо-клона (EchoCat)
+    if (this.echoCat) {
+      this.echoCat.recordPlayer(this.cat, delta);
+      if (this.echoCat.checkOverlap(this.cat)) {
+        this.handlePlayerDeath();
+      }
+    }
+
+    // Проверка зон изменения времени (TimeZone)
+    let inAnyTimeZone = false;
+    for (const tz of this.timeZones) {
+      if (tz.checkOverlap(this.cat)) {
+        inAnyTimeZone = true;
+        const catBody = this.cat.body as Phaser.Physics.Arcade.Body;
+        if (catBody) {
+          catBody.setGravityY(-CONSTANTS.GRAVITY * 0.6);
+        }
+        break;
+      }
+    }
+    if (!inAnyTimeZone && this.cat.getGravityState() === 'normal') {
+      const catBody = this.cat.body as Phaser.Physics.Arcade.Body;
+      if (catBody && catBody.gravity.y !== 0) {
+        catBody.setGravityY(0);
+      }
+    }
+
     // Внезапная активация скрытых шипов при приближении котика
     if (this.staticSpikesGroup) {
       this.staticSpikesGroup.getChildren().forEach((spikeObj: any) => {
@@ -757,6 +912,11 @@ export class GameScene extends Phaser.Scene {
     for (const tb of this.toggleBlocks) tb.reset();
     for (const cr of this.crushers) cr.reset();
     for (const cz of this.controlZones) cz.reset();
+    for (const l of this.lasers) l.reset();
+    for (const gb of this.glitchBlocks) gb.reset();
+    for (const wg of this.warpGates) wg.reset();
+    if (this.echoCat) this.echoCat.reset();
+    for (const tz of this.timeZones) tz.reset();
     this.portal.reset();
 
     for (const t of this.chainPopTimers) {

@@ -9,6 +9,7 @@ export class PixelArtGenerator {
     PixelArtGenerator.generateObjects(scene);
     PixelArtGenerator.generateParticles(scene);
     PixelArtGenerator.generateChapter2(scene);
+    PixelArtGenerator.generateChapter3(scene);
   }
 
   // --- КОТИК: Спрайтшит 24x24 px ---
@@ -807,5 +808,224 @@ export class PixelArtGenerator {
     bgmctx.fillStyle = 'rgba(34, 211, 197, 0.4)';
     bgmctx.fillRect(0, 27, 64, 2);
     scene.textures.addCanvas('bg_sector_mid', bgmCanvas);
+  }
+
+  // --- ГЛАВА 3: МАТРИЦА И ИГРЫ СО ВРЕМЕНЕМ ---
+  private static generateChapter3(scene: Phaser.Scene): void {
+    const C = CONSTANTS.COLORS;
+
+    // 1. Твердый блок Главы 3 (32x32) - Неоновый кибер-камень с циановым контуром
+    const solidCanvas = document.createElement('canvas');
+    solidCanvas.width = 32;
+    solidCanvas.height = 32;
+    const sctx = solidCanvas.getContext('2d')!;
+    sctx.imageSmoothingEnabled = false;
+    sctx.fillStyle = C.PLATFORM_CH3;
+    sctx.fillRect(0, 0, 32, 32);
+    sctx.fillStyle = C.PLATFORM_CH3_LIGHT;
+    sctx.fillRect(2, 2, 28, 28);
+    // Внутренняя микросхема
+    sctx.fillStyle = '#181b2e';
+    sctx.fillRect(6, 6, 20, 20);
+    // Неоновый акцентный кант
+    sctx.fillStyle = C.NEON_CYAN;
+    sctx.fillRect(0, 0, 32, 2);
+    sctx.fillRect(0, 0, 2, 32);
+    sctx.fillStyle = 'rgba(6, 182, 212, 0.3)';
+    sctx.fillRect(30, 0, 2, 32);
+    sctx.fillRect(0, 30, 32, 2);
+    // Точечные неоновые узлы
+    sctx.fillStyle = '#ffffff';
+    sctx.fillRect(2, 2, 2, 2);
+    sctx.fillRect(28, 2, 2, 2);
+    scene.textures.addCanvas('tile_solid_c3', solidCanvas);
+
+    // 2. Фазовый блок A (Активный - Циан) 32x32
+    const gbaCanvas = document.createElement('canvas');
+    gbaCanvas.width = 32;
+    gbaCanvas.height = 32;
+    const gbactx = gbaCanvas.getContext('2d')!;
+    gbactx.imageSmoothingEnabled = false;
+    gbactx.fillStyle = 'rgba(6, 182, 212, 0.25)';
+    gbactx.fillRect(0, 0, 32, 32);
+    gbactx.fillStyle = C.NEON_CYAN;
+    gbactx.fillRect(1, 1, 30, 4);
+    gbactx.fillRect(1, 27, 30, 4);
+    gbactx.fillRect(1, 1, 4, 30);
+    gbactx.fillRect(27, 1, 4, 30);
+    // Голографическое ядро
+    gbactx.fillStyle = '#e0f2fe';
+    gbactx.fillRect(12, 12, 8, 8);
+    scene.textures.addCanvas('tile_glitch_a_active', gbaCanvas);
+
+    // 3. Фазовый блок A (Неактивный - Пунктирный призрак) 32x32
+    const gbiaCanvas = document.createElement('canvas');
+    gbiaCanvas.width = 32;
+    gbiaCanvas.height = 32;
+    const gbiactx = gbiaCanvas.getContext('2d')!;
+    gbiactx.imageSmoothingEnabled = false;
+    gbiactx.fillStyle = 'rgba(6, 182, 212, 0.4)';
+    for (let x = 0; x < 32; x += 6) {
+      gbiactx.fillRect(x, 0, 3, 2);
+      gbiactx.fillRect(x, 30, 3, 2);
+    }
+    for (let y = 0; y < 32; y += 6) {
+      gbiactx.fillRect(0, y, 2, 3);
+      gbiactx.fillRect(30, y, 2, 3);
+    }
+    scene.textures.addCanvas('tile_glitch_a_inactive', gbiaCanvas);
+
+    // 4. Фазовый блок B (Активный - Маджента) 32x32
+    const gbbCanvas = document.createElement('canvas');
+    gbbCanvas.width = 32;
+    gbbCanvas.height = 32;
+    const gbbctx = gbbCanvas.getContext('2d')!;
+    gbbctx.imageSmoothingEnabled = false;
+    gbbctx.fillStyle = 'rgba(236, 72, 153, 0.25)';
+    gbbctx.fillRect(0, 0, 32, 32);
+    gbbctx.fillStyle = C.NEON_MAGENTA;
+    gbbctx.fillRect(1, 1, 30, 4);
+    gbbctx.fillRect(1, 27, 30, 4);
+    gbbctx.fillRect(1, 1, 4, 30);
+    gbbctx.fillRect(27, 1, 4, 30);
+    // Голографическое ядро
+    gbbctx.fillStyle = '#fce7f3';
+    gbbctx.fillRect(12, 12, 8, 8);
+    scene.textures.addCanvas('tile_glitch_b_active', gbbCanvas);
+
+    // 5. Фазовый блок B (Неактивный - Пунктирный призрак) 32x32
+    const gbibCanvas = document.createElement('canvas');
+    gbibCanvas.width = 32;
+    gbibCanvas.height = 32;
+    const gbibctx = gbibCanvas.getContext('2d')!;
+    gbibctx.imageSmoothingEnabled = false;
+    gbibctx.fillStyle = 'rgba(236, 72, 153, 0.4)';
+    for (let x = 0; x < 32; x += 6) {
+      gbibctx.fillRect(x, 0, 3, 2);
+      gbibctx.fillRect(x, 30, 3, 2);
+    }
+    for (let y = 0; y < 32; y += 6) {
+      gbibctx.fillRect(0, y, 2, 3);
+      gbibctx.fillRect(30, y, 2, 3);
+    }
+    scene.textures.addCanvas('tile_glitch_b_inactive', gbibCanvas);
+
+    // 6. Лазерный эмиттер (32x32) - футуристическая турель с рубиновым кристаллом
+    const leCanvas = document.createElement('canvas');
+    leCanvas.width = 32;
+    leCanvas.height = 32;
+    const lectx = leCanvas.getContext('2d')!;
+    lectx.imageSmoothingEnabled = false;
+    lectx.fillStyle = '#1e293b';
+    lectx.fillRect(4, 4, 24, 24);
+    lectx.fillStyle = '#475569';
+    lectx.fillRect(8, 8, 16, 16);
+    // Кристалл
+    lectx.fillStyle = C.LASER_BEAM;
+    lectx.fillRect(12, 12, 8, 8);
+    lectx.fillStyle = C.LASER_CORE;
+    lectx.fillRect(14, 14, 4, 4);
+    scene.textures.addCanvas('laser_emitter', leCanvas);
+
+    // 7. Варп-портал Вход (Циан) 32x32
+    const wpiCanvas = document.createElement('canvas');
+    wpiCanvas.width = 32;
+    wpiCanvas.height = 32;
+    const wpictx = wpiCanvas.getContext('2d')!;
+    wpictx.imageSmoothingEnabled = false;
+    wpictx.fillStyle = 'rgba(6, 182, 212, 0.2)';
+    wpictx.beginPath();
+    wpictx.arc(16, 16, 14, 0, Math.PI * 2);
+    wpictx.fill();
+    wpictx.lineWidth = 3;
+    wpictx.strokeStyle = C.NEON_CYAN;
+    wpictx.stroke();
+    wpictx.fillStyle = '#ffffff';
+    wpictx.fillRect(14, 14, 4, 4);
+    scene.textures.addCanvas('warp_gate_in', wpiCanvas);
+
+    // 8. Варп-портал Выход (Маджента) 32x32
+    const wpoCanvas = document.createElement('canvas');
+    wpoCanvas.width = 32;
+    wpoCanvas.height = 32;
+    const wpoctx = wpoCanvas.getContext('2d')!;
+    wpoctx.imageSmoothingEnabled = false;
+    wpoctx.fillStyle = 'rgba(236, 72, 153, 0.2)';
+    wpoctx.beginPath();
+    wpoctx.arc(16, 16, 14, 0, Math.PI * 2);
+    wpoctx.fill();
+    wpoctx.lineWidth = 3;
+    wpoctx.strokeStyle = C.NEON_MAGENTA;
+    wpoctx.stroke();
+    wpoctx.fillStyle = '#ffffff';
+    wpoctx.fillRect(14, 14, 4, 4);
+    scene.textures.addCanvas('warp_gate_out', wpoCanvas);
+
+    // 9. Эхо-кот (24x24) - полупрозрачный голографический силуэт
+    const ecCanvas = document.createElement('canvas');
+    ecCanvas.width = 24;
+    ecCanvas.height = 24;
+    const ecctx = ecCanvas.getContext('2d')!;
+    ecctx.imageSmoothingEnabled = false;
+    ecctx.fillStyle = 'rgba(168, 85, 247, 0.7)';
+    ecctx.fillRect(4, 6, 16, 14); // Тело
+    ecctx.fillRect(5, 2, 4, 4);   // Левое ухо
+    ecctx.fillRect(15, 2, 4, 4);  // Правое ухо
+    ecctx.fillStyle = '#ffffff';
+    ecctx.fillRect(8, 8, 2, 3);   // Светящийся глаз
+    ecctx.fillRect(14, 8, 2, 3);
+    ecctx.fillStyle = C.NEON_CYAN;
+    ecctx.fillRect(10, 14, 4, 2);  // Глитч-полоска
+    scene.textures.addCanvas('echo_cat', ecCanvas);
+
+    // 10. Time Zone Slow (32x64)
+    const tzCanvas = document.createElement('canvas');
+    tzCanvas.width = 32;
+    tzCanvas.height = 64;
+    const tzctx = tzCanvas.getContext('2d')!;
+    tzctx.imageSmoothingEnabled = false;
+    tzctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
+    tzctx.fillRect(0, 0, 32, 64);
+    tzctx.fillStyle = C.NEON_CYAN;
+    tzctx.fillRect(0, 0, 2, 64);
+    tzctx.fillRect(30, 0, 2, 64);
+    // Символ песочных часов / хроно
+    tzctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    tzctx.fillRect(12, 28, 8, 2);
+    tzctx.fillRect(14, 30, 4, 4);
+    tzctx.fillRect(12, 34, 8, 2);
+    scene.textures.addCanvas('time_zone_slow', tzCanvas);
+
+    // 11. Фон Главы 3: Дальний план (64x64) - Цифровая бездна
+    const bgfCanvas = document.createElement('canvas');
+    bgfCanvas.width = 64;
+    bgfCanvas.height = 64;
+    const bgfctx = bgfCanvas.getContext('2d')!;
+    bgfctx.imageSmoothingEnabled = false;
+    bgfctx.fillStyle = C.BG_BASE_CH3;
+    bgfctx.fillRect(0, 0, 64, 64);
+    bgfctx.fillStyle = C.BG_SECONDARY_CH3;
+    bgfctx.fillRect(4, 4, 56, 56);
+    // Цифровой шум / узлы сети
+    bgfctx.fillStyle = '#1e1b4b';
+    bgfctx.fillRect(16, 16, 4, 4);
+    bgfctx.fillRect(44, 40, 4, 4);
+    scene.textures.addCanvas('bg_ch3_far', bgfCanvas);
+
+    // 12. Фон Главы 3: Средний план (64x64) - Вертикальные шины данных
+    const bgmCanvas = document.createElement('canvas');
+    bgmCanvas.width = 64;
+    bgmCanvas.height = 64;
+    const bgmctx = bgmCanvas.getContext('2d')!;
+    bgmctx.imageSmoothingEnabled = false;
+    bgmctx.clearRect(0, 0, 64, 64);
+    // Вертикальные линии шин данных
+    bgmctx.fillStyle = 'rgba(6, 182, 212, 0.2)';
+    bgmctx.fillRect(16, 0, 2, 64);
+    bgmctx.fillRect(48, 0, 2, 64);
+    // Горизонтальный световод
+    bgmctx.fillStyle = 'rgba(168, 85, 247, 0.25)';
+    bgmctx.fillRect(0, 32, 64, 2);
+    scene.textures.addCanvas('bg_ch3_mid', bgmCanvas);
   }
 }

@@ -11,9 +11,9 @@ describe('Chapter 2 (Levels 11-20) Comprehensive Test Suite', () => {
   });
 
   describe('1. Registry & Chapter Structure Integrity', () => {
-    it('общее количество уровней равно 20', () => {
-      expect(LevelRegistry.getTotalLevels()).toBe(20);
-      expect(LevelRegistry.getAllLevels().length).toBe(20);
+    it('общее количество уровней не менее 20', () => {
+      expect(LevelRegistry.getTotalLevels()).toBeGreaterThanOrEqual(20);
+      expect(LevelRegistry.getAllLevels().length).toBeGreaterThanOrEqual(20);
     });
 
     it('уровни 1-10 принадлежат Главе 1 с темой chapter1', () => {
@@ -38,8 +38,8 @@ describe('Chapter 2 (Levels 11-20) Comprehensive Test Suite', () => {
       expect(LevelRegistry.getLevel(19)!.isChapterEnd).toBeFalsy();
     });
 
-    it('не существует уровня 21', () => {
-      expect(LevelRegistry.getLevel(21)).toBeUndefined();
+    it('не существует уровня больше максимального', () => {
+      expect(LevelRegistry.getLevel(31)).toBeUndefined();
     });
 
     it('каждый уровень Главы 2 содержит правильные ключевые механики по ТЗ', () => {
@@ -110,14 +110,14 @@ describe('Chapter 2 (Levels 11-20) Comprehensive Test Suite', () => {
       expect(save.isLevelUnlocked(11)).toBe(true);
     });
 
-    it('прохождение Уровня 20 фиксирует прогресс на 20 и не создает 21', () => {
+    it('прохождение Уровня 20 открывает Уровень 21 (Глава 3)', () => {
       const save = SaveProvider.getInstance();
       for (let i = 1; i <= 20; i++) {
         save.recordLevelCompletion(i, 8.0);
       }
-      expect(save.getData().highestUnlockedLevel).toBe(20);
+      expect(save.getData().highestUnlockedLevel).toBe(21);
       expect(save.isLevelUnlocked(20)).toBe(true);
-      expect(save.isLevelUnlocked(21)).toBe(false);
+      expect(save.isLevelUnlocked(21)).toBe(true);
       expect(save.getData().completedLevels.length).toBe(20);
     });
 

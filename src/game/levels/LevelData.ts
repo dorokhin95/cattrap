@@ -55,7 +55,7 @@ export interface LevelTriggerData {
   conditionType: 'player_x_greater' | 'player_x_less' | 'player_dist_portal';
   conditionValue: number;
   targetId: string;
-  action: 'pop' | 'drop' | 'collapse' | 'move_portal' | 'chain_pop' | 'crush';
+  action: 'pop' | 'drop' | 'collapse' | 'move_portal' | 'chain_pop' | 'crush' | 'fire_laser' | 'spawn_echo';
   delayMs?: number;
   once?: boolean;
   resetOnDeath?: boolean;
@@ -128,6 +128,56 @@ export interface ControlZoneData {
   type: ControlModifier;
 }
 
+// Механики Главы 3
+export interface LaserHazardData {
+  id: string;
+  x: number;
+  y: number;
+  length: number; // Длина в тайлах
+  direction: 'horizontal' | 'vertical';
+  warningMs?: number;
+  activeMs?: number;
+  cooldownMs?: number;
+  cycle?: boolean;
+  autoStart?: boolean;
+  tripwire?: boolean;
+}
+
+export interface GlitchBlockData {
+  id: string;
+  x: number;
+  y: number;
+  phaseGroup?: 'A' | 'B';
+  activeMs?: number;
+  inactiveMs?: number;
+  initialPhase?: 'active' | 'inactive';
+}
+
+export interface WarpGateData {
+  id: string;
+  x: number;
+  y: number;
+  targetX: number;
+  targetY: number;
+  exitImpulseX?: number;
+  exitImpulseY?: number;
+}
+
+export interface EchoCatData {
+  id: string;
+  delayMs?: number;
+  autoStart?: boolean;
+}
+
+export interface TimeZoneData {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  timeScale: number; // Например 0.4 для Slow-Mo
+}
+
 export interface LevelData {
   id: number;
   chapter: number;
@@ -158,4 +208,11 @@ export interface LevelData {
   toggleBlocks?: ToggleBlockData[];
   crushers?: CrusherData[];
   controlZones?: ControlZoneData[];
+
+  // Механики Главы 3
+  lasers?: LaserHazardData[];
+  glitchBlocks?: GlitchBlockData[];
+  warpGates?: WarpGateData[];
+  echoCat?: EchoCatData;
+  timeZones?: TimeZoneData[];
 }

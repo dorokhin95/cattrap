@@ -12,7 +12,8 @@ export class BackgroundRenderer {
   }
 
   private createBackground(widthTiles: number, heightTiles: number, theme?: LevelTheme, levelId: number = 1): void {
-    const isChapter2 = theme === 'chapter2' || levelId >= 11;
+    const isChapter3 = theme === 'chapter3' || levelId >= 21;
+    const isChapter2 = !isChapter3 && (theme === 'chapter2' || levelId >= 11);
     const worldW = widthTiles * CONSTANTS.TILE_SIZE;
     const worldH = heightTiles * CONSTANTS.TILE_SIZE;
 
@@ -20,7 +21,31 @@ export class BackgroundRenderer {
     const bgW = Math.max(worldW * 1.5, 1200);
     const bgH = Math.max(worldH * 1.5, 800);
 
-    if (isChapter2) {
+    if (isChapter3) {
+      // Глава 3: Матрица и Кибер-Глитч
+      const baseRect = this.scene.add.rectangle(bgW / 2, bgH / 2, bgW, bgH, 0x070a14)
+        .setScrollFactor(0)
+        .setDepth(-100);
+      this.bgObjects.push(baseRect);
+
+      if (this.scene.textures.exists('bg_ch3_far')) {
+        const farTile = this.scene.add.tileSprite(0, 0, bgW, bgH, 'bg_ch3_far')
+          .setOrigin(0, 0)
+          .setScrollFactor(0.10)
+          .setDepth(-80)
+          .setAlpha(0.85);
+        this.bgObjects.push(farTile);
+      }
+
+      if (this.scene.textures.exists('bg_ch3_mid')) {
+        const midTile = this.scene.add.tileSprite(0, 0, bgW, bgH, 'bg_ch3_mid')
+          .setOrigin(0, 0)
+          .setScrollFactor(0.25)
+          .setDepth(-60)
+          .setAlpha(0.8);
+        this.bgObjects.push(midTile);
+      }
+    } else if (isChapter2) {
       // Глава 2: Подземный технический сектор
       const isLateSector = levelId >= 18;
       const baseBgColor = isLateSector ? 0x090e15 : 0x101923;
