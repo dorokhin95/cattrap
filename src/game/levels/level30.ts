@@ -30,6 +30,11 @@ export const level30: LevelData = {
     ...Array.from({ length: 9 }, (_, i) => ({ x: 38 + i, y: 12 })),
     ...Array.from({ length: 9 }, (_, i) => ({ x: 38 + i, y: 13 })),
 
+    // Промежуточный остров в пропасти Section C→D (x=49..51, y=11..13)
+    ...Array.from({ length: 3 }, (_, i) => ({ x: 49 + i, y: 11 })),
+    ...Array.from({ length: 3 }, (_, i) => ({ x: 49 + i, y: 12 })),
+    ...Array.from({ length: 3 }, (_, i) => ({ x: 49 + i, y: 13 })),
+
     // Section D: Финишная платформа (x=53..63, y=11..13)
     ...Array.from({ length: 11 }, (_, i) => ({ x: 53 + i, y: 11 })),
     ...Array.from({ length: 11 }, (_, i) => ({ x: 53 + i, y: 12 })),
@@ -70,39 +75,40 @@ export const level30: LevelData = {
     }
   ],
 
-  // Зона реверса управления в Section C
+  // Реверс только в начале Section C — котик должен добежать до правого края в реверсе
+  // После x=43 управление возвращается к норме — прыжок через пропасть контролируем
   controlZones: [
     {
       id: 'cz30_rev',
       x: 38,
       y: 9,
-      width: 9,
+      width: 5,
       height: 3,
       type: 'reverse'
     },
     {
       id: 'cz30_norm',
-      x: 47,
+      x: 43,
       y: 9,
-      width: 6,
+      width: 21,
       height: 3,
       type: 'normal'
     }
   ],
 
-  // Батут в реверс-секции
+  // Батут на правом крае реверс-секции (ловушка: нужно добраться до него в реверсе)
   bouncePads: [
     { id: 'bp30_c', x: 44, y: 10, power: -520 }
   ],
 
-  // Зона замедления времени над финальной ямой (Section D)
+  // Зона замедления времени над финальной ямой (Section D) — viscous gliding
   timeZones: [
     {
       id: 'tz30_final',
       x: 50,
       y: 7,
-      width: 10,
-      height: 10,
+      width: 8,
+      height: 9,
       timeScale: 0.45
     }
   ],
@@ -141,7 +147,8 @@ export const level30: LevelData = {
   staticSpikes: [
     ...Array.from({ length: 6 }, (_, i) => ({ x: 11 + i, y: 15 })),
     ...Array.from({ length: 7 }, (_, i) => ({ x: 21 + i, y: 15 })),
-    ...Array.from({ length: 6 }, (_, i) => ({ x: 47 + i, y: 15 }))
+    // Пропасть Section C→D: шипы только по бокам от промежуточного острова (x=47..48 и x=52)
+    { x: 47, y: 15 }, { x: 48, y: 15 }, { x: 52, y: 15 }
   ],
 
   // Портал изначально на полу x=59, y=10. При приближении улетает наверх x=58, y=5!
