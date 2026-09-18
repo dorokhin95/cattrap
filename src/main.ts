@@ -11,6 +11,7 @@ const config: Phaser.Types.Core.GameConfig = {
   parent: 'game-container',
   backgroundColor: CONSTANTS.COLORS.BG_DARK,
   pixelArt: true,
+  roundPixels: true,
   scale: {
     mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -23,12 +24,18 @@ const config: Phaser.Types.Core.GameConfig = {
       capture: true
     }
   },
+  render: {
+    antialias: false,
+    pixelArt: true,
+    roundPixels: true,
+    powerPreference: 'high-performance',
+    desynchronized: false
+  },
   physics: {
     default: 'arcade',
     arcade: {
       gravity: { y: CONSTANTS.GRAVITY, x: 0 },
-      fps: 60,
-      fixedStep: true,
+      fixedStep: false,
       debug: false
     }
   },

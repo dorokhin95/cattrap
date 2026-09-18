@@ -10,6 +10,7 @@ export class CameraSystem {
 
   constructor(camera: Phaser.Cameras.Scene2D.Camera) {
     this.camera = camera;
+    this.camera.roundPixels = true;
     this.camera.setBackgroundColor(CONSTANTS.COLORS.BG_DARK);
   }
 
