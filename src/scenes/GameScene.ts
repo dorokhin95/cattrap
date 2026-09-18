@@ -841,15 +841,18 @@ export class GameScene extends Phaser.Scene {
         inAnyTimeZone = true;
         const catBody = this.cat.body as Phaser.Physics.Arcade.Body;
         if (catBody) {
-          catBody.setGravityY(-CONSTANTS.GRAVITY * 0.6);
+          // Мягкое вязкое парение: не взлетать "до небес", а плавно планировать при спуске
+          catBody.setGravityY(-CONSTANTS.GRAVITY * 0.15);
+          catBody.setMaxVelocity(CONSTANTS.MOVE_SPEED + CONSTANTS.CONVEYOR_SPEED, 250);
         }
         break;
       }
     }
     if (!inAnyTimeZone && this.cat.getGravityState() === 'normal') {
       const catBody = this.cat.body as Phaser.Physics.Arcade.Body;
-      if (catBody && catBody.gravity.y !== 0) {
+      if (catBody && (catBody.gravity.y !== 0 || catBody.maxVelocity.y !== 600)) {
         catBody.setGravityY(0);
+        catBody.setMaxVelocity(CONSTANTS.MOVE_SPEED + CONSTANTS.CONVEYOR_SPEED, 600);
       }
     }
 

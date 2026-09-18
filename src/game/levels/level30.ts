@@ -15,10 +15,10 @@ export const level30: LevelData = {
     ...Array.from({ length: 11 }, (_, i) => ({ x: i, y: 12 })),
     ...Array.from({ length: 11 }, (_, i) => ({ x: i, y: 13 })),
 
-    // Остров перед телепортом (x=17..20, y=11..13)
-    ...Array.from({ length: 4 }, (_, i) => ({ x: 17 + i, y: 11 })),
-    ...Array.from({ length: 4 }, (_, i) => ({ x: 17 + i, y: 12 })),
-    ...Array.from({ length: 4 }, (_, i) => ({ x: 17 + i, y: 13 })),
+    // Остров перед телепортом (x=18..21, y=11..13)
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 18 + i, y: 11 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 18 + i, y: 12 })),
+    ...Array.from({ length: 4 }, (_, i) => ({ x: 18 + i, y: 13 })),
 
     // Section B: Остров с ЧЕКПОИНТОМ (x=28..34, y=11..13)
     ...Array.from({ length: 7 }, (_, i) => ({ x: 28 + i, y: 11 })),
@@ -54,15 +54,15 @@ export const level30: LevelData = {
   glitchBlocks: [
     { id: 'gb30_1a', x: 12, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
     { id: 'gb30_1b', x: 13, y: 11, phaseGroup: 'A', activeMs: 1000, inactiveMs: 1000, initialPhase: 'active' },
-    { id: 'gb30_2a', x: 16, y: 10, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' },
-    { id: 'gb30_2b', x: 17, y: 10, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' }
+    { id: 'gb30_2a', x: 15, y: 11, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' },
+    { id: 'gb30_2b', x: 16, y: 11, phaseGroup: 'B', activeMs: 1000, inactiveMs: 1000, initialPhase: 'inactive' }
   ],
 
   // Варп-портал из Section A в Section B (к чекпоинту)
   warpGates: [
     {
       id: 'wg30_to_cp',
-      x: 19,
+      x: 20,
       y: 10,
       targetX: 29,
       targetY: 10,
@@ -154,6 +154,15 @@ export const level30: LevelData = {
   },
 
   triggers: [
+    // Активация фазовых платформ Section A при приближении к яме
+    {
+      id: 'trig30_glitch',
+      conditionType: 'player_x_greater',
+      conditionValue: 8.5,
+      targetId: 'gb30_',
+      action: 'trigger_glitch',
+      once: true
+    },
     // Внезапный лазер в Section A
     {
       id: 'trig30_laser_start',
