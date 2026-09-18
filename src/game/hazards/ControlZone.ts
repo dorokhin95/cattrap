@@ -40,31 +40,9 @@ export class ControlZone extends HazardBase {
 
     if (this.zoneType === 'reverse') {
       AudioManager.getInstance().playSFX('controlReverse');
-      this.showIndicator(cat.x, cat.y - 28, '↔ УПРАВЛЕНИЕ НАОБОРОТ', '#f43f5e');
     } else if (this.zoneType === 'autorun_right') {
       AudioManager.getInstance().playSFX('autorunStart');
-      this.showIndicator(cat.x, cat.y - 28, '>> ТОЛЬКО ВПЕРЁД', '#f59e0b');
     }
-  }
-
-  private showIndicator(x: number, y: number, text: string, color: string): void {
-    const label = this.scene.add.text(x, y, text, {
-      fontSize: '13px',
-      fontStyle: 'bold',
-      color: color,
-      stroke: '#000000',
-      strokeThickness: 3
-    }).setOrigin(0.5);
-
-    this.scene.tweens.add({
-      targets: label,
-      y: y - 20,
-      alpha: 0,
-      duration: 700,
-      onComplete: () => {
-        label.destroy();
-      }
-    });
   }
 
   public reset(): void {
