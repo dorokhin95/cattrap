@@ -841,9 +841,14 @@ export class GameScene extends Phaser.Scene {
         inAnyTimeZone = true;
         const catBody = this.cat.body as Phaser.Physics.Arcade.Body;
         if (catBody) {
-          // Мягкое вязкое парение: не взлетать "до небес", а плавно планировать при спуске
+          // Вязкое время: слегка снижаем гравитацию
           catBody.setGravityY(-CONSTANTS.GRAVITY * 0.15);
-          catBody.setMaxVelocity(CONSTANTS.MOVE_SPEED + CONSTANTS.CONVEYOR_SPEED, 250);
+          // Ограничиваем только ПАДЕНИЕ (v > 0), импульс батута вверх не срезаем!
+          // Это даёт плавное медленное парение вниз, но сохраняет полный импульс прыжка/батута
+          const vy = catBody.velocity.y;
+          const maxFall = 250;
+          const maxRise = 600; // Не ограничиваем взлёт
+          catBody.setMaxVelocity(CONSTANTS.MOVE_SPEED + CONSTANTS.CONVEYOR_SPEED, vy > 0 ? maxFall : maxRise);
         }
         break;
       }
